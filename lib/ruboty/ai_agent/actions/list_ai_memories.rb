@@ -6,7 +6,11 @@ module Ruboty
       # ListAiMemories action for Ruboty::AiAgent
       class ListAiMemories < Base
         def call
-          message.reply("TODO: Implement ListAiMemories action")
+          memories = (user.ai_memories.all || {}).map do |idx, memory|
+            "Memory #{idx}: #{memory}"
+          end.join("\n")
+
+          message.reply(memories.empty? ? 'No memories found.' : memories)
         end
       end
     end

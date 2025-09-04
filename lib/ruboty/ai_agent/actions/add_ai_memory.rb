@@ -6,7 +6,9 @@ module Ruboty
       # AddAiMemory action for Ruboty::AiAgent
       class AddAiMemory < Base
         def call
-          message.reply("TODO: Implement AddAiMemory action with prompt: #{prompt_param}")
+          idx = user.ai_memories.add(prompt_param)
+
+          message.reply("Added memory #{idx}: #{prompt_param}")
         end
 
         def prompt_param #: String

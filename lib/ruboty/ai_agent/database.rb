@@ -36,13 +36,37 @@ module Ruboty
         namespace_keys = keys[0..-2]
         key = keys[-1]
 
-        namespace = data.dig(*namespace_keys)
+        namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
         case namespace
         when Hash
           namespace.delete(key)
         when Array
           namespace.delete_at(key) if key.is_a?(Integer) && key < namespace.length
         end
+      end
+
+      # @rbs keys: Array[Symbol | Integer]
+      # @rbs return: Array[Symbol | Integer]
+      def keys(*keys) #: boolish
+        namespace = keys.empty? ? data : data.dig(*keys)
+        case namespace
+        when Hash
+          namespace.keys
+        when Array
+          namespace.lenght.times.to_a
+        else
+          []
+        end
+      end
+
+      # @rbs keys: Array[Symbol | Integer]
+      # @rbs return: boolish
+      def key?(*keys) #: boolish
+        namespace_keys = keys[0..-2]
+        key = keys[-1]
+
+        namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
+        namespace&.key?(key)
       end
 
       # @rbs at: Array[String | Integer]

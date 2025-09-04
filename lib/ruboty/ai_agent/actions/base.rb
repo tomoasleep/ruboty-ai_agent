@@ -21,6 +21,10 @@ module Ruboty
         def database #: Ruboty::AiAgent::Database
           @database ||= Ruboty::AiAgent::Database.new(message.robot.brain)
         end
+
+        def user #: Ruboty::AiAgent::User
+          database.user(message.from_name)
+        end
       end
     end
   end

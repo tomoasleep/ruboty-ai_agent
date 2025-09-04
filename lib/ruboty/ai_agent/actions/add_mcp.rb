@@ -14,8 +14,9 @@ module Ruboty
           when 'http'
             url = options[:args].first
             if url
-              database.user(message.from_name).mcp_configurations.add(
-                HttpMcpConfiguration.new(
+              user.mcp_configurations.add(
+                McpConfiguration.new(
+                  transport: 'http',
                   name: name_param,
                   headers: options[:headers],
                   url: url

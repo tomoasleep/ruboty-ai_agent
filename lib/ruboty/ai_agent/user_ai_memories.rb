@@ -8,7 +8,9 @@ module Ruboty
 
       # @rbs memory: String
       def add(memory) #: void
-        store(memory, key: length)
+        next_id = ((keys.map(&:to_i).max || 0) + 1).to_s
+        store(memory, key: next_id)
+        next_id
       end
     end
   end

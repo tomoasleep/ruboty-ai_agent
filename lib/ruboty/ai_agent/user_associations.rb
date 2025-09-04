@@ -3,12 +3,12 @@
 module Ruboty
   module AiAgent
     # A set of records for a specific user.
-    class UserAssociations
-      attr_reader :database #: Ruboty::AiAgent::Database
+    class UserAssociations < RecordSet
       attr_reader :user_id #: String
 
       def initialize(database:, user_id:)
-        @database = database
+        super(database:)
+
         @user_id = user_id
       end
 
@@ -20,31 +20,8 @@ module Ruboty
         self.class.association_key || raise(NotImplementedError, 'Subclasses must set the association_key method')
       end
 
-      def length
-        database.len(:users, user_id, assoication_type)
-      end
-
-      def all #: untyped
-        database.fetch(:users, user_id, association_key)
-      end
-
-      # @rbs key: String
-      # @rbs return: Record | nil
-      def fetch(key)
-        database.fetch(:users, user_id, association_key, key)
-      end
-
-      # @rbs key: String
-      # @rbs record: Record
-      # @rbs return: void
-      def store(record, key:)
-        database.store(record, at: [:users, user_id, association_key, key])
-      end
-
-      # @rbs name: String
-      # @rbs return: void
-      def remove(name)
-        detabase.delete(:users, user_id, association_key, name)
+      def namespace_keys
+        [:users, user_id, assoication_type]
       end
     end
   end
