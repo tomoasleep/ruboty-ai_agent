@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'openai'
-require 'mcp'
-
 module Ruboty
   module AiAgent
     # Agent class to interact with LLM and manage conversations.

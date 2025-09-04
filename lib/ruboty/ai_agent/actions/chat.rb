@@ -10,43 +10,46 @@ module Ruboty
         def call
           llm = LLM::OpenAI.new(
             client: OpenAI::Client.new(
-              access_token: ENV.fetch('OPENAI_ACCESS_TOKEN', nil),
-              log_errors: true
+              api_key: ENV.fetch('OPENAI_API_KEY', nil)
             ),
             model: ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
           )
 
-          thread = database.thread(message.from || 'default')
-          thread.messages << ChatMessage.new(
+          chat_thread = database.chat_thread(message.from || 'default')
+          chat_thread.messages << ChatMessage.new(
             role: :user,
             content: body_param
           )
 
           tools = McpClients.new(
-            (user.mcp_configurations.all || {}).values
+            user.mcp_configurations.all_values
           ).available_tools
 
           agent = Agent.new(
             llm:,
-            messages: thread.messages.all,
+            messages: chat_thread.messages.all_values,
             tools:
           )
 
           agent.complete do |event|
             case event[:type]
             when :new_message
-              thread.messages << event[:message]
+              chat_thread.messages << event[:message]
               message.reply(event[:message].content) if event[:message].content
             when :tool_call
               message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]}",
                             streaming: true)
             when :tool_response
-              thread.messages << event[:message]
+              chat_thread.messages << event[:message]
               message.reply("Tool response: #{event[:tool_response].slice}")
             end
           end
         rescue StandardError => e
-          message.reply("エラーが発生しました: #{e.message}")
+          if ENV.fetch('DEBUG')
+            message.reply("エラーが発生しました: #{e.full_message}")
+          else
+            message.reply("エラーが発生しました: #{e.message}")
+          end
         end
 
         def body_param #: String

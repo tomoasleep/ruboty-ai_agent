@@ -8,7 +8,7 @@ module Ruboty
 
       # @rbs message: ChatMessage
       def add(message) #: void
-        store(message, key: length)
+        store(message, key: (keys.last || -1) + 1)
       end
 
       alias << add

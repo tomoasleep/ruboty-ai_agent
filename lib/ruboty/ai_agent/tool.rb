@@ -2,6 +2,7 @@
 
 module Ruboty
   module AiAgent
+    # Define a tool that the AI agent can use.
     class Tool
       attr_reader :name, :title, :description #: String
       attr_reader :input_schema #: Hash

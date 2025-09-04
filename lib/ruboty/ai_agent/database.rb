@@ -4,7 +4,7 @@ module Ruboty
   module AiAgent
     # Memorize and retrieve information using Ruboty's brain.
     class Database
-      NAMESPACE = 'ai_agent'
+      NAMESPACE = :ai_agent
 
       # @rbs brain: Ruboty::Brain::Base
       def initialize(brain)
@@ -53,7 +53,7 @@ module Ruboty
         when Hash
           namespace.keys
         when Array
-          namespace.lenght.times.to_a
+          namespace.length.times.to_a
         else
           []
         end
@@ -77,17 +77,11 @@ module Ruboty
         key = at[-1]
 
         namespace = namespace_keys.reduce(data) do |current, k|
-          current[k] ||=
-            if k.is_a?(Integer)
-              []
-            else
-              {}
-            end
-
+          current[k] ||= {}
           current[k]
         end
 
-        namespace[key] = value.to_json
+        namespace[key] = value.to_h
       end
 
       def user(id) #: User

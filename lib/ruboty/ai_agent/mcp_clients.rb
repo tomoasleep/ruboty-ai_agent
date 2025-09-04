@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'mcp'
-
 module Ruboty
   module AiAgent
     # Manages multiple MCP (Model Context Protocol) clients

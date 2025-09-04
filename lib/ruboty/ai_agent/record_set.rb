@@ -22,6 +22,21 @@ module Ruboty
         database.fetch(*namespace_keys)
       end
 
+      def all_values #: Array
+        case (kv = all)
+        when Hash
+          kv.values
+        when Array
+          kv
+        else
+          []
+        end
+      end
+
+      def keys #: Array[Symbol | Integer]
+        database.keys(*namespace_keys)
+      end
+
       # @rbs key: String
       # @rbs return: Record | nil
       def fetch(key)

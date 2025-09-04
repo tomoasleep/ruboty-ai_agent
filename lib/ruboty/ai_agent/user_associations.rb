@@ -21,7 +21,7 @@ module Ruboty
       end
 
       def namespace_keys
-        [:users, user_id, assoication_type]
+        [:users, user_id, association_key]
       end
     end
   end

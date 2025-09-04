@@ -6,7 +6,7 @@ module Ruboty
   module Handlers
     # Handler for AI agent commands
     class AiAgent < Base
-      env :OPENAI_ACCESS_TOKEN, 'Pass your OpenAI Access Token'
+      env :OPENAI_API_KEY, 'Pass your OpenAI API Key'
       env :OPENAI_MODEL, 'OpenAI model to use', optional: true
 
       on(

@@ -21,7 +21,7 @@ module Ruboty
       end
 
       def namespace_keys
-        [:chat_threads, chat_thread_id, assoication_type]
+        [:chat_threads, chat_thread_id, association_key]
       end
     end
   end

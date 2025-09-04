@@ -93,7 +93,7 @@ module Ruboty
         # @rbs return: Response
         def to_response(openai_response:, tools:)
           choice = openai_response.choices.first
-          tool_call = choice.tool_calls.first
+          tool_call = choice.message.tool_calls&.first
 
           tool = tools.find { |t| t.name == tool_call.function.name } if tool_call
 

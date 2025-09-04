@@ -9,7 +9,7 @@ module Ruboty
           base.extend(ClassMethods)
           base.prepend(PrependFeatures)
 
-          base.instance_exec do
+          base.singleton_class.class_exec do
             attr_accessor :record_type
           end
         end
