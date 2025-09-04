@@ -93,6 +93,10 @@ module Ruboty
       def user(id) #: User
         User.find_or_create(database: self, id: id)
       end
+
+      def chat_thread(id) #: ChatThread
+        ChatThread.find_or_create(database: self, id: id)
+      end
     end
   end
 end

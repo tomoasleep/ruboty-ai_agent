@@ -11,10 +11,10 @@ module Ruboty
     class HttpMcpClient
       attr_reader :base_url, :headers, :session_id
 
-      def initialize(url, headers: {})
+      def initialize(url, headers: {}, session_id: nil)
         @base_url = url
         @headers = headers
-        @session_id = nil
+        @session_id = session_id
       end
 
       def initialize_session
@@ -131,7 +131,6 @@ module Ruboty
         raise Error, "JSON-RPC Error #{result['error']['code']}: #{result['error']['message']}" if result['error']
 
         result['Mcp-Session-Id'] = response['Mcp-Session-Id'] if response['Mcp-Session-Id']
-
         result['result'] || result
       end
 
