@@ -6,6 +6,8 @@ module Ruboty
   module Handlers
     # Handler for AI agent commands
     class AiAgent < Base
+      env :OPENAI_ACCESS_TOKEN, 'Pass your OpenAI Access Token'
+      env :OPENAI_MODEL, 'OpenAI model to use', optional: true
 
       on(
         /(?<body>.+)/m,
@@ -25,10 +27,10 @@ module Ruboty
       on(/remove ai memory (?<index>\d+)/, name: 'remove_ai_memory', description: 'Remove the specified AI memory')
       on(/list ai memor(?:y|ies)/, name: 'list_mcp', description: "List AI's memories")
 
-      on(%r{add ai command /(?<name>\S+)\s+"(?<prompt>.+)"}, name: 'add_ai_command', description: 'Add a new AI command')
+      on(%r{add ai command /(?<name>\S+)\s+"(?<prompt>.+)"}, name: 'add_ai_command',
+                                                             description: 'Add a new AI command')
       on(%r{remove ai command /(?<name>\S+)}, name: 'remove_ai_command', description: 'Remove the specified AI command')
       on(/list ai commands?/, name: 'list_mcp', description: 'List AI commands')
-
 
       def chat(message)
         Ruboty::AiAgent::Actions::Chat.call(message)

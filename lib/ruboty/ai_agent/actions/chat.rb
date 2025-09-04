@@ -13,7 +13,7 @@ module Ruboty
               access_token: ENV.fetch('OPENAI_ACCESS_TOKEN', nil),
               log_errors: true
             ),
-            model: 'gpt-5-nano'
+            model: ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
           )
 
           thread = database.thread(message.from || 'default')
