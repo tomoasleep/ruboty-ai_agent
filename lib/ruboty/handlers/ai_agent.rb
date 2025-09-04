@@ -14,7 +14,7 @@ module Ruboty
         name: 'chat'
       )
 
-      on(/add mcp (?<name>\S+)\s+\z/, name: 'add_mcp', description: 'Add a new MCP server')
+      on(/add mcp (?<name>\S+)\s+(?<config>.+)\z/, name: 'add_mcp', description: 'Add a new MCP server')
       on(/remove mcp (?<name>\S+)/, name: 'remove_mcp', description: 'Remove the specified MCP server')
       on(/list mcps?/, name: 'list_mcp', description: 'List configured MCP servers')
 

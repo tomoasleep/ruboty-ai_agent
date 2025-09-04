@@ -15,5 +15,14 @@ Naming/AccessorMethodName:
   Exclude:
     - lib/ruboty/handlers/ai_agent.rb # we name handler methods from its word pattern
 
+Layout/LeadingCommentSpace:
+  AllowRBSInlineAnnotation: true
+  AllowSteepAnnotation: true
+
 Metrics:
   Enabled: false
+
+Style/Documentation:
+  AllowedConstants:
+    - ClassMethods
+    - PrependFeatures

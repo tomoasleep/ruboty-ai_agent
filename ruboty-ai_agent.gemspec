@@ -42,5 +42,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rake', '~> 13'
   spec.add_development_dependency 'rspec', '~> 3.0'
 
-  spec.add_dependency 'ruboty'
+  spec.add_dependency 'mcp', '~> 0.2'
+  spec.add_dependency 'ruboty', '~> 1.3'
 end
