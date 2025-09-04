@@ -9,6 +9,7 @@ module Ruboty
     class Error < StandardError; end
 
     autoload :Actions, 'ruboty/ai_agent/actions'
+    autoload :Agent, 'ruboty/ai_agent/agent'
     autoload :Database, 'ruboty/ai_agent/database'
     autoload :HttpMcpClient, 'ruboty/ai_agent/http_mcp_client'
     autoload :McpConfiguration, 'ruboty/ai_agent/mcp_configuration'
