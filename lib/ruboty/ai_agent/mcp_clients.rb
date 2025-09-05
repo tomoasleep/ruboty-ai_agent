@@ -13,8 +13,7 @@ module Ruboty
 
       def available_tools #: Array[Tool]
         clients.flat_map do |client|
-          results = client.list_tools
-          tool_defs = results.flat_map { |res| res.dig('result', 'tools') || [] }
+          tool_defs = client.list_tools
           tool_defs.map do |tool_def|
             Tool.new(
               name: tool_def['name'],
@@ -22,7 +21,7 @@ module Ruboty
               description: tool_def['description'] || '',
               input_schema: tool_def['inputSchema']
             ) do |params|
-              client.call_tool(tool_def['name'], params)
+              client.call_tool(tool_def['name'], params).to_json
             end
           end
         end

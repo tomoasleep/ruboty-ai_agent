@@ -28,12 +28,6 @@ module Ruboty
             tools:
           )
           on_response(response, &)
-
-          if response.message
-            on_new_message(response.message, &)
-            messages << response.message
-          end
-
           on_new_message(response.message, &)
 
           if response.tool

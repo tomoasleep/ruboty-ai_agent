@@ -41,7 +41,7 @@ module Ruboty
                             streaming: true)
             when :tool_response
               chat_thread.messages << event[:message]
-              message.reply("Tool response: #{event[:tool_response].slice}")
+              message.reply("Tool response: #{event[:tool_response].slice(0..100)}")
             end
           end
         rescue StandardError => e

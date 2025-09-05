@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 require 'ruboty/ai_agent/version'
 require 'ruboty/handlers/ai_agent'
 

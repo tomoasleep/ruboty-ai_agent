@@ -45,20 +45,22 @@ module Ruboty
 
       def list_tools
         ensure_initialized
-        send_request(method: 'tools/list')
+        results = send_request(method: 'tools/list')
+        results.flat_map { |res| res.dig('result', 'tools') || [] }
       end
 
       def call_tool(name, arguments = {}, &block)
         ensure_initialized
-        send_request(
+        results = send_request(
           method: 'tools/call',
           params: {
             name: name,
             arguments: arguments
           },
-          stream: block_given?,
           &block
         )
+
+        results.flat_map { |res| res.dig('result', 'content') || [] }
       end
 
       def list_prompts

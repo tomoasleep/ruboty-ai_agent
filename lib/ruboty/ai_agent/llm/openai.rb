@@ -46,6 +46,7 @@ module Ruboty
                              [
                                {
                                  id: message.tool_call_id,
+                                 type: 'function',
                                  function: {
                                    name: message.tool_name,
                                    arguments: message.tool_arguments.to_json
@@ -62,7 +63,7 @@ module Ruboty
                 tool_calls: tool_calls
               }
             when :tool
-              { role: 'tool', name: message.name, tool_call_id: message.tool_call_id, content: message.content }
+              { role: 'tool', tool_call_id: message.tool_call_id, content: message.content }
             else
               raise "Unknown message role: #{message.role}"
             end
