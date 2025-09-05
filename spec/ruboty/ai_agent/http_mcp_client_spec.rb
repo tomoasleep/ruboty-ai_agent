@@ -7,7 +7,7 @@ require 'webmock/rspec'
 RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   let(:base_url) { 'http://localhost:9292' }
   let(:headers) { { 'Authorization' => 'Bearer token123' } }
-  let(:client) { described_class.new(base_url, headers: headers) }
+  let(:client) { described_class.new(url: base_url, headers: headers) }
   let(:session_id) { 'test-session-123' }
 
   describe '#initialize' do
@@ -99,9 +99,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         .with(
           body: hash_including(request_body),
           headers: {
+            'Accept' => 'application/json',
             'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer token123',
-            'Mcp-Session-Id' => session_id
+            'Authorization' => 'Bearer token123'
           }
         )
         .to_return(
@@ -188,6 +188,44 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     it 'calls a tool with arguments' do
       result = client.call_tool('echo', { message: 'Hello MCP!' })
       expect(result).to eq('Echo: Hello MCP!')
+    end
+
+    context 'with streaming (SSE)' do
+      let(:sse_response) do
+        [
+          "data: {\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":\"First chunk\"}\n\n",
+          "data: {\"jsonrpc\":\"2.0\",\"id\":\"2\",\"result\":\"Second chunk\"}\n\n"
+        ].join
+      end
+
+      before do
+        stub_request(:post, base_url)
+          .with(
+            body: hash_including(request_body),
+            headers: {
+              'Accept' => 'text/event-stream',
+              'Content-Type' => 'application/json',
+              'Authorization' => 'Bearer token123'
+            }
+          )
+          .to_return(
+            status: 200,
+            body: sse_response,
+            headers: { 'Content-Type' => 'text/event-stream' }
+          )
+      end
+
+      it 'handles streaming response with a block' do
+        results = []
+        client.call_tool('echo', { message: 'Hello MCP!' }) do |chunk|
+          results << chunk
+        end
+        
+        expect(results).to eq([
+          { 'jsonrpc' => '2.0', 'id' => '1', 'result' => 'First chunk' },
+          { 'jsonrpc' => '2.0', 'id' => '2', 'result' => 'Second chunk' }
+        ])
+      end
     end
   end
 

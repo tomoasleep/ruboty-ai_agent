@@ -4,6 +4,7 @@ require 'net/http'
 require 'uri'
 require 'json'
 require 'securerandom'
+require 'event_stream_parser'
 
 module Ruboty
   module AiAgent
@@ -11,10 +12,12 @@ module Ruboty
     class HttpMcpClient
       attr_reader :base_url, :headers, :session_id
 
-      def initialize(url, headers: {}, session_id: nil)
+      def initialize(url:, headers: {}, session_id: nil)
         @base_url = url
         @headers = headers
         @session_id = session_id
+
+        @initialize_called = false
       end
 
       def initialize_session
@@ -28,35 +31,43 @@ module Ruboty
               version: '1.0'
             }
           }
-        )
+        ).first
 
-        @session_id = response['Mcp-Session-Id']
+        @session_id = response['Mcp-Session-Id'] if response.is_a?(Hash) && response['Mcp-Session-Id']
+        @initialize_called = true
         @session_id
       end
 
       def ping
+        ensure_initialized
         send_request(method: 'ping')
       end
 
       def list_tools
+        ensure_initialized
         send_request(method: 'tools/list')
       end
 
-      def call_tool(name, arguments = {})
+      def call_tool(name, arguments = {}, &block)
+        ensure_initialized
         send_request(
           method: 'tools/call',
           params: {
             name: name,
             arguments: arguments
-          }
+          },
+          stream: block_given?,
+          &block
         )
       end
 
       def list_prompts
+        ensure_initialized
         send_request(method: 'prompts/list')
       end
 
       def get_prompt(name, arguments = {})
+        ensure_initialized
         send_request(
           method: 'prompts/get',
           params: {
@@ -67,10 +78,12 @@ module Ruboty
       end
 
       def list_resources
+        ensure_initialized
         send_request(method: 'resources/list')
       end
 
       def read_resource(uri)
+        ensure_initialized
         send_request(
           method: 'resources/read',
           params: {
@@ -80,29 +93,39 @@ module Ruboty
       end
 
       def cleanup_session
-        return unless @session_id
+        if @session_id
+          uri = URI.parse(@base_url)
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.use_ssl = uri.scheme == 'https'
 
-        uri = URI.parse(@base_url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = uri.scheme == 'https'
+          request = Net::HTTP::Delete.new(uri.path.empty? ? '/' : uri.path)
+          request['Accept'] = 'application/json, text/event-stream'
+          request['Content-Type'] = 'application/json'
+          request['Mcp-Session-Id'] = @session_id
+          headers.each { |k, v| request[k] = v }
 
-        request = Net::HTTP::Delete.new(uri.path.empty? ? '/' : uri.path)
-        request['Content-Type'] = 'application/json'
-        request['Mcp-Session-Id'] = @session_id
-        headers.each { |k, v| request[k] = v }
+          http.request(request)
+          @session_id = nil
+        end
 
-        http.request(request)
-        @session_id = nil
+        @initialize_called = false
       end
 
       private
 
-      def send_request(method:, params: nil, id: nil)
+      def ensure_initialized
+        return if @initialize_called || @session_id
+
+        initialize_session
+      end
+
+      def send_request(method:, params: nil, id: nil, &block) #: Array[Hash] | nil
         uri = URI.parse(@base_url)
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = uri.scheme == 'https'
 
         request = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.path)
+        request['Accept'] = 'application/json, text/event-stream'
         request['Content-Type'] = 'application/json'
         request['Mcp-Session-Id'] = @session_id if @session_id
         headers.each { |k, v| request[k] = v }
@@ -117,21 +140,56 @@ module Ruboty
         request.body = JSON.generate(body)
 
         response = http.request(request)
+        raise Error, "HTTP #{response.code}: #{response.body}" unless response.code.to_i == 200
 
         @session_id = response['Mcp-Session-Id'] if method == 'initialize'
 
-        handle_response(response)
+        if response['Content-Type'] =~ %r{text/event-stream}
+          handle_streaming_response(response, &block)
+        else
+          handle_response(response)
+        end
       end
 
-      def handle_response(response)
-        raise Error, "HTTP #{response.code}: #{response.body}" unless response.code.to_i == 200
-
+      def handle_response(response, &block)
         result = JSON.parse(response.body)
 
         raise Error, "JSON-RPC Error #{result['error']['code']}: #{result['error']['message']}" if result['error']
 
         result['Mcp-Session-Id'] = response['Mcp-Session-Id'] if response['Mcp-Session-Id']
-        result['result'] || result
+
+        if block
+          block.call([result])
+        else
+          [result]
+        end
+      end
+
+      def handle_streaming_response(response, &block)
+        events = []
+        parser = EventStreamParser::Parser.new
+
+        body = response.body
+        parser.feed(body) do |_type, data, _id, _reconnection_time|
+          next if data.nil? || data.empty?
+
+          begin
+            parsed_data = JSON.parse(data)
+            if parsed_data['error']
+              raise Error, "JSON-RPC Error #{parsed_data['error']['code']}: #{parsed_data['error']['message']}"
+            end
+
+            if block_given?
+              block.call(parsed_data)
+            else
+              events << parsed_data
+            end
+          rescue JSON::ParserError => e
+            raise Error, "Failed to parse SSE data: #{e.message}"
+          end
+        end
+
+        events unless block_given?
       end
 
       class Error < StandardError; end

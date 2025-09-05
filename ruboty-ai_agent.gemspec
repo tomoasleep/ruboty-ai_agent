@@ -43,6 +43,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'webmock', '~> 3.0'
 
+  spec.add_dependency 'event_stream_parser', '~> 1.0'
   spec.add_dependency 'openai', '~> 0.22.0'
   spec.add_dependency 'ruboty', '~> 1.3'
 end

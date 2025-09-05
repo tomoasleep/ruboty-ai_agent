@@ -78,7 +78,7 @@ module Ruboty
               function: {
                 name: tool.name,
                 description: tool.description,
-                parameters: tool.inputSchema || {
+                parameters: tool.input_schema || {
                   type: 'object',
                   properties: {},
                   required: []

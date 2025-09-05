@@ -14,14 +14,17 @@ module Ruboty
           when 'http'
             url = options[:args].first
             if url
-              user.mcp_configurations.add(
-                McpConfiguration.new(
-                  transport: 'http',
-                  name: name_param,
-                  headers: options[:headers],
-                  url: url
-                )
+              new_mcp_configuration = McpConfiguration.new(
+                transport: 'http',
+                name: name_param,
+                headers: options[:headers],
+                url: url
               )
+              user.mcp_configurations.add(
+                new_mcp_configuration
+              )
+
+              message.reply("Added MCP configuration #{name_param}: #{new_mcp_configuration.to_h.except(:record_type).to_json}")
             else
               message.reply('Error: URL is required for HTTP transport. Please specify the URL as an argument.')
               nil

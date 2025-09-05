@@ -13,13 +13,14 @@ module Ruboty
 
       def available_tools #: Array[Tool]
         clients.flat_map do |client|
-          tool_defs = client.list_tools
+          results = client.list_tools
+          tool_defs = results.flat_map { |res| res.dig('result', 'tools') || [] }
           tool_defs.map do |tool_def|
             Tool.new(
               name: tool_def['name'],
               title: tool_def['title'] || '',
               description: tool_def['description'] || '',
-              inputSchema: tool_def['inputSchema']
+              input_schema: tool_def['inputSchema']
             ) do |params|
               client.call_tool(tool_def['name'], params)
             end
@@ -53,10 +54,6 @@ module Ruboty
             raise "Unknown MCP server type: #{server_config.transport}"
           end
         end
-      rescue StandardError => e
-        # If MCP initialization fails, continue without it
-        puts "Warning: Failed to initialize MCP clients: #{e.message}"
-        []
       end
     end
   end
