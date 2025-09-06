@@ -45,7 +45,7 @@ module DatabaseFactory
     create_database(chat_thread_messages: thread_data)
   end
 
-  def create_sample_chat_message(role:, content:, **options)
+  def create_chat_message(role:, content:, **options)
     Ruboty::AiAgent::ChatMessage.new(
       role: role,
       content: content,
@@ -53,7 +53,7 @@ module DatabaseFactory
     )
   end
 
-  def create_sample_mcp_configuration(name:, **options)
+  def create_mcp_configuration(name:, **options)
     defaults = {
       transport: 'http',
       headers: {},
@@ -66,7 +66,7 @@ module DatabaseFactory
     )
   end
 
-  def create_sample_tool(name:, **options)
+  def create_tool(name:, **options)
     defaults = {
       title: "#{name.capitalize} Tool",
       description: "A tool for #{name}",

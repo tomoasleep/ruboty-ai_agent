@@ -22,7 +22,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     context 'with http server config' do
       let(:mcp_configurations) do
         [
-          create_sample_mcp_configuration(
+          create_mcp_configuration(
             name: 'test_server',
             transport: 'http',
             url: 'http://localhost:3000/mcp',
@@ -54,7 +54,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     context 'with stdio server config' do
       let(:mcp_configurations) do
         [
-          create_sample_mcp_configuration(
+          create_mcp_configuration(
             name: 'stdio_server',
             transport: 'stdio'
           )
@@ -71,7 +71,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     context 'with invalid server type' do
       let(:mcp_configurations) do
         [
-          create_sample_mcp_configuration(
+          create_mcp_configuration(
             name: 'invalid_server',
             transport: 'invalid',
             url: 'http://localhost:3000'
@@ -91,7 +91,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     let(:http_client) { double('HttpClient') }
     let(:mcp_configurations) do
       [
-        create_sample_mcp_configuration(
+        create_mcp_configuration(
           name: 'test_server',
           transport: 'http',
           url: 'http://localhost:3000'
@@ -154,7 +154,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     let(:http_client) { double('HttpClient') }
     let(:mcp_configurations) do
       [
-        create_sample_mcp_configuration(
+        create_mcp_configuration(
           name: 'test_server',
           transport: 'http',
           url: 'http://localhost:3000'

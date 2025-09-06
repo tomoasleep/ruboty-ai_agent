@@ -36,14 +36,14 @@ RSpec.describe Ruboty::AiAgent::Agent do
     context 'with provided messages and tools' do
       let(:messages) do
         [
-          create_sample_chat_message(role: :system, content: 'You are a helpful assistant'),
-          create_sample_chat_message(role: :user, content: 'Hello')
+          create_chat_message(role: :system, content: 'You are a helpful assistant'),
+          create_chat_message(role: :user, content: 'Hello')
         ]
       end
 
       let(:tools) do
         [
-          create_sample_tool(name: 'test_tool')
+          create_tool(name: 'test_tool')
         ]
       end
 
@@ -61,7 +61,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
 
   describe '#complete' do
     let(:llm_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
-    let(:response_message) { create_sample_chat_message(role: :assistant, content: 'Test response') }
+    let(:response_message) { create_chat_message(role: :assistant, content: 'Test response') }
 
     subject(:complete_response) { agent.complete }
 
@@ -98,12 +98,12 @@ RSpec.describe Ruboty::AiAgent::Agent do
     end
 
     context 'with tool call response' do
-      let(:tool) { create_sample_tool(name: 'test_tool') }
+      let(:tool) { create_tool(name: 'test_tool') }
       let(:tool_call_id) { 'call_123' }
       let(:tool_arguments) { { test: 'value' } }
       let(:tool_response) { 'tool result' }
-      let(:tool_message) { create_sample_chat_message(role: :assistant, content: nil, tool_call_id: tool_call_id) }
-      let(:tool_response_message) { create_sample_chat_message(role: :tool, content: tool_response) }
+      let(:tool_message) { create_chat_message(role: :assistant, content: nil, tool_call_id: tool_call_id) }
+      let(:tool_response_message) { create_chat_message(role: :tool, content: tool_response) }
 
       let(:second_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
 
@@ -137,7 +137,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
 
   describe 'callback methods' do
     describe '#on_new_message' do
-      let(:message) { create_sample_chat_message(role: :assistant, content: 'Hello') }
+      let(:message) { create_chat_message(role: :assistant, content: 'Hello') }
 
       it 'calls callback with new_message event' do
         callback_result = nil
@@ -153,7 +153,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
     end
 
     describe '#on_tool_call' do
-      let(:tool) { create_sample_tool(name: 'test_tool') }
+      let(:tool) { create_tool(name: 'test_tool') }
       let(:tool_arguments) { { param: 'value' } }
 
       it 'calls callback with tool_call event' do
@@ -172,7 +172,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
 
     describe '#on_tool_response' do
       let(:tool_response) { 'result' }
-      let(:message) { create_sample_chat_message(role: :tool, content: tool_response) }
+      let(:message) { create_chat_message(role: :tool, content: tool_response) }
 
       it 'calls callback with tool_response event' do
         callback_result = nil
