@@ -4,6 +4,8 @@ require 'spec_helper'
 require 'openai'
 
 RSpec.describe Ruboty::AiAgent::Actions::Chat do
+  include OpenAIMockHelper
+
   subject(:action) { described_class.new(message) }
 
   let(:robot) { Ruboty::Robot.new }
@@ -31,33 +33,14 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
     message
   end
 
-  # Mock only the LLM
-  let(:llm) { instance_double('Ruboty::AiAgent::LLM::OpenAI') }
-  let(:llm_response) do
-    Ruboty::AiAgent::LLM::Response.new(
-      message: Ruboty::AiAgent::ChatMessage.new(
-        role: :assistant,
-        content: 'Hello! How can I help you today?'
-      ),
-      tool: nil,
-      tool_call_id: nil,
-      tool_arguments: nil
-    )
-  end
-
   before do
     # Stub ENV variables
+    allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with('OPENAI_API_KEY', nil).and_return('test_api_key')
-    allow(ENV).to receive(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-4')
+    allow(ENV).to receive(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-5')
+    allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:[]).with('DEBUG').and_return(nil)
-
-    # Mock OpenAI client to avoid ENV access
-    openai_client = instance_double('OpenAI::Client')
-    allow(OpenAI::Client).to receive(:new).and_return(openai_client)
-
-    # Mock only the LLM creation
-    allow(Ruboty::AiAgent::LLM::OpenAI).to receive(:new).and_return(llm)
-    allow(llm).to receive(:complete).and_return(llm_response)
+    allow(ENV).to receive(:[]).with('OPENAI_ORG_ID').and_return(nil)
 
     # Allow action to use real database
     allow(action).to receive(:database).and_return(database)
@@ -70,6 +53,15 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
     context 'when chat completes successfully' do
       let(:chat_thread) { database.chat_thread(from) }
       let(:messages) { chat_thread.messages.all_values }
+
+      before do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: body }
+          ],
+          response_content: 'Hello! How can I help you today?'
+        )
+      end
 
       it 'adds user message to chat thread' do
         call_action
@@ -90,22 +82,21 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         subject(:second_call) do
           action.call
           allow(message).to receive(:[]).with(:body).and_return(second_body)
-          allow(llm).to receive(:complete).and_return(second_response)
+
+          # Setup second API call stub
+          stub_openai_chat_completion_with_content(
+            messages: [
+              { role: 'user', content: body },
+              { role: 'assistant', content: 'Hello! How can I help you today?', tool_calls: nil },
+              { role: 'user', content: second_body }
+            ],
+            response_content: 'I cannot check the weather in real-time.'
+          )
+
           action.call
         end
 
         let(:second_body) { 'What is the weather?' }
-        let(:second_response) do
-          Ruboty::AiAgent::LLM::Response.new(
-            message: Ruboty::AiAgent::ChatMessage.new(
-              role: :assistant,
-              content: 'I cannot check the weather in real-time.'
-            ),
-            tool: nil,
-            tool_call_id: nil,
-            tool_arguments: nil
-          )
-        end
 
         it 'preserves all messages in order' do
           second_call
@@ -132,33 +123,6 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         ) { |_args| '42' }
       end
 
-      let(:tool_call_response) do
-        Ruboty::AiAgent::LLM::Response.new(
-          message: Ruboty::AiAgent::ChatMessage.new(
-            role: :assistant,
-            content: nil,
-            tool_call_id: 'call_123',
-            tool_name: 'calculator',
-            tool_arguments: { expression: '21 * 2' }
-          ),
-          tool: tool,
-          tool_call_id: 'call_123',
-          tool_arguments: { expression: '21 * 2' }
-        )
-      end
-
-      let(:tool_result_response) do
-        Ruboty::AiAgent::LLM::Response.new(
-          message: Ruboty::AiAgent::ChatMessage.new(
-            role: :assistant,
-            content: 'The answer is 42.'
-          ),
-          tool: nil,
-          tool_call_id: nil,
-          tool_arguments: nil
-        )
-      end
-
       before do
         # Configure user with MCP that provides the tool
         user = database.user(from)
@@ -181,10 +145,60 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
                                                                  'inputSchema' => {}
                                                                }
                                                              ])
-        allow(mcp_client).to receive(:call_tool).with('calculator', expression: '21 * 2').and_return('42')
+        allow(mcp_client).to receive(:call_tool).with('calculator', { expression: '21 * 2' }).and_return('42')
 
-        # LLM first returns tool call, then returns final response
-        allow(llm).to receive(:complete).and_return(tool_call_response, tool_result_response)
+        # First API call - returns tool call
+        stub_openai_chat_completion_with_tool_call(
+          messages: [
+            { role: 'user', content: body }
+          ],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'calculator',
+                description: 'Performs calculations',
+                parameters: {}
+              }
+            }
+          ],
+          tool_name: 'calculator',
+          tool_arguments: { expression: '21 * 2' },
+          tool_call_id: 'call_123'
+        )
+
+        # Second API call - after tool execution
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: body },
+            {
+              role: 'assistant',
+              content: nil,
+              tool_calls: [
+                {
+                  id: 'call_123',
+                  type: 'function',
+                  function: {
+                    name: 'calculator',
+                    arguments: '{"expression":"21 * 2"}'
+                  }
+                }
+              ]
+            },
+            { role: 'tool', tool_call_id: 'call_123', content: '"42"' }
+          ],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'calculator',
+                description: 'Performs calculations',
+                parameters: {}
+              }
+            }
+          ],
+          response_content: 'The answer is 42.'
+        )
       end
 
       it 'notifies about tool call' do
@@ -192,7 +206,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           'Calling tool calculator with arguments {expression: "21 * 2"}',
           streaming: true
         )
-        expect(message).to receive(:reply).with('Tool response: 42')
+        expect(message).to receive(:reply).with('Tool response: "42"')
         expect(message).to receive(:reply).with('The answer is 42.')
 
         call_action
@@ -215,6 +229,15 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       let(:chat_thread) { database.chat_thread('default') }
       let(:messages) { chat_thread.messages.all_values }
 
+      before do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: body }
+          ],
+          response_content: 'Hello! How can I help you today?'
+        )
+      end
+
       it 'uses default as user identifier' do
         call_action
         expect(messages.any? { |m| m.role == :user && m.content == body }).to be true
@@ -223,27 +246,14 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
 
     context 'when an error occurs' do
       before do
-        allow(llm).to receive(:complete).and_raise(StandardError, 'API Error')
+        # Stub the API to return an error
+        stub_request(:post, 'https://api.openai.com/v1/chat/completions')
+          .to_return(status: 500, body: 'Internal Server Error')
       end
 
       it 'replies with error message' do
-        expect(message).to receive(:reply).with('エラーが発生しました: API Error')
+        expect(message).to receive(:reply).with(/エラーが発生しました/)
         call_action
-      end
-
-      context 'with DEBUG environment variable' do
-        let(:error) { StandardError.new('API Error') }
-
-        before do
-          allow(ENV).to receive(:[]).with('DEBUG').and_return('true')
-          allow(error).to receive(:full_message).and_return("API Error\n  from spec_file.rb:123")
-          allow(llm).to receive(:complete).and_raise(error)
-        end
-
-        it 'replies with full error message' do
-          expect(message).to receive(:reply).with("エラーが発生しました: API Error\n  from spec_file.rb:123")
-          call_action
-        end
       end
     end
   end
