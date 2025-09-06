@@ -8,12 +8,18 @@
 # where the inspected file is and continue its way up to the root directory.
 #
 # See https://docs.rubocop.org/rubocop/configuration
+plugins:
+  - rubocop-rake
+
 AllCops:
   TargetRubyVersion: 3.1
 
 Naming/AccessorMethodName:
   Exclude:
     - lib/ruboty/handlers/ai_agent.rb # we name handler methods from its word pattern
+
+Layout/LineLength:
+  Enabled: false
 
 Layout/LeadingCommentSpace:
   AllowRBSInlineAnnotation: true
