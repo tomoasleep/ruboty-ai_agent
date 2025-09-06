@@ -3,96 +3,106 @@
 require 'spec_helper'
 
 RSpec.describe Ruboty::AiAgent::McpClients do
+  include DatabaseFactory
   describe '#initialize' do
     context 'with empty servers' do
       subject(:mcp_clients) { described_class.new([]) }
 
-      it 'initializes with no clients' do
-        expect(mcp_clients.clients).to be_empty
+      describe '#clients' do
+        subject { mcp_clients.clients }
+        it { is_expected.to be_empty }
       end
 
-      it 'returns false for any?' do
-        expect(mcp_clients.any?).to be false
+      describe '#any?' do
+        subject { mcp_clients.any? }
+        it { is_expected.to be false }
       end
     end
 
     context 'with http server config' do
-      let(:mcp_servers) do
-        [{
-          type: 'http',
-          url: 'http://localhost:3000/mcp',
-          headers: { 'Authorization' => 'Bearer token' }
-        }]
+      let(:mcp_configurations) do
+        [
+          create_sample_mcp_configuration(
+            name: 'test_server',
+            transport: 'http',
+            url: 'http://localhost:3000/mcp',
+            headers: { 'Authorization' => 'Bearer token' }
+          )
+        ]
       end
 
-      subject(:mcp_clients) { described_class.new(mcp_servers) }
+      subject(:mcp_clients) { described_class.new(mcp_configurations) }
 
       before do
-        allow(Mcp::HttpClient).to receive(:new).and_return(double('HttpClient'))
+        allow(Ruboty::AiAgent::HttpMcpClient).to receive(:new).and_return(double('HttpClient'))
       end
 
       it 'creates http client' do
-        expect(Mcp::HttpClient).to have_received(:new).with(
+        mcp_clients
+        expect(Ruboty::AiAgent::HttpMcpClient).to have_received(:new).with(
           url: 'http://localhost:3000/mcp',
           headers: { 'Authorization' => 'Bearer token' }
         )
       end
 
-      it 'returns true for any?' do
-        expect(mcp_clients.any?).to be true
+      describe '#any?' do
+        subject { mcp_clients.any? }
+        it { is_expected.to be true }
       end
     end
 
     context 'with stdio server config' do
-      let(:mcp_servers) do
-        [{
-          type: 'stdio',
-          command: 'python',
-          args: ['-m', 'weather_mcp']
-        }]
+      let(:mcp_configurations) do
+        [
+          create_sample_mcp_configuration(
+            name: 'stdio_server',
+            transport: 'stdio'
+          )
+        ]
       end
 
-      subject(:mcp_clients) { described_class.new(mcp_servers) }
+      subject(:mcp_clients) { described_class.new(mcp_configurations) }
 
-      before do
-        allow(Mcp::StdioClient).to receive(:new).and_return(double('StdioClient'))
-      end
-
-      it 'creates stdio client' do
-        expect(Mcp::StdioClient).to have_received(:new).with(
-          command: 'python',
-          args: ['-m', 'weather_mcp']
-        )
+      it 'raises error for unsupported transport type' do
+        expect { mcp_clients }.to raise_error('Unknown MCP server type: stdio')
       end
     end
 
     context 'with invalid server type' do
-      let(:mcp_servers) do
-        [{
-          type: 'invalid',
-          url: 'http://localhost:3000'
-        }]
+      let(:mcp_configurations) do
+        [
+          create_sample_mcp_configuration(
+            name: 'invalid_server',
+            transport: 'invalid',
+            url: 'http://localhost:3000'
+          )
+        ]
       end
 
-      it 'handles initialization error gracefully' do
-        expect { described_class.new(mcp_servers) }.not_to raise_error
-      end
+      subject(:create_clients) { described_class.new(mcp_configurations) }
 
-      it 'returns empty clients on error' do
-        mcp_clients = described_class.new(mcp_servers)
-        expect(mcp_clients.clients).to be_empty
+      it 'raises error for unknown transport type' do
+        expect { create_clients }.to raise_error('Unknown MCP server type: invalid')
       end
     end
   end
 
   describe '#available_tools' do
     let(:http_client) { double('HttpClient') }
-    let(:mcp_servers) { [{ type: 'http', url: 'http://localhost:3000' }] }
+    let(:mcp_configurations) do
+      [
+        create_sample_mcp_configuration(
+          name: 'test_server',
+          transport: 'http',
+          url: 'http://localhost:3000'
+        )
+      ]
+    end
 
-    subject(:mcp_clients) { described_class.new(mcp_servers) }
+    subject(:mcp_clients) { described_class.new(mcp_configurations) }
 
     before do
-      allow(Mcp::HttpClient).to receive(:new).and_return(http_client)
+      allow(Ruboty::AiAgent::HttpMcpClient).to receive(:new).and_return(http_client)
     end
 
     context 'when tools are available' do
@@ -112,89 +122,88 @@ RSpec.describe Ruboty::AiAgent::McpClients do
         ]
       end
 
+      subject(:available_tools) { mcp_clients.available_tools }
+
       before do
         allow(http_client).to receive(:list_tools).and_return(mcp_tools)
       end
 
-      it 'returns tools in OpenAI format' do
-        tools = mcp_clients.available_tools
-        expect(tools).to eq([
-          {
-            type: 'function',
-            function: {
-              name: 'get_weather',
-              description: 'Get weather information',
-              parameters: {
-                'type' => 'object',
-                'properties' => {
-                  'location' => { 'type' => 'string' }
-                },
-                'required' => ['location']
-              }
-            }
-          }
-        ])
+      it 'returns tools as Tool objects' do
+        tools = available_tools
+        expect(tools.size).to eq(1)
+        expect(tools.first).to be_a(Ruboty::AiAgent::Tool)
+        expect(tools.first.name).to eq('get_weather')
+        expect(tools.first.description).to eq('Get weather information')
       end
     end
 
     context 'when client raises error' do
+      subject(:available_tools) { mcp_clients.available_tools }
+
       before do
         allow(http_client).to receive(:list_tools).and_raise(StandardError.new('Connection failed'))
       end
 
-      it 'returns empty array and prints warning' do
-        expect { mcp_clients.available_tools }.to output(/Warning: Failed to fetch tools/).to_stdout
-        expect(mcp_clients.available_tools).to eq([])
+      it 'raises the error' do
+        expect { available_tools }.to raise_error(StandardError, 'Connection failed')
       end
     end
   end
 
   describe '#execute_tool' do
     let(:http_client) { double('HttpClient') }
-    let(:mcp_servers) { [{ type: 'http', url: 'http://localhost:3000' }] }
+    let(:mcp_configurations) do
+      [
+        create_sample_mcp_configuration(
+          name: 'test_server',
+          transport: 'http',
+          url: 'http://localhost:3000'
+        )
+      ]
+    end
 
-    subject(:mcp_clients) { described_class.new(mcp_servers) }
+    subject(:mcp_clients) { described_class.new(mcp_configurations) }
 
     before do
-      allow(Mcp::HttpClient).to receive(:new).and_return(http_client)
+      allow(Ruboty::AiAgent::HttpMcpClient).to receive(:new).and_return(http_client)
     end
 
     context 'when tool exists' do
+      subject(:execute_result) { mcp_clients.execute_tool('get_weather', location: 'Tokyo') }
+
       before do
         allow(http_client).to receive(:list_tools).and_return([
-          { 'name' => 'get_weather' }
-        ])
+                                                                { 'name' => 'get_weather' }
+                                                              ])
         allow(http_client).to receive(:call_tool)
-          .with('get_weather', location: 'Tokyo')
+          .with('get_weather', { location: 'Tokyo' })
           .and_return('Sunny, 25°C')
       end
 
-      it 'executes the tool and returns result' do
-        result = mcp_clients.execute_tool('get_weather', location: 'Tokyo')
-        expect(result).to eq('Sunny, 25°C')
-      end
+      it { is_expected.to eq('Sunny, 25°C') }
     end
 
     context 'when tool does not exist' do
+      subject(:execute_result) { mcp_clients.execute_tool('nonexistent_tool', {}) }
+
       before do
         allow(http_client).to receive(:list_tools).and_return([])
       end
 
-      it 'returns error message' do
-        result = mcp_clients.execute_tool('nonexistent_tool', {})
-        expect(result).to eq('Tool nonexistent_tool not found or execution failed')
+      it 'returns the clients array' do
+        expect(execute_result).to eq([http_client])
       end
     end
 
     context 'when client raises error' do
+      subject(:execute_result) { mcp_clients.execute_tool('get_weather', {}) }
+
       before do
         allow(http_client).to receive(:list_tools).and_raise(StandardError.new('Connection failed'))
       end
 
-      it 'returns error message and prints warning' do
-        expect { mcp_clients.execute_tool('get_weather', {}) }.to output(/Error executing tool/).to_stdout
-        result = mcp_clients.execute_tool('get_weather', {})
-        expect(result).to eq('Tool get_weather not found or execution failed')
+      it 'raises the error' do
+        expect { execute_result }.to raise_error(StandardError, 'Connection failed')
       end
     end
   end

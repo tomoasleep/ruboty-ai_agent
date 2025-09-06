@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require 'ruboty/ai_agent/http_mcp_client'
 require 'webmock/rspec'
 
 RSpec.describe Ruboty::AiAgent::HttpMcpClient do
@@ -74,10 +73,6 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   end
 
   describe '#ping' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:request_body) do
       {
         jsonrpc: '2.0',
@@ -95,11 +90,14 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .with(
           body: hash_including(request_body),
           headers: {
-            'Accept' => 'application/json',
+            'Accept' => 'application/json, text/event-stream',
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer token123'
           }
@@ -110,17 +108,12 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'sends ping request' do
-      result = client.ping
-      expect(result).to eq({ 'pong' => true })
-    end
+    subject(:ping_result) { client.ping }
+
+    it { is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id', 'result' => { 'pong' => true } }]) }
   end
 
   describe '#list_tools' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:response_body) do
       {
         jsonrpc: '2.0',
@@ -134,6 +127,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .to_return(
           status: 200,
@@ -141,21 +137,12 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'lists available tools' do
-      result = client.list_tools
-      expect(result).to eq({
-        'tools' => [
-          { 'name' => 'echo', 'description' => 'Echoes back messages' }
-        ]
-      })
-    end
+    subject(:list_tools_result) { client.list_tools }
+
+    it { is_expected.to eq([{ 'name' => 'echo', 'description' => 'Echoes back messages' }]) }
   end
 
   describe '#call_tool' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:request_body) do
       {
         jsonrpc: '2.0',
@@ -172,11 +159,14 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
       {
         jsonrpc: '2.0',
         id: 'test-id',
-        result: 'Echo: Hello MCP!'
+        result: { content: 'Echo: Hello MCP!' }
       }
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .with(body: hash_including(request_body))
         .to_return(
@@ -185,10 +175,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'calls a tool with arguments' do
-      result = client.call_tool('echo', { message: 'Hello MCP!' })
-      expect(result).to eq('Echo: Hello MCP!')
-    end
+    subject(:call_tool_result) { client.call_tool('echo', { message: 'Hello MCP!' }) }
+
+    it { is_expected.to eq(['Echo: Hello MCP!']) }
 
     context 'with streaming (SSE)' do
       let(:sse_response) do
@@ -199,11 +188,14 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
       end
 
       before do
+        # Mock ensure_initialized to avoid automatic initialization
+        allow(client).to receive(:ensure_initialized)
+
         stub_request(:post, base_url)
           .with(
             body: hash_including(request_body),
             headers: {
-              'Accept' => 'text/event-stream',
+              'Accept' => 'application/json, text/event-stream',
               'Content-Type' => 'application/json',
               'Authorization' => 'Bearer token123'
             }
@@ -220,20 +212,16 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         client.call_tool('echo', { message: 'Hello MCP!' }) do |chunk|
           results << chunk
         end
-        
+
         expect(results).to eq([
-          { 'jsonrpc' => '2.0', 'id' => '1', 'result' => 'First chunk' },
-          { 'jsonrpc' => '2.0', 'id' => '2', 'result' => 'Second chunk' }
-        ])
+                                { 'jsonrpc' => '2.0', 'id' => '1', 'result' => 'First chunk' },
+                                { 'jsonrpc' => '2.0', 'id' => '2', 'result' => 'Second chunk' }
+                              ])
       end
     end
   end
 
   describe '#list_prompts' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:response_body) do
       {
         jsonrpc: '2.0',
@@ -247,6 +235,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .to_return(
           status: 200,
@@ -254,21 +245,15 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'lists available prompts' do
-      result = client.list_prompts
-      expect(result).to eq({
-        'prompts' => [
-          { 'name' => 'example_prompt', 'description' => 'An example prompt' }
-        ]
-      })
-    end
+    subject(:list_prompts_result) { client.list_prompts }
+
+    it {
+      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
+                           'result' => { 'prompts' => [{ 'name' => 'example_prompt', 'description' => 'An example prompt' }] } }])
+    }
   end
 
   describe '#get_prompt' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:request_body) do
       {
         jsonrpc: '2.0',
@@ -292,6 +277,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .with(body: hash_including(request_body))
         .to_return(
@@ -300,17 +288,15 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'gets a prompt with arguments' do
-      result = client.get_prompt('example_prompt', { input: 'test' })
-      expect(result).to eq({ 'prompt' => 'Generated prompt text' })
-    end
+    subject(:get_prompt_result) { client.get_prompt('example_prompt', { input: 'test' }) }
+
+    it {
+      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
+                           'result' => { 'prompt' => 'Generated prompt text' } }])
+    }
   end
 
   describe '#list_resources' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:response_body) do
       {
         jsonrpc: '2.0',
@@ -324,6 +310,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .to_return(
           status: 200,
@@ -331,21 +320,15 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'lists available resources' do
-      result = client.list_resources
-      expect(result).to eq({
-        'resources' => [
-          { 'uri' => 'test://resource', 'name' => 'Test Resource' }
-        ]
-      })
-    end
+    subject(:list_resources_result) { client.list_resources }
+
+    it {
+      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
+                           'result' => { 'resources' => [{ 'uri' => 'test://resource', 'name' => 'Test Resource' }] } }])
+    }
   end
 
   describe '#read_resource' do
-    before do
-      allow(client).to receive(:session_id).and_return(session_id)
-    end
-
     let(:request_body) do
       {
         jsonrpc: '2.0',
@@ -368,6 +351,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     before do
+      # Mock ensure_initialized to avoid automatic initialization
+      allow(client).to receive(:ensure_initialized)
+
       stub_request(:post, base_url)
         .with(body: hash_including(request_body))
         .to_return(
@@ -376,10 +362,11 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         )
     end
 
-    it 'reads a resource by URI' do
-      result = client.read_resource('test://resource')
-      expect(result).to eq({ 'content' => 'Resource content' })
-    end
+    subject(:read_resource_result) { client.read_resource('test://resource') }
+
+    it {
+      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id', 'result' => { 'content' => 'Resource content' } }])
+    }
   end
 
   describe '#cleanup_session' do
@@ -440,7 +427,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
           jsonrpc: '2.0',
           id: 'test-id',
           error: {
-            code: -32601,
+            code: -32_601,
             message: 'Method not found'
           }
         }

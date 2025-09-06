@@ -4,248 +4,204 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 RSpec.describe Ruboty::AiAgent::Agent do
-  let(:client) { double('OpenAI::Client') }
-  let(:model) { 'gpt-4o' }
-  let(:system_prompt) { 'You are a helpful assistant.' }
+  include DatabaseFactory
+  let(:llm) { instance_double('Ruboty::AiAgent::LLM::OpenAI') }
   let(:messages) { [] }
-  let(:mcp_servers) { [] }
-  
+  let(:tools) { [] }
+
   subject(:agent) do
     described_class.new(
-      client: client,
+      llm: llm,
       messages: messages,
-      system_prompt: system_prompt,
-      mcp_servers: mcp_servers,
-      model: model
+      tools: tools
     )
   end
 
   describe '#initialize' do
-    context 'with no existing messages' do
-      it 'initializes with system prompt as first message' do
-        expect(agent.messages.first).to eq({ role: 'system', content: system_prompt })
-      end
+    describe '#llm' do
+      subject { agent.llm }
+      it { is_expected.to eq(llm) }
     end
 
-    context 'with existing messages that include system prompt' do
+    describe '#messages' do
+      subject { agent.messages }
+      it { is_expected.to eq(messages) }
+    end
+
+    describe '#tools' do
+      subject { agent.tools }
+      it { is_expected.to eq(tools) }
+    end
+
+    context 'with provided messages and tools' do
       let(:messages) do
         [
-          { role: 'system', content: 'Previous system prompt' },
-          { role: 'user', content: 'Hello' },
-          { role: 'assistant', content: 'Hi there!' }
+          create_sample_chat_message(role: :system, content: 'You are a helpful assistant'),
+          create_sample_chat_message(role: :user, content: 'Hello')
         ]
       end
 
-      it 'preserves existing messages' do
-        expect(agent.messages).to eq(messages)
-      end
-
-      it 'does not add another system prompt' do
-        system_messages = agent.messages.select { |m| m[:role] == 'system' }
-        expect(system_messages.count).to eq(1)
-      end
-    end
-
-    context 'with messages but no system prompt at beginning' do
-      let(:messages) do
+      let(:tools) do
         [
-          { role: 'user', content: 'Hello' },
-          { role: 'assistant', content: 'Hi there!' }
+          create_sample_tool(name: 'test_tool')
         ]
       end
 
-      it 'adds system prompt at the beginning' do
-        expect(agent.messages.first).to eq({ role: 'system', content: system_prompt })
-        expect(agent.messages[1..]).to eq(messages)
+      describe '#messages' do
+        subject { agent.messages }
+        it { is_expected.to eq(messages) }
+      end
+
+      describe '#tools' do
+        subject { agent.tools }
+        it { is_expected.to eq(tools) }
       end
     end
   end
 
-  describe '#chat' do
-    let(:user_input) { 'What is the weather today?' }
-    let(:assistant_response) { 'I cannot access real-time weather information.' }
-    let(:api_response) do
-      {
-        'choices' => [
-          {
-            'message' => {
-              'role' => 'assistant',
-              'content' => assistant_response
-            }
-          }
-        ]
-      }
-    end
+  describe '#complete' do
+    let(:llm_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
+    let(:response_message) { create_sample_chat_message(role: :assistant, content: 'Test response') }
+
+    subject(:complete_response) { agent.complete }
 
     before do
-      allow(client).to receive(:chat).with(parameters: anything).and_return(api_response)
+      allow(llm).to receive(:complete).and_return(llm_response)
+      allow(llm_response).to receive(:message).and_return(response_message)
+      allow(llm_response).to receive(:tool).and_return(nil)
     end
 
-    it 'sends user input to OpenAI API' do
-      agent.chat(user_input)
-      
-      expect(client).to have_received(:chat).with(parameters: hash_including(
-        messages: array_including(
-          hash_including(role: 'user', content: user_input)
+    describe 'LLM interaction' do
+      it 'calls LLM complete with messages and tools' do
+        complete_response
+
+        expect(llm).to have_received(:complete).with(
+          messages: agent.messages,
+          tools: agent.tools
         )
-      ))
-    end
-
-    it 'returns the assistant response' do
-      response = agent.chat(user_input)
-      expect(response).to eq(assistant_response)
-    end
-
-    it 'adds both user and assistant messages to history' do
-      initial_message_count = agent.messages.count
-      agent.chat(user_input)
-      
-      expect(agent.messages.count).to eq(initial_message_count + 2)
-      expect(agent.messages[-2]).to eq({ role: 'user', content: user_input })
-      expect(agent.messages[-1]).to include(
-        'role' => 'assistant',
-        'content' => assistant_response
-      )
-    end
-
-    context 'with streaming' do
-      let(:chunks) do
-        [
-          { 'choices' => [{ 'delta' => { 'content' => 'I cannot ' } }] },
-          { 'choices' => [{ 'delta' => { 'content' => 'access ' } }] },
-          { 'choices' => [{ 'delta' => { 'content' => 'real-time weather.' } }] }
-        ]
-      end
-
-      it 'yields content chunks to the block' do
-        allow(client).to receive(:chat) do |parameters:|
-          stream_proc = parameters[:stream]
-          chunks.each { |chunk| stream_proc.call(chunk, nil) }
-          nil
-        end
-
-        collected_chunks = []
-        agent.chat(user_input, stream: true) do |chunk|
-          collected_chunks << chunk
-        end
-
-        expect(collected_chunks).to eq(['I cannot ', 'access ', 'real-time weather.'])
       end
     end
 
-    context 'with tool calls' do
-      let(:mcp_servers) do
-        [{
-          type: 'http',
-          url: 'http://localhost:3000/mcp'
-        }]
-      end
+    describe 'response handling' do
+      it { is_expected.to eq(llm_response) }
+    end
 
-      let(:tool_response) do
-        {
-          'choices' => [
-            {
-              'message' => {
-                'role' => 'assistant',
-                'content' => nil,
-                'tool_calls' => [
-                  {
-                    'id' => 'call_123',
-                    'function' => {
-                      'name' => 'get_weather',
-                      'arguments' => '{"location": "Tokyo"}'
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      end
+    describe 'message history after complete' do
+      let!(:initial_message_count) { agent.messages.count }
 
-      let(:final_response) do
-        {
-          'choices' => [
-            {
-              'message' => {
-                'role' => 'assistant',
-                'content' => 'The weather in Tokyo is sunny and 25°C.'
-              }
-            }
-          ]
-        }
+      before { complete_response }
+
+      it 'adds response message to history' do
+        expect(agent.messages.count).to eq(initial_message_count + 1)
+        expect(agent.messages.last).to eq(response_message)
       end
+    end
+
+    context 'with tool call response' do
+      let(:tool) { create_sample_tool(name: 'test_tool') }
+      let(:tool_call_id) { 'call_123' }
+      let(:tool_arguments) { { test: 'value' } }
+      let(:tool_response) { 'tool result' }
+      let(:tool_message) { create_sample_chat_message(role: :assistant, content: nil, tool_call_id: tool_call_id) }
+      let(:tool_response_message) { create_sample_chat_message(role: :tool, content: tool_response) }
+
+      let(:second_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
 
       before do
-        mcp_client = double('Mcp::HttpClient')
-        allow(Mcp::HttpClient).to receive(:new).and_return(mcp_client)
-        allow(mcp_client).to receive(:list_tools).and_return([
-          {
-            'name' => 'get_weather',
-            'description' => 'Get the current weather',
-            'inputSchema' => {
-              'type' => 'object',
-              'properties' => {
-                'location' => { 'type' => 'string' }
-              },
-              'required' => ['location']
-            }
-          }
-        ])
+        allow(llm_response).to receive(:tool).and_return(tool)
+        allow(llm_response).to receive(:tool_call_id).and_return(tool_call_id)
+        allow(llm_response).to receive(:tool_arguments).and_return(tool_arguments)
+        allow(llm_response).to receive(:call_tool).and_return(tool_response)
+        allow(llm_response).to receive(:message).and_return(tool_message)
 
-        allow(mcp_client).to receive(:call_tool)
-          .with('get_weather', location: 'Tokyo')
-          .and_return('Sunny, 25°C')
+        allow(Ruboty::AiAgent::ChatMessage).to receive(:from_llm_response)
+          .with(
+            tool: tool,
+            tool_call_id: tool_call_id,
+            tool_arguments: tool_arguments,
+            tool_response: tool_response
+          )
+          .and_return(tool_response_message)
 
-        allow(client).to receive(:chat)
-          .and_return(tool_response, final_response)
+        # Setup second LLM call after tool execution
+        allow(second_response).to receive(:message).and_return(response_message)
+        allow(second_response).to receive(:tool).and_return(nil)
+        allow(llm).to receive(:complete).and_return(llm_response, second_response)
       end
 
-      xit 'handles tool calls and returns final response' do
-        response = agent.chat(user_input)
-        expect(response).to eq('The weather in Tokyo is sunny and 25°C.')
-      end
-    end
-
-    context 'with API error' do
-      before do
-        error = Class.new(StandardError)
-        error.define_method(:is_a?) { |klass| klass.name == 'Faraday::Error' }
-        allow(client).to receive(:chat).and_raise(error.new('API Error'))
-      end
-
-      it 'raises an error with appropriate message' do
-        expect { agent.chat(user_input) }.to raise_error(StandardError, 'API Error')
+      it 'handles tool call and returns final response' do
+        expect(complete_response).to eq(second_response)
       end
     end
   end
 
-  describe '#messages' do
-    let(:messages) do
-      [
-        { role: 'user', content: 'Hello' },
-        { role: 'assistant', content: 'Hi!' }
-      ]
+  describe 'callback methods' do
+    describe '#on_new_message' do
+      let(:message) { create_sample_chat_message(role: :assistant, content: 'Hello') }
+
+      it 'calls callback with new_message event' do
+        callback_result = nil
+        callback = proc { |event| callback_result = event }
+
+        agent.on_new_message(message, &callback)
+
+        expect(callback_result).to eq({
+                                        type: :new_message,
+                                        message: message
+                                      })
+      end
     end
 
-    it 'returns current conversation history' do
-      expect(agent.messages).to include(hash_including(role: 'user', content: 'Hello'))
+    describe '#on_tool_call' do
+      let(:tool) { create_sample_tool(name: 'test_tool') }
+      let(:tool_arguments) { { param: 'value' } }
+
+      it 'calls callback with tool_call event' do
+        callback_result = nil
+        callback = proc { |event| callback_result = event }
+
+        agent.on_tool_call(tool: tool, tool_arguments: tool_arguments, &callback)
+
+        expect(callback_result).to eq({
+                                        type: :tool_call,
+                                        tool: tool,
+                                        tool_arguments: tool_arguments
+                                      })
+      end
     end
 
-    it 'can be used to persist conversation state' do
-      allow(client).to receive(:chat).and_return(
-        { 'choices' => [{ 'message' => { 'role' => 'assistant', 'content' => 'Test response' } }] }
-      )
-      agent.chat('Test message')
-      
-      # Create new agent with saved messages
-      new_agent = described_class.new(
-        client: client,
-        messages: agent.messages,
-        model: model
-      )
-      
-      expect(new_agent.messages).to eq(agent.messages)
+    describe '#on_tool_response' do
+      let(:tool_response) { 'result' }
+      let(:message) { create_sample_chat_message(role: :tool, content: tool_response) }
+
+      it 'calls callback with tool_response event' do
+        callback_result = nil
+        callback = proc { |event| callback_result = event }
+
+        agent.on_tool_response(tool_response: tool_response, message: message, &callback)
+
+        expect(callback_result).to eq({
+                                        type: :tool_response,
+                                        tool_response: tool_response,
+                                        message: message
+                                      })
+      end
+    end
+
+    describe '#on_response' do
+      let(:response) { instance_double('Ruboty::AiAgent::LLM::Response') }
+
+      it 'calls callback with response event' do
+        callback_result = nil
+        callback = proc { |event| callback_result = event }
+
+        agent.on_response(response, &callback)
+
+        expect(callback_result).to eq({
+                                        type: :response,
+                                        response: response
+                                      })
+      end
     end
   end
 end

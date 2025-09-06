@@ -60,6 +60,8 @@ module Ruboty
           &block
         )
 
+        return nil if block_given?
+
         results.flat_map { |res| res.dig('result', 'content') || [] }
       end
 
@@ -177,9 +179,7 @@ module Ruboty
 
           begin
             parsed_data = JSON.parse(data)
-            if parsed_data['error']
-              raise Error, "JSON-RPC Error #{parsed_data['error']['code']}: #{parsed_data['error']['message']}"
-            end
+            raise Error, "JSON-RPC Error #{parsed_data['error']['code']}: #{parsed_data['error']['message']}" if parsed_data['error']
 
             if block_given?
               block.call(parsed_data)
