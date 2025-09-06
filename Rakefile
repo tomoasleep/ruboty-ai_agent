@@ -11,3 +11,4 @@ RuboCop::RakeTask.new do |task|
 end
 
 task default: %i[rubocop spec]
+task autocorrect: %i[rubocop:autocorrect spec]
