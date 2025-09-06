@@ -4,6 +4,10 @@ module Ruboty
   module AiAgent
     # Memorize and retrieve information using Ruboty's brain.
     class Database
+      autoload :QueryMethods, 'ruboty/ai_agent/database/query_methods'
+
+      include QueryMethods
+
       NAMESPACE = :ai_agent
 
       # @rbs brain: Ruboty::Brain::Base
@@ -13,75 +17,6 @@ module Ruboty
 
       def data #: Hash
         @brain.data[NAMESPACE] ||= {}
-      end
-
-      # @rbs keys: Array[Symbol | Integer]
-      # @rbs return: untyped
-      def fetch(*keys)
-        item = data.dig(*keys)
-
-        Recordable.convert_recursively(item)
-      end
-
-      # @rbs keys: Array[Symbol | Integer]
-      # @rbs return: Integer
-      def len(*keys)
-        item = data.dig(*keys)
-        item.respond_to?(:length) ? deserialized_item.length : 0
-      end
-
-      # @rbs keys: Array[Symbol | Integer]
-      # @rbs return: void
-      def delete(*keys)
-        namespace_keys = keys[0..-2]
-        key = keys[-1]
-
-        namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
-        case namespace
-        when Hash
-          namespace.delete(key)
-        when Array
-          namespace.delete_at(key) if key.is_a?(Integer) && key < namespace.length
-        end
-      end
-
-      # @rbs keys: Array[Symbol | Integer]
-      # @rbs return: Array[Symbol | Integer]
-      def keys(*keys) #: boolish
-        namespace = keys.empty? ? data : data.dig(*keys)
-        case namespace
-        when Hash
-          namespace.keys
-        when Array
-          namespace.length.times.to_a
-        else
-          []
-        end
-      end
-
-      # @rbs keys: Array[Symbol | Integer]
-      # @rbs return: boolish
-      def key?(*keys) #: boolish
-        namespace_keys = keys[0..-2]
-        key = keys[-1]
-
-        namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
-        namespace&.key?(key)
-      end
-
-      # @rbs at: Array[String | Integer]
-      # @rbs value: untyped
-      # @rbs return: void
-      def store(value, at:)
-        namespace_keys = at[0..-2]
-        key = at[-1]
-
-        namespace = namespace_keys.reduce(data) do |current, k|
-          current[k] ||= {}
-          current[k]
-        end
-
-        namespace[key] = value.to_h
       end
 
       def user(id) #: User
