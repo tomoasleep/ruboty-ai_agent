@@ -6,7 +6,7 @@ module Ruboty
       # ShowSystemPrompt action for Ruboty::AiAgent
       class ShowSystemPrompt < Base
         def call
-          message.reply("TODO: Implement ShowSystemPrompt action")
+          message.reply('TODO: Implement ShowSystemPrompt action')
         end
       end
     end

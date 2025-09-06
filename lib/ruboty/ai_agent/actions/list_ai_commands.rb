@@ -6,7 +6,7 @@ module Ruboty
       # ListAiCommands action for Ruboty::AiAgent
       class ListAiCommands < Base
         def call
-          message.reply("TODO: Implement ListAiCommands action")
+          message.reply('TODO: Implement ListAiCommands action')
         end
       end
     end
