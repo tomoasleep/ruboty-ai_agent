@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'webmock/rspec'
 
 RSpec.describe Ruboty::AiAgent::HttpMcpClient do
+  include McpMockHelper
   let(:base_url) { 'http://localhost:9292' }
   let(:headers) { { 'Authorization' => 'Bearer token123' } }
   let(:client) { described_class.new(url: base_url, headers: headers) }
@@ -18,51 +19,12 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   end
 
   describe '#initialize_session' do
-    let(:request_body) do
-      {
-        jsonrpc: '2.0',
-        method: 'initialize',
-        id: anything,
-        params: {
-          protocolVersion: '2024-11-05',
-          capabilities: {},
-          clientInfo: {
-            name: 'ruboty-ai_agent',
-            version: '1.0'
-          }
-        }
-      }
-    end
-
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          protocolVersion: '2024-11-05',
-          capabilities: {},
-          serverInfo: {
-            name: 'test-server',
-            version: '1.0'
-          }
-        }
-      }
-    end
-
     before do
-      stub_request(:post, base_url)
-        .with(
-          body: hash_including(request_body),
-          headers: {
-            'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer token123'
-          }
-        )
-        .to_return(
-          status: 200,
-          body: response_body.to_json,
-          headers: { 'Mcp-Session-Id' => session_id }
-        )
+      stub_mcp_initialize(
+        base_url: base_url,
+        session_id: session_id,
+        headers: headers
+      )
     end
 
     it 'initializes session and returns session_id' do
@@ -73,39 +35,15 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   end
 
   describe '#ping' do
-    let(:request_body) do
-      {
-        jsonrpc: '2.0',
-        method: 'ping',
-        id: anything
-      }
-    end
-
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: { pong: true }
-      }
-    end
-
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .with(
-          body: hash_including(request_body),
-          headers: {
-            'Accept' => 'application/json, text/event-stream',
-            'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer token123'
-          }
-        )
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_ping(
+        base_url: base_url,
+        headers: headers,
+        pong_result: true
+      )
     end
 
     subject(:ping_result) { client.ping }
@@ -114,102 +52,65 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   end
 
   describe '#list_tools' do
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          tools: [
-            { name: 'echo', description: 'Echoes back messages' }
-          ]
-        }
-      }
-    end
+    let(:tools) { [{ 'name' => 'echo', 'description' => 'Echoes back messages' }] }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_list_tools(
+        base_url: base_url,
+        headers: headers,
+        tools: tools
+      )
     end
 
     subject(:list_tools_result) { client.list_tools }
 
-    it { is_expected.to eq([{ 'name' => 'echo', 'description' => 'Echoes back messages' }]) }
+    it { is_expected.to eq(tools) }
   end
 
   describe '#call_tool' do
-    let(:request_body) do
-      {
-        jsonrpc: '2.0',
-        method: 'tools/call',
-        id: anything,
-        params: {
-          name: 'echo',
-          arguments: { message: 'Hello MCP!' }
-        }
-      }
-    end
-
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: { content: 'Echo: Hello MCP!' }
-      }
-    end
+    let(:tool_name) { 'echo' }
+    let(:tool_arguments) { { message: 'Hello MCP!' } }
+    let(:response_content) { 'Echo: Hello MCP!' }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .with(body: hash_including(request_body))
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_call_tool(
+        base_url: base_url,
+        headers: headers,
+        tool_name: tool_name,
+        tool_arguments: tool_arguments,
+        response_content: response_content
+      )
     end
 
-    subject(:call_tool_result) { client.call_tool('echo', { message: 'Hello MCP!' }) }
+    subject(:call_tool_result) { client.call_tool(tool_name, tool_arguments) }
 
-    it { is_expected.to eq(['Echo: Hello MCP!']) }
+    it { is_expected.to eq([response_content]) }
 
     context 'with streaming (SSE)' do
-      let(:sse_response) do
-        [
-          "data: {\"jsonrpc\":\"2.0\",\"id\":\"1\",\"result\":\"First chunk\"}\n\n",
-          "data: {\"jsonrpc\":\"2.0\",\"id\":\"2\",\"result\":\"Second chunk\"}\n\n"
-        ].join
-      end
+      let(:streaming_chunks) { ['First chunk', 'Second chunk'] }
 
       before do
         # Mock ensure_initialized to avoid automatic initialization
         allow(client).to receive(:ensure_initialized)
 
-        stub_request(:post, base_url)
-          .with(
-            body: hash_including(request_body),
-            headers: {
-              'Accept' => 'application/json, text/event-stream',
-              'Content-Type' => 'application/json',
-              'Authorization' => 'Bearer token123'
-            }
-          )
-          .to_return(
-            status: 200,
-            body: sse_response,
-            headers: { 'Content-Type' => 'text/event-stream' }
-          )
+        stub_mcp_call_tool_streaming(
+          base_url: base_url,
+          headers: headers,
+          tool_name: tool_name,
+          tool_arguments: tool_arguments,
+          streaming_chunks: streaming_chunks
+        )
       end
 
       it 'handles streaming response with a block' do
         results = []
-        client.call_tool('echo', { message: 'Hello MCP!' }) do |chunk|
+        client.call_tool(tool_name, tool_arguments) do |chunk|
           results << chunk
         end
 
@@ -222,168 +123,106 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   end
 
   describe '#list_prompts' do
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          prompts: [
-            { name: 'example_prompt', description: 'An example prompt' }
-          ]
-        }
-      }
-    end
+    let(:prompts) { [{ 'name' => 'example_prompt', 'description' => 'An example prompt' }] }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_list_prompts(
+        base_url: base_url,
+        headers: headers,
+        prompts: prompts
+      )
     end
 
     subject(:list_prompts_result) { client.list_prompts }
 
     it {
       is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
-                           'result' => { 'prompts' => [{ 'name' => 'example_prompt', 'description' => 'An example prompt' }] } }])
+                           'result' => { 'prompts' => prompts } }])
     }
   end
 
   describe '#get_prompt' do
-    let(:request_body) do
-      {
-        jsonrpc: '2.0',
-        method: 'prompts/get',
-        id: anything,
-        params: {
-          name: 'example_prompt',
-          arguments: { input: 'test' }
-        }
-      }
-    end
-
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          prompt: 'Generated prompt text'
-        }
-      }
-    end
+    let(:prompt_name) { 'example_prompt' }
+    let(:prompt_arguments) { { input: 'test' } }
+    let(:response_prompt) { 'Generated prompt text' }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .with(body: hash_including(request_body))
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_get_prompt(
+        base_url: base_url,
+        headers: headers,
+        prompt_name: prompt_name,
+        prompt_arguments: prompt_arguments,
+        response_prompt: response_prompt
+      )
     end
 
-    subject(:get_prompt_result) { client.get_prompt('example_prompt', { input: 'test' }) }
+    subject(:get_prompt_result) { client.get_prompt(prompt_name, prompt_arguments) }
 
     it {
       is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
-                           'result' => { 'prompt' => 'Generated prompt text' } }])
+                           'result' => { 'prompt' => response_prompt } }])
     }
   end
 
   describe '#list_resources' do
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          resources: [
-            { uri: 'test://resource', name: 'Test Resource' }
-          ]
-        }
-      }
-    end
+    let(:resources) { [{ 'uri' => 'test://resource', 'name' => 'Test Resource' }] }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_list_resources(
+        base_url: base_url,
+        headers: headers,
+        resources: resources
+      )
     end
 
     subject(:list_resources_result) { client.list_resources }
 
     it {
       is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id',
-                           'result' => { 'resources' => [{ 'uri' => 'test://resource', 'name' => 'Test Resource' }] } }])
+                           'result' => { 'resources' => resources } }])
     }
   end
 
   describe '#read_resource' do
-    let(:request_body) do
-      {
-        jsonrpc: '2.0',
-        method: 'resources/read',
-        id: anything,
-        params: {
-          uri: 'test://resource'
-        }
-      }
-    end
-
-    let(:response_body) do
-      {
-        jsonrpc: '2.0',
-        id: 'test-id',
-        result: {
-          content: 'Resource content'
-        }
-      }
-    end
+    let(:resource_uri) { 'test://resource' }
+    let(:response_content) { 'Resource content' }
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
       allow(client).to receive(:ensure_initialized)
 
-      stub_request(:post, base_url)
-        .with(body: hash_including(request_body))
-        .to_return(
-          status: 200,
-          body: response_body.to_json
-        )
+      stub_mcp_read_resource(
+        base_url: base_url,
+        headers: headers,
+        resource_uri: resource_uri,
+        response_content: response_content
+      )
     end
 
-    subject(:read_resource_result) { client.read_resource('test://resource') }
+    subject(:read_resource_result) { client.read_resource(resource_uri) }
 
     it {
-      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id', 'result' => { 'content' => 'Resource content' } }])
+      is_expected.to eq([{ 'jsonrpc' => '2.0', 'id' => 'test-id', 'result' => { 'content' => response_content } }])
     }
   end
 
   describe '#cleanup_session' do
     before do
       client.instance_variable_set(:@session_id, session_id)
-    end
-
-    before do
-      stub_request(:delete, base_url)
-        .with(
-          headers: {
-            'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer token123',
-            'Mcp-Session-Id' => session_id
-          }
-        )
-        .to_return(status: 200)
+      stub_mcp_cleanup_session(
+        base_url: base_url,
+        headers: headers,
+        session_id: session_id
+      )
     end
 
     it 'sends DELETE request and clears session_id' do
@@ -406,11 +245,12 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
   describe 'error handling' do
     describe 'HTTP errors' do
       before do
-        stub_request(:post, base_url)
-          .to_return(
-            status: 500,
-            body: 'Internal Server Error'
-          )
+        stub_mcp_error(
+          base_url: base_url,
+          headers: headers,
+          http_status: 500,
+          error_body: 'Internal Server Error'
+        )
       end
 
       it 'raises Error for non-200 responses' do
@@ -422,23 +262,13 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     end
 
     describe 'JSON-RPC errors' do
-      let(:error_response) do
-        {
-          jsonrpc: '2.0',
-          id: 'test-id',
-          error: {
-            code: -32_601,
-            message: 'Method not found'
-          }
-        }
-      end
-
       before do
-        stub_request(:post, base_url)
-          .to_return(
-            status: 200,
-            body: error_response.to_json
-          )
+        stub_mcp_json_rpc_error(
+          base_url: base_url,
+          headers: headers,
+          error_code: -32_601,
+          error_message: 'Method not found'
+        )
       end
 
       it 'raises Error for JSON-RPC errors' do

@@ -5,6 +5,7 @@ require 'openai'
 
 RSpec.describe Ruboty::AiAgent::Actions::Chat do
   include OpenAIMockHelper
+  include McpMockHelper
 
   subject(:action) { described_class.new(message) }
 
@@ -135,17 +136,28 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           )
         )
 
-        # Mock MCP client to return our tool
-        mcp_client = instance_double('Ruboty::AiAgent::HttpMcpClient')
-        allow(Ruboty::AiAgent::HttpMcpClient).to receive(:new).and_return(mcp_client)
-        allow(mcp_client).to receive(:list_tools).and_return([
-                                                               {
-                                                                 'name' => 'calculator',
-                                                                 'description' => 'Performs calculations',
-                                                                 'inputSchema' => {}
-                                                               }
-                                                             ])
-        allow(mcp_client).to receive(:call_tool).with('calculator', { expression: '21 * 2' }).and_return('42')
+        # Mock MCP HTTP calls  
+        stub_mcp_initialize(
+          base_url: 'http://localhost:3000'
+        )
+        
+        stub_mcp_list_tools(
+          base_url: 'http://localhost:3000',
+          tools: [
+            {
+              'name' => 'calculator',
+              'description' => 'Performs calculations',
+              'inputSchema' => {}
+            }
+          ]
+        )
+        
+        stub_mcp_call_tool(
+          base_url: 'http://localhost:3000',
+          tool_name: 'calculator',
+          tool_arguments: { expression: '21 * 2' },
+          response_content: '42'
+        )
 
         # First API call - returns tool call
         stub_openai_chat_completion_with_tool_call(
@@ -185,7 +197,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
                 }
               ]
             },
-            { role: 'tool', tool_call_id: 'call_123', content: '"42"' }
+            { role: 'tool', tool_call_id: 'call_123', content: '["42"]' }
           ],
           tools: [
             {
@@ -206,7 +218,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           'Calling tool calculator with arguments {expression: "21 * 2"}',
           streaming: true
         )
-        expect(message).to receive(:reply).with('Tool response: "42"')
+        expect(message).to receive(:reply).with('Tool response: ["42"]')
         expect(message).to receive(:reply).with('The answer is 42.')
 
         call_action
