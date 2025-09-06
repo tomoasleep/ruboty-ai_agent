@@ -54,7 +54,7 @@ module Ruboty
         def parse_config #: config
           options = {
             transport: 'http',
-            headers: [],
+            headers: {},
             args: []
           }
 
@@ -68,13 +68,22 @@ module Ruboty
             end
 
             opts.on('--header VALUE', 'Add a header (can be specified multiple times)') do |h|
-              options[:headers] << h
+              key, value = undump_string(h).split(':', 2).map!(&:strip)
+              options[:headers][key] = value
             end
           end
 
           options[:args] = parser.parse(args)
 
           options
+        end
+
+        # @rbs str: String
+        # @rbs return: String
+        def undump_string(str)
+          str.undump
+        rescue StandardError
+          str
         end
       end
     end

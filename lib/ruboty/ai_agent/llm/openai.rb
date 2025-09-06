@@ -53,8 +53,6 @@ module Ruboty
                                  }
                                }
                              ]
-                           else
-                             []
                            end
 
               {

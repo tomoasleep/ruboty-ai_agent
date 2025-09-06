@@ -45,7 +45,7 @@ module Ruboty
             end
           end
         rescue StandardError => e
-          if ENV.fetch('DEBUG')
+          if ENV['DEBUG']
             message.reply("エラーが発生しました: #{e.full_message}")
           else
             message.reply("エラーが発生しました: #{e.message}")
