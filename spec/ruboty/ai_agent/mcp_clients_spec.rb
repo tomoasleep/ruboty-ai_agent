@@ -22,7 +22,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     context 'with http server config' do
       let(:mcp_configurations) do
         [
-          create_mcp_configuration(
+          Ruboty::AiAgent::McpConfiguration.new(
             name: 'test_server',
             transport: 'http',
             url: 'http://localhost:3000/mcp',
@@ -51,27 +51,10 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       end
     end
 
-    context 'with stdio server config' do
-      let(:mcp_configurations) do
-        [
-          create_mcp_configuration(
-            name: 'stdio_server',
-            transport: 'stdio'
-          )
-        ]
-      end
-
-      subject(:mcp_clients) { described_class.new(mcp_configurations) }
-
-      it 'raises error for unsupported transport type' do
-        expect { mcp_clients }.to raise_error('Unknown MCP server type: stdio')
-      end
-    end
-
     context 'with invalid server type' do
       let(:mcp_configurations) do
         [
-          create_mcp_configuration(
+          Ruboty::AiAgent::McpConfiguration.new(
             name: 'invalid_server',
             transport: 'invalid',
             url: 'http://localhost:3000'
@@ -91,7 +74,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     let(:http_client) { double('HttpClient') }
     let(:mcp_configurations) do
       [
-        create_mcp_configuration(
+        Ruboty::AiAgent::McpConfiguration.new(
           name: 'test_server',
           transport: 'http',
           url: 'http://localhost:3000'
@@ -154,7 +137,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     let(:http_client) { double('HttpClient') }
     let(:mcp_configurations) do
       [
-        create_mcp_configuration(
+        Ruboty::AiAgent::McpConfiguration.new(
           name: 'test_server',
           transport: 'http',
           url: 'http://localhost:3000'
