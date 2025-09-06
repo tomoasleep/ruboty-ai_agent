@@ -2,9 +2,11 @@
 
 require 'bundler/setup'
 require 'ruboty/ai_agent'
+require 'webmock/rspec'
 
-# Load factory methods
+# Load factory methods and mock helpers
 require_relative 'support/factories'
+require_relative 'support/mocks'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -17,3 +19,5 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+WebMock.disable_net_connect!
