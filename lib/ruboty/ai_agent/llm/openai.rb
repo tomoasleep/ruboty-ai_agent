@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 require 'openai'
-require_relative 'openai/model'
 
 module Ruboty
   module AiAgent
     module LLM
       # LLM interface for OpenAI's chat completion API.
       class OpenAI
+        autoload :Model, 'ruboty/ai_agent/llm/openai/model'
         attr_reader :client #: OpenAI::Client
         attr_reader :model #: String
 
@@ -131,11 +131,12 @@ module Ruboty
           tool_call = choice.message.tool_calls&.first
 
           token_usage = if openai_response.usage
-                          {
+                          TokenUsage.new(
                             prompt_tokens: openai_response.usage.prompt_tokens,
                             completion_tokens: openai_response.usage.completion_tokens,
-                            total_tokens: openai_response.usage.total_tokens
-                          }
+                            total_tokens: openai_response.usage.total_tokens,
+                            token_limit: model_info.token_limit
+                          )
                         end
 
           if tool_call
@@ -167,8 +168,7 @@ module Ruboty
               tool_call_id: tool_call&.id,
               tool_name: tool&.name,
               tool_arguments:,
-              token_usage:,
-              token_limit: model_info.token_limit
+              token_usage:
             ),
             tool:,
             tool_call_id: tool_call&.id,

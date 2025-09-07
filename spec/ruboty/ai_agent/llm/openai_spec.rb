@@ -55,17 +55,11 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
       it 'includes token usage information in the response' do
         response = complete
 
-        expect(response.message.token_usage).to eq({
-                                                     prompt_tokens: 50,
-                                                     completion_tokens: 20,
-                                                     total_tokens: 70
-                                                   })
-      end
-
-      it 'includes token limit information in the response' do
-        response = complete
-
-        expect(response.message.token_limit).to eq(400_000)
+        expect(response.message.token_usage).to be_a(Ruboty::AiAgent::TokenUsage)
+        expect(response.message.token_usage.prompt_tokens).to eq(50)
+        expect(response.message.token_usage.completion_tokens).to eq(20)
+        expect(response.message.token_usage.total_tokens).to eq(70)
+        expect(response.message.token_usage.token_limit).to eq(400_000)
       end
     end
 

@@ -26,6 +26,7 @@ module Ruboty
     autoload :McpConfiguration, 'ruboty/ai_agent/mcp_configuration'
     autoload :Recordable, 'ruboty/ai_agent/recordable'
     autoload :RecordSet, 'ruboty/ai_agent/record_set'
+    autoload :TokenUsage, 'ruboty/ai_agent/token_usage'
     autoload :Tool, 'ruboty/ai_agent/tool'
     autoload :User, 'ruboty/ai_agent/user'
     autoload :UserAiMemories, 'ruboty/ai_agent/user_ai_memories'

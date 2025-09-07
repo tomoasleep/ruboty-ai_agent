@@ -9,7 +9,7 @@ module Ruboty
 
         private
 
-        def format_usage_message: (untyped usage, ?untyped limit) -> untyped
+        def format_usage_message: (untyped usage) -> untyped
       end
     end
   end
