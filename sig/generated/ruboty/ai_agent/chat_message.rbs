@@ -16,12 +16,15 @@ module Ruboty
 
       attr_reader tool_arguments: Hash[Symbol | String, untyped]?
 
+      attr_reader token_usage: Hash[Symbol, Integer]?
+
       # @rbs role: Symbol
       # @rbs content: String
       # @rbs ?tool_call_id: String?
       # @rbs ?tool_name: String?
       # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
-      def initialize: (role: Symbol, content: String, ?tool_call_id: untyped, ?tool_name: untyped, ?tool_arguments: untyped) -> untyped
+      # @rbs ?token_usage: Hash[Symbol, Integer]?
+      def initialize: (role: Symbol, content: String, ?tool_call_id: untyped, ?tool_name: untyped, ?tool_arguments: untyped, ?token_usage: untyped) -> untyped
 
       def to_h: () -> Hash[Symbol, untyped]
 

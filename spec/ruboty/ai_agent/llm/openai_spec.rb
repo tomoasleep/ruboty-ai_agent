@@ -51,6 +51,16 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
         expect(response.tool).to be_nil
         expect(response.tool_call_id).to be_nil
       end
+
+      it 'includes token usage information in the response' do
+        response = complete
+
+        expect(response.message.token_usage).to eq({
+                                                     prompt_tokens: 50,
+                                                     completion_tokens: 20,
+                                                     total_tokens: 70
+                                                   })
+      end
     end
 
     context 'with tools' do
