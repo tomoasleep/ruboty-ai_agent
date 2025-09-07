@@ -24,7 +24,7 @@ gemfile do
 end
 
 module Ruboty
-  class Robot
+  class Robot # rubocop:disable Style/Documentation
     def bundle
       # noop
     end
