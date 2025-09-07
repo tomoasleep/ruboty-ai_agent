@@ -11,10 +11,6 @@ module Ruboty
         def call: ...
 
         def body_param: () -> String
-
-        # @rbs chat_thread: ChatThread
-        # @rbs return: Array[Commands::Base]
-        def builtin_commands: (chat_thread: ChatThread) -> Array[Commands::Base]
       end
     end
   end

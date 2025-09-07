@@ -5,6 +5,8 @@ module Ruboty
     module Commands
       # Clear histories of the chat thread.
       class Clear < Base
+        on(%r{/clear}, name: 'clear', description: 'Clear the chat history.')
+
         attr_reader :message #: Ruboty::Message
         attr_reader :chat_thread #: Ruboty::AiAgent::ChatThread
 
@@ -20,11 +22,6 @@ module Ruboty
         def call #: void
           chat_thread.clear
           message.reply('Cleared the chat history.')
-        end
-
-        # @rbs override
-        def match?(commandline)
-          commandline.match(%r{\A\s*(/clear)})
         end
       end
     end

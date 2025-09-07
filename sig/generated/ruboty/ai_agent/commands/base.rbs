@@ -6,14 +6,34 @@ module Ruboty
       # Base class for commands.
       # @abstract
       class Base
+        class Matcher < Data
+          attr_reader pattern(): untyped
+
+          attr_reader description(): untyped
+
+          attr_reader name(): untyped
+
+          def self.new: (untyped pattern, untyped description, untyped name) -> instance
+                      | (pattern: untyped, description: untyped, name: untyped) -> instance
+
+          def self.members: () -> [ :pattern, :description, :name ]
+
+          def members: () -> [ :pattern, :description, :name ]
+        end
+
+        def self.matchers: () -> Array[Matcher]
+
+        def self.on: (untyped pattern, name: untyped, description: untyped) -> untyped
+
         # @rbs *args: untyped
         # @rbs return: void
         def call: (*untyped args) -> void
 
         # @rbs commandline: String
         # @rbs return: boolish
-        # @abstract
         def match?: (String commandline) -> boolish
+
+        def matchers: () -> Array[Matcher]
       end
     end
   end

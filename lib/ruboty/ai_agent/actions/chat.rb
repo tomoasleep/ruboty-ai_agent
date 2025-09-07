@@ -16,9 +16,7 @@ module Ruboty
             model: ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
           )
 
-          chat_thread = database.chat_thread(message.from || 'default')
-
-          commands = builtin_commands(chat_thread:)
+          commands = Commands.builtins(message:, chat_thread:)
           tools =  McpClients.new(
             user.mcp_configurations.all_values
           ).available_tools
@@ -61,17 +59,6 @@ module Ruboty
 
         def body_param #: String
           message[:body]
-        end
-
-        # @rbs chat_thread: ChatThread
-        # @rbs return: Array[Commands::Base]
-        def builtin_commands(chat_thread:)
-          [
-            Commands::Clear.new(
-              message:,
-              chat_thread:
-            )
-          ]
         end
       end
     end

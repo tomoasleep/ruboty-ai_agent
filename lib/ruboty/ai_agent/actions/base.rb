@@ -32,6 +32,11 @@ module Ruboty
         def user #: Ruboty::AiAgent::User
           @user ||= database.user(message.from_name)
         end
+
+        # @rbs %a{memorized}
+        def chat_thread #: Ruboty::AiAgent::ChatThread
+          @chat_thread ||= database.chat_thread(message.from || 'default')
+        end
       end
     end
   end

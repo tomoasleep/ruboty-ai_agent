@@ -30,7 +30,7 @@ module Ruboty
       on(%r{add ai command /(?<name>\S+)\s+"(?<prompt>.+)"}, name: 'add_ai_command',
                                                              description: 'Add a new AI command')
       on(%r{remove ai command /(?<name>\S+)}, name: 'remove_ai_command', description: 'Remove the specified AI command')
-      on(/list ai commands?/, name: 'list_mcp', description: 'List AI commands')
+      on(/list ai commands?/, name: 'list_ai_commands', description: 'List AI commands')
 
       def chat(message)
         Ruboty::AiAgent::Actions::Chat.call(message)

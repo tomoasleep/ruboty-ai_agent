@@ -14,9 +14,6 @@ module Ruboty
         def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
 
         def call: () -> void
-
-        # @rbs override
-        def match?: ...
       end
     end
   end

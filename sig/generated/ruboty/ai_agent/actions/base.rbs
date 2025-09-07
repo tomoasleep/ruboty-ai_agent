@@ -24,6 +24,10 @@ module Ruboty
         # @rbs %a{memorized}
         %a{memorized}
         def user: () -> Ruboty::AiAgent::User
+
+        # @rbs %a{memorized}
+        %a{memorized}
+        def chat_thread: () -> Ruboty::AiAgent::ChatThread
       end
     end
   end

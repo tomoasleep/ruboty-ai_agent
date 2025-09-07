@@ -5,7 +5,8 @@ module Ruboty
     module Actions
       # ListAiCommands action for Ruboty::AiAgent
       class ListAiCommands < Base
-        def call: () -> untyped
+        # @rbs override
+        def call: ...
       end
     end
   end
