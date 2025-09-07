@@ -1,0 +1,421 @@
+module Ruboty
+  extend Mem
+
+  def self.actions: () -> untyped
+
+  def self.die: (untyped message) -> untyped
+
+  alias self.handlers self.handlers_with_memoize
+
+  def self.handlers=: (untyped value) -> untyped
+
+  def self.handlers_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+  alias self.handlers_without_memoize self.handlers
+
+  def self.logger: () -> untyped
+
+  def self.unmemoize_handlers: () -> untyped
+
+  VERSION: ::String
+
+  class Action
+    def self.prefix_pattern: (untyped robot_name) -> untyped
+
+    def <=>: (untyped action) -> untyped
+
+    def all?: () -> untyped
+
+    def call: (untyped handler, untyped message, ?untyped options) -> untyped
+
+    def description: () -> untyped
+
+    def hidden?: () -> untyped
+
+    def missing?: () -> untyped
+
+    def name: () -> untyped
+
+    def options: () -> untyped
+
+    def pattern: () -> untyped
+
+    private
+
+    def initialize: (untyped pattern, ?untyped options) -> void
+
+    def pattern_with: (untyped robot_name) -> untyped
+  end
+
+  module Actions
+    class Base
+      def message: () -> untyped
+
+      private
+
+      def initialize: (untyped message) -> void
+    end
+
+    class Help < ::Ruboty::Actions::Base
+      def call: () -> untyped
+
+      private
+
+      def all_descriptions: () -> untyped
+
+      def filtered_descriptions: () -> untyped
+    end
+
+    class Ping < ::Ruboty::Actions::Base
+      def call: () -> untyped
+
+      private
+
+      def ping: () -> untyped
+
+      def pong: () -> untyped
+    end
+
+    class Whoami < ::Ruboty::Actions::Base
+      def call: () -> untyped
+    end
+  end
+
+  class AdapterBuilder
+    def self.adapter_classes: () -> untyped
+
+    def build: () -> untyped
+
+    def robot: () -> untyped
+
+    private
+
+    def adapter_class: () -> untyped
+
+    def initialize: (untyped robot) -> void
+  end
+
+  module Adapters
+    class Base
+      include Ruboty::Env::Validatable
+
+      extend Ruboty::Env::Validatable::ClassMethods
+
+      def self.inherited: (untyped child_class) -> untyped
+
+      def robot: () -> untyped
+
+      private
+
+      def initialize: (untyped robot) -> void
+    end
+
+    class Shell < ::Ruboty::Adapters::Base
+      def run: () -> untyped
+
+      def say: (untyped message) -> untyped
+
+      def stopped: () -> untyped
+
+      def stopped=: (untyped) -> untyped
+
+      private
+
+      def explain: () -> untyped
+
+      def history_file: () -> untyped
+
+      def history_pathname: () -> untyped
+
+      def initialize: (*untyped args) -> void
+
+      def listen: () -> untyped
+
+      def read: () -> untyped
+
+      def remember: () -> untyped
+
+      def step: () -> untyped
+
+      def stop: () -> untyped
+
+      def stopped?: () -> untyped
+
+      PROMPT: ::String
+
+      SOURCE: ::String
+
+      USAGE: ::String
+    end
+  end
+
+  module Brains
+    class Base
+      include Ruboty::Env::Validatable
+
+      extend Ruboty::Env::Validatable::ClassMethods
+
+      def self.brain_classes: () -> untyped
+
+      def self.find_class: () -> untyped
+
+      def self.inherited: (untyped child) -> untyped
+
+      def data: () -> untyped
+
+      private
+
+      def initialize: () -> void
+    end
+
+    class Memory < ::Ruboty::Brains::Base
+      def data: () -> untyped
+    end
+  end
+
+  class CommandBuilder
+    include Mem
+
+    extend Mem::ClassMethods
+
+    def arguments: () -> untyped
+
+    def build: () -> untyped
+
+    private
+
+    def command_class: () -> untyped
+
+    def initialize: (?untyped arguments) -> void
+
+    alias options options_with_memoize
+
+    def options_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+    alias options_without_memoize options
+
+    def unmemoize_options: () -> untyped
+  end
+
+  module Commands
+    class Base
+      def options: () -> untyped
+
+      private
+
+      def initialize: (untyped options) -> void
+    end
+
+    class Generate < ::Ruboty::Commands::Base
+      def call: () -> untyped
+
+      private
+
+      def copy: () -> untyped
+
+      def destination_path: () -> untyped
+
+      def die: () -> untyped
+
+      def templates_directory_path: () -> untyped
+
+      def valid?: () -> untyped
+    end
+
+    class Help < ::Ruboty::Commands::Base
+      def call: () -> untyped
+    end
+
+    class Run < ::Ruboty::Commands::Base
+      def call: () -> untyped
+    end
+  end
+
+  class Env
+    def description: () -> untyped
+
+    def key: () -> untyped
+
+    def options: () -> untyped
+
+    def to_usage: () -> untyped
+
+    def validate: () -> untyped
+
+    private
+
+    def error: () -> untyped
+
+    def initialize: (untyped key, untyped description, ?untyped options) -> void
+
+    def missing?: () -> untyped
+
+    def required?: () -> untyped
+
+    class MissingRequiredKeyError < ::StandardError
+    end
+
+    module Validatable
+      extend ActiveSupport::Concern
+
+      def validate: () -> untyped
+
+      def validate!: () -> untyped
+
+      module ClassMethods
+        def env: (untyped key, untyped description, ?untyped options) -> untyped
+
+        def envs: () -> untyped
+
+        def usage: () -> untyped
+      end
+    end
+
+    class ValidationError < ::StandardError
+    end
+  end
+
+  module Handlers
+    class Base
+      include Ruboty::Env::Validatable
+
+      extend Ruboty::Env::Validatable::ClassMethods
+
+      extend Mem
+
+      alias self.actions self.actions_with_memoize
+
+      def self.actions=: (untyped value) -> untyped
+
+      def self.actions_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+      alias self.actions_without_memoize self.actions
+
+      def self.inherited: (untyped child) -> untyped
+
+      def self.on: (untyped pattern, ?untyped options) -> untyped
+
+      def self.unmemoize_actions: () -> untyped
+
+      def call: (untyped message, ?untyped options) -> untyped
+
+      def robot: () -> untyped
+
+      private
+
+      def initialize: (untyped robot) -> void
+    end
+
+    class Help < ::Ruboty::Handlers::Base
+      def help: (untyped message) -> untyped
+    end
+
+    class Ping < ::Ruboty::Handlers::Base
+      def ping: (untyped message) -> untyped
+    end
+
+    class Whoami < ::Ruboty::Handlers::Base
+      def whoami: (untyped message) -> untyped
+    end
+  end
+
+  class Message
+    def []: (untyped index) -> untyped
+
+    def body: () -> untyped
+
+    def from: () -> untyped
+
+    def from_name: () -> untyped
+
+    def match: (untyped pattern) -> untyped
+
+    def match_data: () -> untyped
+
+    def original: () -> untyped
+
+    def reply: (untyped body, ?untyped options) -> untyped
+
+    def robot: () -> untyped
+
+    def to: () -> untyped
+
+    private
+
+    def initialize: (untyped original) -> void
+  end
+
+  class Robot
+    include Mem
+
+    extend Mem::ClassMethods
+
+    alias brain brain_with_memoize
+
+    def brain=: (untyped value) -> untyped
+
+    def brain_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+    alias brain_without_memoize brain
+
+    def name: () -> untyped
+
+    def options: () -> untyped
+
+    def receive: (untyped attributes) -> untyped
+
+    def run: () -> untyped
+
+    def say: (*untyped args) -> untyped
+
+    def unmemoize_brain: () -> untyped
+
+    private
+
+    def adapt: () -> untyped
+
+    alias adapter adapter_with_memoize
+
+    def adapter_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+    alias adapter_without_memoize adapter
+
+    def bundle: () -> untyped
+
+    def daemon: () -> untyped
+
+    def dotenv: () -> untyped
+
+    alias env env_with_memoize
+
+    def env_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+    alias env_without_memoize env
+
+    def handle: () -> untyped
+
+    alias handlers handlers_with_memoize
+
+    def handlers_with_memoize: (*untyped args) { (*untyped) -> untyped } -> untyped
+
+    alias handlers_without_memoize handlers
+
+    def initialize: (?untyped options) -> void
+
+    def pid: () -> untyped
+
+    def remember: () -> untyped
+
+    def setup: () -> untyped
+
+    def unmemoize_adapter: () -> untyped
+
+    def unmemoize_env: () -> untyped
+
+    def unmemoize_handlers: () -> untyped
+
+    DEFAULT_ENV: ::String
+
+    DEFAULT_ROBOT_NAME: ::String
+  end
+end

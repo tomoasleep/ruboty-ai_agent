@@ -1,0 +1,59 @@
+# Generated from lib/ruboty/ai_agent/http_mcp_client.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Mcp client with HTTP transport.
+    class HttpMcpClient
+      attr_reader base_url: untyped
+
+      attr_reader headers: untyped
+
+      attr_reader session_id: untyped
+
+      def initialize: (url: untyped, ?headers: untyped, ?session_id: untyped) -> untyped
+
+      def initialize_session: () -> untyped
+
+      def ping: () -> untyped
+
+      def list_tools: () -> untyped
+
+      # @rbs name: String
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      def call_tool: (String name, ?untyped arguments) ?{ (Hash[String, untyped]) -> void } -> untyped
+
+      def list_prompts: () -> untyped
+
+      def get_prompt: (untyped name, ?untyped arguments) -> untyped
+
+      def list_resources: () -> untyped
+
+      def read_resource: (untyped uri) -> untyped
+
+      def cleanup_session: () -> untyped
+
+      private
+
+      @initialize_called: bool
+
+      def ensure_initialized: () -> untyped
+
+      # @rbs method: String
+      # @rbs ?params: Hash[String | Symbol, untyped]?
+      # @rbs ?id: String?
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
+      def send_request: (method: String, ?params: untyped, ?id: untyped) ?{ (Hash[String, untyped]) -> void } -> Array[Hash[String, untyped]]
+
+      def handle_response: (untyped response) ?{ (?) -> untyped } -> untyped
+
+      # @rbs response: Net::HTTPResponse
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
+      def handle_streaming_response: (Net::HTTPResponse response) ?{ (Hash[String, untyped]) -> void } -> Array[Hash[String, untyped]]
+
+      class Error < StandardError
+      end
+    end
+  end
+end

@@ -1,0 +1,24 @@
+# Generated from lib/ruboty/ai_agent/mcp_clients.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manages multiple MCP (Model Context Protocol) clients
+    class McpClients
+      attr_reader clients: untyped
+
+      # @rbs mcp_configurations: Array[McpConfiguration]
+      def initialize: (?Array[McpConfiguration] mcp_configurations) -> untyped
+
+      def available_tools: () -> Array[Tool]
+
+      def execute_tool: (untyped function_name, untyped arguments) -> untyped
+
+      def any?: () -> untyped
+
+      private
+
+      # @rbs mcp_configurations: Array[McpConfiguration]
+      def initialize_mcp_clients: (Array[McpConfiguration] mcp_configurations) -> untyped
+    end
+  end
+end

@@ -44,7 +44,7 @@ module Ruboty
       def initialize_mcp_clients(mcp_configurations)
         mcp_configurations.map do |server_config|
           case server_config.transport
-          when 'http'
+          when :http
             HttpMcpClient.new(
               url: server_config.url,
               headers: server_config.headers || {}

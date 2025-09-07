@@ -1,0 +1,9 @@
+# Generated from lib/ruboty/ai_agent.rb with RBS::Inline
+
+module Ruboty
+  # Add AI Agent feature to Ruboty.
+  module AiAgent
+    class Error < StandardError
+    end
+  end
+end

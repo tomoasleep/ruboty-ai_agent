@@ -1,0 +1,9 @@
+# Generated from lib/ruboty/ai_agent/actions.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Ruboty AI Agent actions.
+    module Actions
+    end
+  end
+end

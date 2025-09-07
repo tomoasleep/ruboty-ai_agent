@@ -1,0 +1,16 @@
+# Generated from lib/ruboty/ai_agent/actions/chat.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # Chat action for Ruboty::AiAgent
+      class Chat < Base
+        CONVERSATION_KEY: ::Symbol
+
+        def call: () -> untyped
+
+        def body_param: () -> String
+      end
+    end
+  end
+end

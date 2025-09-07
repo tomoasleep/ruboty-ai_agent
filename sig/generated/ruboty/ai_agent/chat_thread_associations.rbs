@@ -1,0 +1,21 @@
+# Generated from lib/ruboty/ai_agent/chat_thread_associations.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # A set of records for a specific thread.
+    # @rbs generic Record
+    class ChatThreadAssociations[Record] < RecordSet[Record]
+      attr_reader chat_thread_id: String
+
+      def initialize: (database: untyped, chat_thread_id: untyped) -> untyped
+
+      def self.association_key: () -> Symbol
+
+      def self.association_key=: (Symbol) -> Symbol
+
+      def association_key: () -> Symbol
+
+      def namespace_keys: () -> untyped
+    end
+  end
+end

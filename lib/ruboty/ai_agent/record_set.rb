@@ -3,6 +3,7 @@
 module Ruboty
   module AiAgent
     # A set of records.
+    # @rbs generic Record
     class RecordSet
       attr_reader :database #: Ruboty::AiAgent::Database
 
@@ -10,7 +11,7 @@ module Ruboty
         @database = database
       end
 
-      def namespace_keys #: Array[Symbol | String]
+      def namespace_keys #: Array[Symbol | String | Integer]
         raise NotImplementedError, 'Subclasses must implement the namespace_keys method'
       end
 
@@ -22,7 +23,7 @@ module Ruboty
         database.fetch(*namespace_keys)
       end
 
-      def all_values #: Array
+      def all_values #: Array[Record]
         case (kv = all)
         when Hash
           kv.values
@@ -33,27 +34,27 @@ module Ruboty
         end
       end
 
-      def keys #: Array[Symbol | Integer]
+      def keys #: Array[Database::keynable]
         database.keys(*namespace_keys)
       end
 
-      # @rbs key: String
+      # @rbs key: Symbol | String | Integer
       # @rbs return: Record | nil
       def fetch(key)
         database.fetch(*namespace_keys, key)
       end
 
-      # @rbs key: String
+      # @rbs key: Symbol | String | Integer
       # @rbs record: Record
       # @rbs return: void
       def store(record, key:)
         database.store(record, at: [*namespace_keys, key])
       end
 
-      # @rbs key: String
+      # @rbs key: String | Integer
       # @rbs return: void
       def remove(key)
-        detabase.delete(*namespace_keys, key)
+        database.delete(*namespace_keys, key)
       end
 
       def key?(key)

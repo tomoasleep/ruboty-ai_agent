@@ -12,13 +12,13 @@ module Ruboty
       attr_reader :content #: String
       attr_reader :tool_call_id #: String?
       attr_reader :tool_name #: String?
-      attr_reader :tool_arguments #: Hash?
+      attr_reader :tool_arguments #: Hash[Symbol | String, untyped]?
 
       # @rbs role: Symbol
       # @rbs content: String
-      # @rbs tool_call_id: String?
-      # @rbs tool_name: String?
-      # @rbs tool_arguments: Hash?
+      # @rbs ?tool_call_id: String?
+      # @rbs ?tool_name: String?
+      # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
       def initialize(role:, content:, tool_call_id: nil, tool_name: nil, tool_arguments: nil)
         @role = role
         @content = content
@@ -27,7 +27,7 @@ module Ruboty
         @tool_arguments = tool_arguments
       end
 
-      def to_h #: Hash
+      def to_h #: Hash[Symbol, untyped]
         {
           role:,
           content:,

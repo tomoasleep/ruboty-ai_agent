@@ -2,12 +2,27 @@
 
 module Ruboty
   module AiAgent
+    # @rbs!
+    #   type transports = :http | :websocket
+
+    McpConfiguration = Data.define(
+      :name, #: String
+      :transport, #: transports
+      :headers, #: Hash[String, String]
+      :url #: String
+    )
+
     # Save MCP configuration details.
-    class McpConfiguration < Data.define(:name, :transport, :headers, :url)
+    class McpConfiguration
       include Recordable
 
+      # @rbs name: String
+      # @rbs transport: transports
+      # @rbs url: String
+      # @rbs headers: Hash[String, String]?
       def initialize(name:, transport:, url:, headers: {})
-        super(name:, transport:, headers:, url:)
+        # No superclass method `initialize` in RBS.
+        super(name:, transport:, headers:, url:) # steep:ignore UnexpectedKeywordArgument
       end
 
       register_record_type :mcp_configuration

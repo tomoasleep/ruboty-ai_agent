@@ -1,0 +1,38 @@
+# Generated from lib/ruboty/ai_agent/record_set.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # A set of records.
+    # @rbs generic Record
+    class RecordSet[Record]
+      attr_reader database: Ruboty::AiAgent::Database
+
+      def initialize: (database: untyped) -> untyped
+
+      def namespace_keys: () -> Array[Symbol | String | Integer]
+
+      def length: () -> Integer
+
+      def all: () -> untyped
+
+      def all_values: () -> Array[Record]
+
+      def keys: () -> Array[Database::keynable]
+
+      # @rbs key: Symbol | String | Integer
+      # @rbs return: Record | nil
+      def fetch: (Symbol | String | Integer key) -> (Record | nil)
+
+      # @rbs key: Symbol | String | Integer
+      # @rbs record: Record
+      # @rbs return: void
+      def store: (Record record, key: Symbol | String | Integer) -> void
+
+      # @rbs key: String | Integer
+      # @rbs return: void
+      def remove: (String | Integer key) -> void
+
+      def key?: (untyped key) -> untyped
+    end
+  end
+end

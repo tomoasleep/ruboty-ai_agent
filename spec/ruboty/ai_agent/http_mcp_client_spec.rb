@@ -93,7 +93,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
     it { is_expected.to eq([response_content]) }
 
     context 'with streaming (SSE)' do
-      let(:streaming_chunks) { ['First chunk', 'Second chunk'] }
+      let(:streaming_chunks) { [{ 'content' => 'First chunk' }, { 'content' => 'Second chunk' }] }
 
       before do
         # Mock ensure_initialized to avoid automatic initialization
@@ -115,8 +115,8 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
         end
 
         expect(results).to eq([
-                                { 'jsonrpc' => '2.0', 'id' => '1', 'result' => 'First chunk' },
-                                { 'jsonrpc' => '2.0', 'id' => '2', 'result' => 'Second chunk' }
+                                { 'jsonrpc' => '2.0', 'id' => '1', 'result' => { 'content' => 'First chunk' } },
+                                { 'jsonrpc' => '2.0', 'id' => '2', 'result' => { 'content' => 'Second chunk' } }
                               ])
       end
     end

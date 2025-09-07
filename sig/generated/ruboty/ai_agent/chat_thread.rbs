@@ -1,0 +1,20 @@
+# Generated from lib/ruboty/ai_agent/chat_thread.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manage thread-specific data.
+    class ChatThread
+      attr_reader database: Ruboty::AiAgent::Database
+
+      attr_reader id: String
+
+      def self.find_or_create: (database: untyped, id: untyped) -> ChatThread
+
+      def initialize: (database: untyped, id: untyped) -> untyped
+
+      # @rbs %a{memorized}
+      %a{memorized}
+      def messages: () -> ChatThreadMessages
+    end
+  end
+end

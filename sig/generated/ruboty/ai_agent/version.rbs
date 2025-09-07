@@ -1,0 +1,7 @@
+# Generated from lib/ruboty/ai_agent/version.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    VERSION: ::String
+  end
+end

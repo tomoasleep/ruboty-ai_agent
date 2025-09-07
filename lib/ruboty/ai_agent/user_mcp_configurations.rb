@@ -3,7 +3,7 @@
 module Ruboty
   module AiAgent
     # Manage MCP configurations for a specific user.
-    class UserMcpConfigurations < UserAssociations
+    class UserMcpConfigurations < UserAssociations #[McpConfiguration]
       self.association_key = :mcp_configurations
 
       # @rbs mcp_configuration: McpConfiguration:

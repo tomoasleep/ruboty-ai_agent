@@ -86,7 +86,7 @@ module OpenAIMockHelper
           ]
         }
       else
-        { role: 'assistant', content: message.content, tool_calls: nil }
+        { role: 'assistant', content: message.content }
       end
     when :tool
       { role: 'tool', tool_call_id: message.tool_call_id, content: message.content }
@@ -165,8 +165,4 @@ module OpenAIMockHelper
 
     expect(expectation).to have_been_made.once
   end
-end
-
-RSpec.configure do |config|
-  config.include OpenAIMockHelper
 end

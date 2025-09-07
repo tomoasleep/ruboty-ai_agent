@@ -1,0 +1,21 @@
+module EventStreamParser
+  VERSION: ::String
+
+  class Parser
+    def feed: (untyped chunk) { (*untyped) -> untyped } -> untyped
+
+    def stream: () -> untyped
+
+    private
+
+    def dispatch_event: () -> untyped
+
+    def ignore: () -> untyped
+
+    def initialize: () -> void
+
+    def process_field: (untyped field, untyped value) -> untyped
+
+    def process_line: (untyped line) { (*untyped) -> untyped } -> untyped
+  end
+end

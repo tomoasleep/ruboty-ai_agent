@@ -4,19 +4,24 @@ module Ruboty
   module AiAgent
     # Memorize and retrieve information using Ruboty's brain.
     class Database
+      # @rbs!
+      #   type keynable = Symbol | String | Integer
+
       autoload :QueryMethods, 'ruboty/ai_agent/database/query_methods'
 
       include QueryMethods
 
       NAMESPACE = :ai_agent
 
-      # @rbs brain: Ruboty::Brain::Base
+      attr_reader :brain #: Ruboty::Brains::Base
+
+      # @rbs brain: Ruboty::Brains::Base
       def initialize(brain)
         @brain = brain
       end
 
-      def data #: Hash
-        @brain.data[NAMESPACE] ||= {}
+      def data #: Hash[keynable, untyped]
+        brain.data[NAMESPACE] ||= {} # steep:ignore UnannotatedEmptyCollection
       end
 
       def user(id) #: User

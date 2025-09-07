@@ -3,7 +3,8 @@
 module Ruboty
   module AiAgent
     # A set of records for a specific thread.
-    class ChatThreadAssociations < RecordSet
+    # @rbs generic Record
+    class ChatThreadAssociations < RecordSet #[Record]
       attr_reader :chat_thread_id #: String
 
       def initialize(database:, chat_thread_id:)
@@ -12,6 +13,11 @@ module Ruboty
         @chat_thread_id = chat_thread_id
       end
 
+      # @rbs!
+      #   def self.association_key: () -> Symbol
+      #   def self.association_key=: (Symbol) -> Symbol
+
+      # @rbs skip
       class << self
         attr_accessor :association_key
       end

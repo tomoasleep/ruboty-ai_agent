@@ -88,7 +88,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           stub_openai_chat_completion_with_content(
             messages: [
               { role: 'user', content: body },
-              { role: 'assistant', content: 'Hello! How can I help you today?', tool_calls: nil },
+              { role: 'assistant', content: 'Hello! How can I help you today?' },
               { role: 'user', content: second_body }
             ],
             response_content: 'I cannot check the weather in real-time.'
@@ -136,11 +136,11 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           )
         )
 
-        # Mock MCP HTTP calls  
+        # Mock MCP HTTP calls
         stub_mcp_initialize(
           base_url: 'http://localhost:3000'
         )
-        
+
         stub_mcp_list_tools(
           base_url: 'http://localhost:3000',
           tools: [
@@ -151,7 +151,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             }
           ]
         )
-        
+
         stub_mcp_call_tool(
           base_url: 'http://localhost:3000',
           tool_name: 'calculator',
@@ -185,7 +185,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             { role: 'user', content: body },
             {
               role: 'assistant',
-              content: nil,
+              content: '',
               tool_calls: [
                 {
                   id: 'call_123',

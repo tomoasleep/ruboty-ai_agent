@@ -1,0 +1,16 @@
+# Generated from lib/ruboty/ai_agent/actions/add_ai_command.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # AddAiCommand action for Ruboty::AiAgent
+      class AddAiCommand < Base
+        def call: () -> untyped
+
+        def name_param: () -> String
+
+        def prompt_param: () -> String
+      end
+    end
+  end
+end

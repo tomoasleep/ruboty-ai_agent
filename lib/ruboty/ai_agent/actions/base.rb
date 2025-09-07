@@ -14,10 +14,16 @@ module Ruboty
           new(message).call
         end
 
+        # @rbs return: void
+        def call
+          raise NotImplementedError
+        end
+
         def initialize(message)
           @message = message
         end
 
+        # @rbs %a{memorized}
         def database #: Ruboty::AiAgent::Database
           @database ||= Ruboty::AiAgent::Database.new(message.robot.brain)
         end

@@ -1,0 +1,19 @@
+module Mem
+  def self.included: (untyped base) -> untyped
+
+  def has_memoized?: (untyped key) -> untyped
+
+  def memoize: (untyped key, untyped value) -> untyped
+
+  def memoized: (untyped key) -> untyped
+
+  def memoized_table: () -> untyped
+
+  def unmemoize: (untyped key) -> untyped
+
+  VERSION: ::String
+
+  module ClassMethods
+    def memoize: (untyped method_name) -> untyped
+  end
+end

@@ -5,14 +5,14 @@ module Ruboty
     # Define a tool that the AI agent can use.
     class Tool
       attr_reader :name, :title, :description #: String
-      attr_reader :input_schema #: Hash
-      attr_reader :on_call #: ? (Hash) -> String
+      attr_reader :input_schema #: Hash[untyped, untyped]?
+      attr_reader :on_call #: (^(Hash[String, untyped]) -> String )?
 
       # @rbs name: String
       # @rbs title: String
       # @rbs description: String
-      # @rbs input_schema: Hash?
-      # @rbs &on_call: ? (Hash) -> String
+      # @rbs input_schema: Hash[untyped, untyped]?
+      # @rbs &on_call: ? (Hash[String, untyped]) -> String
       def initialize(name:, title:, description:, input_schema:, &on_call) #: void
         @name = name
         @title = title

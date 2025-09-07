@@ -1,0 +1,31 @@
+# Generated from lib/ruboty/ai_agent/chat_message.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Save MCP configuration details.
+    class ChatMessage
+      include Recordable
+
+      attr_reader role: Symbol
+
+      attr_reader content: String
+
+      attr_reader tool_call_id: String?
+
+      attr_reader tool_name: String?
+
+      attr_reader tool_arguments: Hash[Symbol | String, untyped]?
+
+      # @rbs role: Symbol
+      # @rbs content: String
+      # @rbs ?tool_call_id: String?
+      # @rbs ?tool_name: String?
+      # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
+      def initialize: (role: Symbol, content: String, ?tool_call_id: untyped, ?tool_name: untyped, ?tool_arguments: untyped) -> untyped
+
+      def to_h: () -> Hash[Symbol, untyped]
+
+      def self.from_llm_response: (tool: untyped, tool_call_id: untyped, tool_arguments: untyped, tool_response: untyped) -> ChatMessage
+    end
+  end
+end

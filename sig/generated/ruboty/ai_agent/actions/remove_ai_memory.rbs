@@ -1,0 +1,14 @@
+# Generated from lib/ruboty/ai_agent/actions/remove_ai_memory.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # RemoveAiMemory action for Ruboty::AiAgent
+      class RemoveAiMemory < Base
+        def call: () -> untyped
+
+        def index_param: () -> String
+      end
+    end
+  end
+end

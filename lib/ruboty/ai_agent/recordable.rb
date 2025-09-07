@@ -2,23 +2,27 @@
 
 module Ruboty
   module AiAgent
+    # @rbs!
+    #   interface _WithToH
+    #     def to_h: () -> Hash[Database::keynable, untyped]
+    #   end
+
     # Convertable between Hash and Recordable bidirectionally.
+    # @rbs module-self _WithToH
     module Recordable
       class << self
         def included(base)
           base.extend(ClassMethods)
-          base.prepend(PrependFeatures)
-
-          base.singleton_class.class_exec do
-            attr_accessor :record_type
-          end
+          base.prepend(PrependMethods)
         end
+
+        # @rbs @record_types: Hash[Symbol, Class]
 
         def record_types #: Hash[Symbol, Class]
           @record_types ||= {}
         end
 
-        # @rbs hash: Hash[Symbol, untyped]
+        # @rbs hash: Hash[Symbol, untyped]?
         # @rbs return: bool
         def convertable?(hash)
           return false unless hash.is_a?(Hash)
@@ -45,7 +49,7 @@ module Ruboty
         end
 
         # @rbs record: Recordable
-        # @rbs return: Hash
+        # @rbs return: Hash[Database::keynable, untyped]
         def record_to_hash(record)
           record.to_h
         end
@@ -61,8 +65,11 @@ module Ruboty
         end
       end
 
+      # @rbs module-self Class
       module ClassMethods
-        # @rbs name: String
+        attr_accessor :record_type #: Symbol
+
+        # @rbs name: Symbol
         def register_record_type(name)
           name = name.to_sym
           self.record_type = name
@@ -73,13 +80,20 @@ module Ruboty
         end
       end
 
-      module PrependFeatures
-        def to_h #: Hash
+      # @rbs module-self Recordable::ClassMethods.instance
+      module PrependMethods
+        def to_h #: Hash[Database::keynable, untyped]
           {
-            record_type: self.class.record_type,
+            record_type: record_type,
             **super
           }
         end
+      end
+
+      # @rbs %a{pure}
+      def record_type #: Symbol
+        self.class #: singleton(::Object) & ClassMethods
+            .record_type
       end
     end
   end

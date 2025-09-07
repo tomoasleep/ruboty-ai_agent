@@ -1,0 +1,14 @@
+# Generated from lib/ruboty/ai_agent/actions/add_ai_memory.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # AddAiMemory action for Ruboty::AiAgent
+      class AddAiMemory < Base
+        def call: () -> untyped
+
+        def prompt_param: () -> String
+      end
+    end
+  end
+end

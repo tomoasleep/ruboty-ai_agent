@@ -1,0 +1,12 @@
+# Generated from lib/ruboty/ai_agent/actions/show_system_prompt.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # ShowSystemPrompt action for Ruboty::AiAgent
+      class ShowSystemPrompt < Base
+        def call: () -> untyped
+      end
+    end
+  end
+end

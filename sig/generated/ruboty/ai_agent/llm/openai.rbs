@@ -1,0 +1,50 @@
+# Generated from lib/ruboty/ai_agent/llm/openai.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module LLM
+      # LLM interface for OpenAI's chat completion API.
+      class OpenAI
+        attr_reader client: OpenAI::Client
+
+        attr_reader model: String
+
+        # @rbs client: OpenAI::Client
+        # @rbs model: String
+        def initialize: (client: OpenAI::Client, model: String) -> untyped
+
+        # @rbs messages: Array[ChatMessage]
+        # @rbs tools: Array[Tool]
+        # @rbs return: Response
+        def complete: (messages: Array[ChatMessage], ?tools: Array[Tool]) -> Response
+
+        private
+
+        type tool_call = { id: String, type: "function", function: { name: String, arguments: String } }
+
+        type system_message = { role: "system", content: String }
+
+        type user_message = { role: "user", content: String }
+
+        type assistant_message = { role: "assistant", content: String, tool_calls: Array[tool_call]? }
+
+        type tool_message = { role: "tool", tool_call_id: String, content: String }
+
+        type message = system_message | user_message | assistant_message | tool_message
+
+        # @rbs messages: Array[ChatMessage]
+        # @rbs return: Array[OpenAI::Models::Chat::chat_completion_message_param]
+        def openai_messages_from_messages: (Array[ChatMessage] messages) -> Array[OpenAI::Models::Chat::chat_completion_message_param]
+
+        # @rbs tools: Array[Tool]
+        # @rbs return: Array[OpenAI::Models::Chat::chat_completion_tool]
+        def openai_tools_from_tools: (Array[Tool] tools) -> Array[OpenAI::Models::Chat::chat_completion_tool]
+
+        # @rbs openai_response: OpenAI::Models::Chat::ChatCompletion
+        # @rbs tools: Array[Tool]
+        # @rbs return: Response
+        def to_response: (openai_response: OpenAI::Models::Chat::ChatCompletion, tools: Array[Tool]) -> Response
+      end
+    end
+  end
+end

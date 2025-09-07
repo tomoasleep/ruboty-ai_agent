@@ -1,0 +1,21 @@
+# Generated from lib/ruboty/ai_agent/user_associations.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # A set of records for a specific user.
+    # @rbs generic Record
+    class UserAssociations[Record] < RecordSet[Record]
+      attr_reader user_id: String
+
+      def initialize: (database: untyped, user_id: untyped) -> untyped
+
+      def self.association_key: () -> Symbol
+
+      def self.association_key=: (Symbol) -> Symbol
+
+      def association_key: () -> Symbol
+
+      def namespace_keys: () -> untyped
+    end
+  end
+end

@@ -10,6 +10,7 @@
 # See https://docs.rubocop.org/rubocop/configuration
 plugins:
   - rubocop-rake
+  - rubocop-rbs_inline
 
 AllCops:
   TargetRubyVersion: 3.1
@@ -17,6 +18,10 @@ AllCops:
 Naming/AccessorMethodName:
   Exclude:
     - lib/ruboty/handlers/ai_agent.rb # we name handler methods from its word pattern
+
+Naming/FileName:
+  Exclude:
+    - Steepfile
 
 Layout/LineLength:
   Enabled: false
@@ -28,7 +33,13 @@ Layout/LeadingCommentSpace:
 Metrics:
   Enabled: false
 
+Style/CommentedKeyword:
+  Enabled: false # because of RBS annotations
+
 Style/Documentation:
   AllowedConstants:
     - ClassMethods
     - PrependFeatures
+
+Style/RedundantBegin:
+  Enabled: false # because of Steep annotations

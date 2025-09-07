@@ -1,0 +1,28 @@
+# Generated from lib/ruboty/ai_agent/actions/base.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # Base class for actions.
+      # @abstract
+      class Base
+        attr_reader message: Ruboty::Message
+
+        # @rbs message: Ruboty::Message
+        # @rbs return: void
+        def self.call: (Ruboty::Message message) -> void
+
+        # @rbs return: void
+        def call: () -> void
+
+        def initialize: (untyped message) -> untyped
+
+        # @rbs %a{memorized}
+        %a{memorized}
+        def database: () -> Ruboty::AiAgent::Database
+
+        def user: () -> Ruboty::AiAgent::User
+      end
+    end
+  end
+end

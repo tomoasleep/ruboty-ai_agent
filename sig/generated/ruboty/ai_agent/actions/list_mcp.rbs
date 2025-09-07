@@ -1,0 +1,12 @@
+# Generated from lib/ruboty/ai_agent/actions/list_mcp.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # ListMcp action for Ruboty::AiAgent
+      class ListMcp < Base
+        def call: () -> untyped
+      end
+    end
+  end
+end

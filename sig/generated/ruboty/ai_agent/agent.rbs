@@ -1,0 +1,29 @@
+# Generated from lib/ruboty/ai_agent/agent.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Agent class to interact with LLM and manage conversations.
+    class Agent
+      attr_reader llm: LLM::OpenAI
+
+      attr_reader messages: Array[ChatMessage]
+
+      attr_reader tools: Array[Tool]
+
+      # @rbs llm: LLM::OpenAI
+      # @rbs messages: Array[ChatMessage]
+      # @rbs tools: Array[Tool]
+      def initialize: (llm: LLM::OpenAI, ?messages: Array[ChatMessage], ?tools: Array[Tool]) -> untyped
+
+      def complete: () ?{ (?) -> untyped } -> untyped
+
+      def on_new_message: (untyped message) ?{ (?) -> untyped } -> untyped
+
+      def on_tool_call: (tool: untyped, tool_arguments: untyped) ?{ (?) -> untyped } -> untyped
+
+      def on_tool_response: (tool_response: untyped, message: untyped) ?{ (?) -> untyped } -> untyped
+
+      def on_response: (untyped response) ?{ (?) -> untyped } -> untyped
+    end
+  end
+end

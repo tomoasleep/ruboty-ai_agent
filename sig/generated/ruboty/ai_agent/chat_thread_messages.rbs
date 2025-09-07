@@ -1,0 +1,13 @@
+# Generated from lib/ruboty/ai_agent/chat_thread_messages.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manage messages for the chat thread.
+    class ChatThreadMessages < ChatThreadAssociations[ChatMessage]
+      # @rbs message: ChatMessage
+      def add: (ChatMessage message) -> void
+
+      alias << add
+    end
+  end
+end

@@ -3,6 +3,8 @@
 require 'spec_helper'
 
 RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
+  include OpenAIMockHelper
+
   subject(:llm) { described_class.new(client: client, model: model) }
 
   let(:client) { ::OpenAI::Client.new(api_key: 'test_token') }
@@ -89,7 +91,7 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
 
           aggregate_failures do
             expect(response.message.role).to eq(:assistant)
-            expect(response.message.content).to be_nil
+            expect(response.message.content).to be_empty
             expect(response.message.tool_call_id).to eq('call_123')
             expect(response.message.tool_name).to eq('get_weather')
             expect(response.message.tool_arguments).to eq({ location: 'Tokyo' })

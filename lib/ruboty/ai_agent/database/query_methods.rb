@@ -3,9 +3,14 @@
 module Ruboty
   module AiAgent
     class Database
-      # @rbs module-self Database
+      # @rbs!
+      #   interface _WithData
+      #     def data: -> Hash[keynable, untyped]
+      #   end
+
+      # @rbs module-self _WithData
       module QueryMethods
-        # @rbs keys: Array[Symbol | Integer]
+        # @rbs *keys: keynable
         # @rbs return: untyped
         def fetch(*keys)
           item = data.dig(*keys)
@@ -13,20 +18,20 @@ module Ruboty
           Recordable.convert_recursively(item)
         end
 
-        # @rbs keys: Array[Symbol | Integer]
+        # @rbs *keys: keynable
         # @rbs return: Integer
         def len(*keys)
           item = data.dig(*keys)
           item.respond_to?(:length) ? item.length : 0
         end
 
-        # @rbs keys: Array[Symbol | Integer]
+        # @rbs *keys: keynable
         # @rbs return: void
         def delete(*keys)
-          namespace_keys = keys[0..-2]
+          namespace_keys = keys[0..-2] || []
           key = keys[-1]
 
-          namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
+          namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys) #: top
           case namespace
           when Hash
             namespace.delete(key)
@@ -35,10 +40,10 @@ module Ruboty
           end
         end
 
-        # @rbs keys: Array[Symbol | Integer]
-        # @rbs return: Array[Symbol | Integer]
-        def keys(*keys) #: boolish
-          namespace = keys.empty? ? data : data.dig(*keys)
+        # @rbs *keys: keynable
+        # @rbs return: Array[keynable]
+        def keys(*keys)
+          namespace = keys.empty? ? data : data.dig(*keys) #: top
           case namespace
           when Hash
             namespace.keys
@@ -49,21 +54,21 @@ module Ruboty
           end
         end
 
-        # @rbs keys: Array[Symbol | Integer]
+        # @rbs *keys: keynable
         # @rbs return: boolish
-        def key?(*keys) #: boolish
-          namespace_keys = keys[0..-2]
+        def key?(*keys)
+          namespace_keys = keys[0..-2] || []
           key = keys[-1]
 
           namespace = namespace_keys.empty? ? data : data.dig(*namespace_keys)
           namespace&.key?(key)
         end
 
-        # @rbs at: Array[String | Integer]
+        # @rbs at: Array[keynable]
         # @rbs value: untyped
         # @rbs return: void
         def store(value, at:)
-          namespace_keys = at[0..-2]
+          namespace_keys = at[0..-2] || []
           key = at[-1]
 
           namespace = namespace_keys.reduce(data) do |current, k|

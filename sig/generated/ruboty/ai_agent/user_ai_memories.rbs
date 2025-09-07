@@ -1,0 +1,11 @@
+# Generated from lib/ruboty/ai_agent/user_ai_memories.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manage Ai Memories for a specific user.
+    class UserAiMemories < UserAssociations[String]
+      # @rbs memory: String
+      def add: (String memory) -> void
+    end
+  end
+end

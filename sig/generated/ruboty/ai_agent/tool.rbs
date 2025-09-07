@@ -1,0 +1,27 @@
+# Generated from lib/ruboty/ai_agent/tool.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Define a tool that the AI agent can use.
+    class Tool
+      attr_reader name: String
+
+      attr_reader title: String
+
+      attr_reader description: String
+
+      attr_reader input_schema: Hash[untyped, untyped]?
+
+      attr_reader on_call: (^(Hash[String, untyped]) -> String)?
+
+      # @rbs name: String
+      # @rbs title: String
+      # @rbs description: String
+      # @rbs input_schema: Hash[untyped, untyped]?
+      # @rbs &on_call: ? (Hash[String, untyped]) -> String
+      def initialize: (name: String, title: String, description: String, input_schema: Hash[untyped, untyped]?) ?{ (Hash[String, untyped]) -> String } -> void
+
+      def call: (untyped params) -> String?
+    end
+  end
+end

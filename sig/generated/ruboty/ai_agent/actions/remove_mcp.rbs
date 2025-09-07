@@ -1,0 +1,14 @@
+# Generated from lib/ruboty/ai_agent/actions/remove_mcp.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # RemoveMcp action for Ruboty::AiAgent
+      class RemoveMcp < Base
+        def call: () -> untyped
+
+        def name_param: () -> String
+      end
+    end
+  end
+end

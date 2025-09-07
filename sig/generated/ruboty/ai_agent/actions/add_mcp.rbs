@@ -1,0 +1,26 @@
+# Generated from lib/ruboty/ai_agent/actions/add_mcp.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # AddMcp action for Ruboty::AiAgent
+      class AddMcp < Base
+        def call: () -> untyped
+
+        def name_param: () -> String
+
+        def config_param: () -> String
+
+        private
+
+        type config = { transport: :http | :sse, headers: Hash[String, String], args: Array[String] }
+
+        def parse_config: () -> config
+
+        # @rbs str: String
+        # @rbs return: String
+        def undump_string: (String str) -> String
+      end
+    end
+  end
+end

@@ -25,7 +25,7 @@ module Ruboty
           method: 'initialize',
           params: {
             protocolVersion: '2024-11-05',
-            capabilities: {},
+            capabilities: {}, #: Hash[untyped, untyped]
             clientInfo: {
               name: 'ruboty-ai_agent',
               version: '1.0'
@@ -49,6 +49,8 @@ module Ruboty
         results.flat_map { |res| res.dig('result', 'tools') || [] }
       end
 
+      # @rbs name: String
+      # @rbs &block: ? (Hash[String, untyped]) -> void
       def call_tool(name, arguments = {}, &block)
         ensure_initialized
         results = send_request(
@@ -59,8 +61,6 @@ module Ruboty
           },
           &block
         )
-
-        return nil if block_given?
 
         results.flat_map { |res| res.dig('result', 'content') || [] }
       end
@@ -99,10 +99,13 @@ module Ruboty
       def cleanup_session
         if @session_id
           uri = URI.parse(@base_url)
+
+          raise 'Invalid uri' if uri.host.nil?
+
           http = Net::HTTP.new(uri.host, uri.port)
           http.use_ssl = uri.scheme == 'https'
 
-          request = Net::HTTP::Delete.new(uri.path.empty? ? '/' : uri.path)
+          request = Net::HTTP::Delete.new(uri.path.nil? || uri.path.empty? ? '/' : uri.path)
           request['Accept'] = 'application/json, text/event-stream'
           request['Content-Type'] = 'application/json'
           request['Mcp-Session-Id'] = @session_id
@@ -117,18 +120,28 @@ module Ruboty
 
       private
 
+      # @rbs @initialize_called: bool
+
       def ensure_initialized
         return if @initialize_called || @session_id
 
         initialize_session
       end
 
-      def send_request(method:, params: nil, id: nil, &block) #: Array[Hash] | nil
+      # @rbs method: String
+      # @rbs ?params: Hash[String | Symbol, untyped]?
+      # @rbs ?id: String?
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
+      def send_request(method:, params: nil, id: nil, &block)
         uri = URI.parse(@base_url)
+
+        raise 'Invalid uri' if uri.host.nil?
+
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = uri.scheme == 'https'
 
-        request = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.path)
+        request = Net::HTTP::Post.new(uri.path.nil? || uri.path.empty? ? '/' : uri.path)
         request['Accept'] = 'application/json, text/event-stream'
         request['Content-Type'] = 'application/json'
         request['Mcp-Session-Id'] = @session_id if @session_id
@@ -138,7 +151,7 @@ module Ruboty
           jsonrpc: '2.0',
           method: method,
           id: id || SecureRandom.uuid
-        }
+        } #: Hash[Symbol, untyped]
         body[:params] = params if params
 
         request.body = JSON.generate(body)
@@ -151,10 +164,13 @@ module Ruboty
         if response['Content-Type'] =~ %r{text/event-stream}
           handle_streaming_response(response, &block)
         else
-          handle_response(response)
+          handle_response(response, &block)
         end
       end
 
+      # @rbs response: Net::HTTPResponse
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
       def handle_response(response, &block)
         result = JSON.parse(response.body)
 
@@ -162,15 +178,16 @@ module Ruboty
 
         result['Mcp-Session-Id'] = response['Mcp-Session-Id'] if response['Mcp-Session-Id']
 
-        if block
-          block.call([result])
-        else
-          [result]
-        end
+        block&.call(result)
+
+        [result]
       end
 
+      # @rbs response: Net::HTTPResponse
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
       def handle_streaming_response(response, &block)
-        events = []
+        events = [] #: Array[Hash[String, untyped]]
         parser = EventStreamParser::Parser.new
 
         body = response.body
@@ -181,17 +198,15 @@ module Ruboty
             parsed_data = JSON.parse(data)
             raise Error, "JSON-RPC Error #{parsed_data['error']['code']}: #{parsed_data['error']['message']}" if parsed_data['error']
 
-            if block_given?
-              block.call(parsed_data)
-            else
-              events << parsed_data
-            end
+            block&.call(parsed_data)
+
+            events << parsed_data
           rescue JSON::ParserError => e
             raise Error, "Failed to parse SSE data: #{e.message}"
           end
         end
 
-        events unless block_given?
+        events
       end
 
       class Error < StandardError; end

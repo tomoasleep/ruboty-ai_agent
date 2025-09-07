@@ -1,0 +1,39 @@
+# Generated from lib/ruboty/ai_agent/database/query_methods.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    class Database
+      interface _WithData
+        def data: () -> Hash[keynable, untyped]
+      end
+
+      # @rbs module-self _WithData
+      module QueryMethods : _WithData
+        # @rbs *keys: keynable
+        # @rbs return: untyped
+        def fetch: (*keynable keys) -> untyped
+
+        # @rbs *keys: keynable
+        # @rbs return: Integer
+        def len: (*keynable keys) -> Integer
+
+        # @rbs *keys: keynable
+        # @rbs return: void
+        def delete: (*keynable keys) -> void
+
+        # @rbs *keys: keynable
+        # @rbs return: Array[keynable]
+        def keys: (*keynable keys) -> Array[keynable]
+
+        # @rbs *keys: keynable
+        # @rbs return: boolish
+        def key?: (*keynable keys) -> boolish
+
+        # @rbs at: Array[keynable]
+        # @rbs value: untyped
+        # @rbs return: void
+        def store: (untyped value, at: Array[keynable]) -> void
+      end
+    end
+  end
+end

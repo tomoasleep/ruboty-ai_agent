@@ -1,0 +1,25 @@
+# Generated from lib/ruboty/ai_agent/database.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Memorize and retrieve information using Ruboty's brain.
+    class Database
+      type keynable = Symbol | String | Integer
+
+      include QueryMethods
+
+      NAMESPACE: ::Symbol
+
+      attr_reader brain: Ruboty::Brains::Base
+
+      # @rbs brain: Ruboty::Brains::Base
+      def initialize: (Ruboty::Brains::Base brain) -> untyped
+
+      def data: () -> Hash[keynable, untyped]
+
+      def user: (untyped id) -> User
+
+      def chat_thread: (untyped id) -> ChatThread
+    end
+  end
+end

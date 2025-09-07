@@ -13,3 +13,7 @@
 .rspec_status
 
 Gemfile.lock
+
+# rbs collection
+.gem_rbs_collection/
+rbs_collection.lock.yaml

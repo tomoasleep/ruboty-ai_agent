@@ -1,0 +1,11 @@
+# Generated from lib/ruboty/ai_agent/user_mcp_configurations.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manage MCP configurations for a specific user.
+    class UserMcpConfigurations < UserAssociations[McpConfiguration]
+      # @rbs mcp_configuration: McpConfiguration:
+      def add: (McpConfiguration mcp_configuration) -> void
+    end
+  end
+end

@@ -3,7 +3,8 @@
 module Ruboty
   module AiAgent
     # A set of records for a specific user.
-    class UserAssociations < RecordSet
+    # @rbs generic Record
+    class UserAssociations < RecordSet #[Record]
       attr_reader :user_id #: String
 
       def initialize(database:, user_id:)
@@ -12,6 +13,11 @@ module Ruboty
         @user_id = user_id
       end
 
+      # @rbs!
+      #   def self.association_key: () -> Symbol
+      #   def self.association_key=: (Symbol) -> Symbol
+
+      # @rbs skip
       class << self
         attr_accessor :association_key
       end

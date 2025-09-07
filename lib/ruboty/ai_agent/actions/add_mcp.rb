@@ -11,11 +11,11 @@ module Ruboty
           options = parse_config
 
           case options[:transport]
-          when 'http'
-            url = options[:args].first
+          when :http
+            url = options[:args].first #: String?
             if url
               new_mcp_configuration = McpConfiguration.new(
-                transport: 'http',
+                transport: :http,
                 name: name_param,
                 headers: options[:headers],
                 url: url
@@ -30,9 +30,9 @@ module Ruboty
               nil
             end
 
-          when 'sse'
+          when :sse
             message.reply('Error: SSE transport is not yet implemented.')
-          else
+          else # steep:ignore UnreachableValueBranch
             message.reply('Error: Invalid or missing transport type. Please specify --transport http or --transport sse.')
           end
         rescue OptionParser::InvalidOption, OptionParser::InvalidArgument => e
@@ -49,16 +49,14 @@ module Ruboty
 
         private
 
-        # @rbs! type config = { transport: "http" | "sse", headers: Array[String], args: Array[String] }
+        # @rbs! type config = { transport: :http | :sse, headers: Hash[String, String], args: Array[String] }
 
         def parse_config #: config
           options = {
-            transport: 'http',
+            transport: :http,
             headers: {},
             args: []
-          }
-
-          return options unless config_param
+          } #: config
 
           args = config_param.split(/\s+(?=-)/)
 
@@ -69,6 +67,11 @@ module Ruboty
 
             opts.on('--header VALUE', 'Add a header (can be specified multiple times)') do |h|
               key, value = undump_string(h).split(':', 2).map!(&:strip)
+              unless key && value
+                message.reply("Warning: Invalid format for --header '#{h}'. Expected format is 'Key: Value'.")
+                next
+              end
+
               options[:headers][key] = value
             end
           end

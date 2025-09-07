@@ -3,9 +3,16 @@
 module Ruboty
   module AiAgent
     module LLM
+      Response = Data.define(
+        :message, #: ChatMessage
+        :tool, #: Ruboty::AiAgent::Tool?
+        :tool_call_id, #: String?
+        :tool_arguments #: Hash[String, String]?
+      )
+
       # General response class for LLM interactions.
-      class Response < Data.define(:message, :tool, :tool_call_id, :tool_arguments)
-        def call_tool
+      class Response
+        def call_tool #: String?
           tool&.call(tool_arguments)
         end
       end

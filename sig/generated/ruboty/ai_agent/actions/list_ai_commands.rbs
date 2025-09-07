@@ -1,0 +1,12 @@
+# Generated from lib/ruboty/ai_agent/actions/list_ai_commands.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Actions
+      # ListAiCommands action for Ruboty::AiAgent
+      class ListAiCommands < Base
+        def call: () -> untyped
+      end
+    end
+  end
+end

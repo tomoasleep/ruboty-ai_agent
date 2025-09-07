@@ -1,0 +1,35 @@
+# Generated from lib/ruboty/ai_agent/mcp_configuration.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    type transports = :http | :websocket
+
+    class McpConfiguration < Data
+      attr_reader name(): String
+
+      attr_reader transport(): transports
+
+      attr_reader headers(): Hash[String, String]
+
+      attr_reader url(): String
+
+      def self.new: (String name, transports transport, Hash[String, String] headers, String url) -> instance
+                  | (name: String, transport: transports, headers: Hash[String, String], url: String) -> instance
+
+      def self.members: () -> [ :name, :transport, :headers, :url ]
+
+      def members: () -> [ :name, :transport, :headers, :url ]
+    end
+
+    # Save MCP configuration details.
+    class McpConfiguration
+      include Recordable
+
+      # @rbs name: String
+      # @rbs transport: transports
+      # @rbs url: String
+      # @rbs headers: Hash[String, String]?
+      def initialize: (name: String, transport: transports, url: String, ?headers: Hash[String, String]?) -> untyped
+    end
+  end
+end
