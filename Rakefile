@@ -26,6 +26,11 @@ namespace :rbs do
     sh('rm -rf sig/generated-by-scripts')
   end
 
+  desc 'Install rbs collection'
+  task :collection do
+    sh('bundle exec rbs collection install')
+  end
+
   desc 'Run rbs-inline to generate RBS files'
   task :inline do
     sh('bundle exec rbs-inline --opt-out --output lib')
