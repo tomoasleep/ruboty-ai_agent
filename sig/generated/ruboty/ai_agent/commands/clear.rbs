@@ -1,0 +1,23 @@
+# Generated from lib/ruboty/ai_agent/commands/clear.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Commands
+      # Clear histories of the chat thread.
+      class Clear < Base
+        attr_reader message: Ruboty::Message
+
+        attr_reader chat_thread: Ruboty::AiAgent::ChatThread
+
+        # @rbs message: Ruboty::Message
+        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
+        def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
+
+        def call: () -> void
+
+        # @rbs override
+        def match?: ...
+      end
+    end
+  end
+end

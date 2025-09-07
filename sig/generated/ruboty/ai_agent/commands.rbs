@@ -1,0 +1,9 @@
+# Generated from lib/ruboty/ai_agent/commands.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Interaction commands (a.k.a. Slash commands, Prompts, etc)
+    module Commands
+    end
+  end
+end

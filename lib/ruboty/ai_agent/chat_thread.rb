@@ -22,6 +22,10 @@ module Ruboty
       def messages #: ChatThreadMessages
         @messages ||= ChatThreadMessages.new(database: database, chat_thread_id: id)
       end
+
+      def clear #: void
+        messages.clear
+      end
     end
   end
 end

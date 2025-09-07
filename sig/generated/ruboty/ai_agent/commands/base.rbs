@@ -1,0 +1,20 @@
+# Generated from lib/ruboty/ai_agent/commands/base.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Commands
+      # Base class for commands.
+      # @abstract
+      class Base
+        # @rbs *args: untyped
+        # @rbs return: void
+        def call: (*untyped args) -> void
+
+        # @rbs commandline: String
+        # @rbs return: boolish
+        # @abstract
+        def match?: (String commandline) -> boolish
+      end
+    end
+  end
+end

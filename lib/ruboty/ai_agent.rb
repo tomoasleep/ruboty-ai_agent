@@ -16,6 +16,7 @@ module Ruboty
     autoload :ChatThread, 'ruboty/ai_agent/chat_thread'
     autoload :ChatThreadAssociations, 'ruboty/ai_agent/chat_thread_associations'
     autoload :ChatThreadMessages, 'ruboty/ai_agent/chat_thread_messages'
+    autoload :Commands, 'ruboty/ai_agent/commands'
     autoload :Database, 'ruboty/ai_agent/database'
     autoload :HttpMcpClient, 'ruboty/ai_agent/http_mcp_client'
     autoload :LLM, 'ruboty/ai_agent/llm'

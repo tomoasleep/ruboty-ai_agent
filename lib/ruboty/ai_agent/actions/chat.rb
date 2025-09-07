@@ -7,6 +7,7 @@ module Ruboty
       class Chat < Base
         CONVERSATION_KEY = :conversations
 
+        # @rbs override
         def call
           llm = LLM::OpenAI.new(
             client: OpenAI::Client.new(
@@ -16,14 +17,20 @@ module Ruboty
           )
 
           chat_thread = database.chat_thread(message.from || 'default')
+
+          commands = builtin_commands(chat_thread:)
+          tools =  McpClients.new(
+            user.mcp_configurations.all_values
+          ).available_tools
+
+          commands.each do |command|
+            return command.call if command.match?(body_param)
+          end
+
           chat_thread.messages << ChatMessage.new(
             role: :user,
             content: body_param
           )
-
-          tools = McpClients.new(
-            user.mcp_configurations.all_values
-          ).available_tools
 
           agent = Agent.new(
             llm:,
@@ -54,6 +61,17 @@ module Ruboty
 
         def body_param #: String
           message[:body]
+        end
+
+        # @rbs chat_thread: ChatThread
+        # @rbs return: Array[Commands::Base]
+        def builtin_commands(chat_thread:)
+          [
+            Commands::Clear.new(
+              message:,
+              chat_thread:
+            )
+          ]
         end
       end
     end

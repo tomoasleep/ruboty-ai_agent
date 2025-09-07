@@ -9,7 +9,7 @@ module Ruboty
 
       def initialize: (database: untyped) -> untyped
 
-      def namespace_keys: () -> Array[Symbol | String | Integer]
+      def namespace_keys: () -> Array[Database::keynable]
 
       def length: () -> Integer
 
@@ -19,20 +19,24 @@ module Ruboty
 
       def keys: () -> Array[Database::keynable]
 
-      # @rbs key: Symbol | String | Integer
+      # @rbs key: Database::keynable
       # @rbs return: Record | nil
-      def fetch: (Symbol | String | Integer key) -> (Record | nil)
+      def fetch: (Database::keynable key) -> (Record | nil)
 
-      # @rbs key: Symbol | String | Integer
+      # @rbs key: Database::keynable
       # @rbs record: Record
       # @rbs return: void
-      def store: (Record record, key: Symbol | String | Integer) -> void
+      def store: (Record record, key: Database::keynable) -> void
 
-      # @rbs key: String | Integer
+      # @rbs key: Database::keynable
       # @rbs return: void
-      def remove: (String | Integer key) -> void
+      def remove: (Database::keynable key) -> void
 
-      def key?: (untyped key) -> untyped
+      # @rbs key: Database::keynable
+      # @rbs return: boolish
+      def key?: (Database::keynable key) -> boolish
+
+      def clear: () -> void
     end
   end
 end
