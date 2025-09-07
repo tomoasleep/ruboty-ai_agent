@@ -15,7 +15,7 @@ module Ruboty
         def fetch(*keys)
           item = data.dig(*keys)
 
-          Recordable.convert_recursively(item)
+          Recordable.instantiate_recursively(item)
         end
 
         # @rbs *keys: keynable
@@ -76,7 +76,7 @@ module Ruboty
             current[k]
           end
 
-          namespace[key] = value.to_h
+          namespace[key] = Recordable.hashify_recursively(value)
         end
       end
     end

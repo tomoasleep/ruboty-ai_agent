@@ -33,16 +33,31 @@ module Ruboty
 
         # @rbs value: untyped
         # @rbs return: untyped
-        def convert_recursively(value)
+        def instantiate_recursively(value)
           case value
           when Hash
             if convertable?(value)
               record_from_hash(value)
             else
-              value.transform_values { |v| convert_recursively(v) }
+              value.transform_values { |v| instantiate_recursively(v) }
             end
           when Array
-            value.map { |v| convert_recursively(v) }
+            value.map { |v| instantiate_recursively(v) }
+          else
+            value
+          end
+        end
+
+        # @rbs value: untyped
+        # @rbs return: untyped
+        def hashify_recursively(value)
+          case value
+          when Recordable
+            hashify_recursively(value.to_h)
+          when Hash
+            value.transform_values { |v| hashify_recursively(v) }
+          when Array
+            value.map { |v| hashify_recursively(v) }
           else
             value
           end

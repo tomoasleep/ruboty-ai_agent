@@ -20,3 +20,12 @@ module Ruboty
     end
   end
 end
+
+module Ruboty
+  module AiAgent
+    class User
+      @mcp_configurations: UserMcpConfigurations
+      @ai_memories: UserAiMemories
+    end
+  end
+end

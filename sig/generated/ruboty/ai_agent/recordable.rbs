@@ -21,7 +21,11 @@ module Ruboty
 
       # @rbs value: untyped
       # @rbs return: untyped
-      def self.convert_recursively: (untyped value) -> untyped
+      def self.instantiate_recursively: (untyped value) -> untyped
+
+      # @rbs value: untyped
+      # @rbs return: untyped
+      def self.hashify_recursively: (untyped value) -> untyped
 
       # @rbs record: Recordable
       # @rbs return: Hash[Database::keynable, untyped]

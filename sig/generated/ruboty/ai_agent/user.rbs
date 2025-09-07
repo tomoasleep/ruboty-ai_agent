@@ -12,9 +12,18 @@ module Ruboty
 
       def initialize: (database: untyped, id: untyped) -> untyped
 
+      # @rbs %a{memorized}
+      %a{memorized}
       def mcp_configurations: () -> UserMcpConfigurations
 
+      # @rbs %a{memorized}
+      %a{memorized}
       def ai_memories: () -> UserAiMemories
+
+      def system_prompt: () -> String?
+
+      # @rbs prompt: String?
+      def system_prompt=: (String? prompt) -> untyped
     end
   end
 end

@@ -1,0 +1,23 @@
+# Generated from lib/ruboty/ai_agent/global_settings.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Global settings for AI agent.
+    class GlobalSettings
+      attr_reader database: Ruboty::AiAgent::Database
+
+      NAMESPACE_KEYS: Array[Database::keynable]
+
+      def self.find_or_create: (database: untyped) -> GlobalSettings
+
+      # @rbs database: Ruboty::AiAgent::Database
+      def initialize: (database: Ruboty::AiAgent::Database) -> untyped
+
+      def system_prompt: () -> String?
+
+      # @rbs prompt: String?
+      # @rbs return: void
+      def system_prompt=: (String? prompt) -> void
+    end
+  end
+end

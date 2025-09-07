@@ -8,6 +8,8 @@ module Ruboty
         def call: () -> untyped
 
         def prompt_param: () -> String
+
+        def scope_param: () -> String
       end
     end
   end

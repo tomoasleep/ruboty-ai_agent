@@ -18,12 +18,23 @@ module Ruboty
         @id = id
       end
 
+      # @rbs %a{memorized}
       def mcp_configurations #: UserMcpConfigurations
         @mcp_configurations ||= UserMcpConfigurations.new(database: database, user_id: id)
       end
 
+      # @rbs %a{memorized}
       def ai_memories #: UserAiMemories
         @ai_memories ||= UserAiMemories.new(database: database, user_id: id)
+      end
+
+      def system_prompt #: String?
+        database.fetch(:users, id, :system_prompt)
+      end
+
+      # @rbs prompt: String?
+      def system_prompt=(prompt)
+        database.store(prompt, at: [:users, id, :system_prompt])
       end
     end
   end

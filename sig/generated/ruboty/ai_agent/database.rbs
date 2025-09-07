@@ -20,6 +20,8 @@ module Ruboty
       def user: (untyped id) -> User
 
       def chat_thread: (untyped id) -> ChatThread
+
+      def global_settings: () -> GlobalSettings
     end
   end
 end

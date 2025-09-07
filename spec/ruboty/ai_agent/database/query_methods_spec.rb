@@ -46,14 +46,32 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
     end
 
     context 'with Recordable objects' do
-      let(:keys) { [:users, 'user1'] }
-
-      before do
-        allow(Ruboty::AiAgent::Recordable).to receive(:convert_recursively).and_return('converted_value')
+      let(:brain_data) do
+        {
+          users: {
+            'user1' => {
+              mcp_configurations: {
+                'test' => {
+                  name: 'test',
+                  transport: :http,
+                  headers: {},
+                  url: 'http://localhost:3000/mcp',
+                  record_type: :mcp_configuration
+                }
+              }
+            }
+          }
+        }
       end
 
+      let(:keys) { [:users, 'user1', :mcp_configurations, 'test'] }
+
       it 'converts results using Recordable' do
-        expect(fetch_result).to eq('converted_value')
+        expect(fetch_result).to be_a(Ruboty::AiAgent::McpConfiguration)
+        expect(fetch_result.name).to eq('test')
+        expect(fetch_result.transport).to eq(:http)
+        expect(fetch_result.headers).to eq({})
+        expect(fetch_result.url).to eq('http://localhost:3000/mcp')
       end
     end
   end
@@ -187,12 +205,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       end
     end
 
-    context 'with object that responds to to_h' do
-      let(:object) { double('Object', to_h: { converted: 'data' }) }
+    context 'with object is Recordable' do
+      let(:value) do
+        Ruboty::AiAgent::McpConfiguration.new(
+          name: 'data',
+          transport: :http,
+          headers: {},
+          url: 'http://localhost:3000/mcp'
+        )
+      end
 
-      it 'calls to_h on the value' do
-        database.store(object, at: [:test])
-        expect(database.fetch(:test)).to eq({ converted: 'data' })
+      it 'converts to hasified value' do
+        subject
+        expect(database.data.dig(*at)).to eq({
+                                               name: 'data',
+                                               transport: :http,
+                                               headers: {},
+                                               url: 'http://localhost:3000/mcp',
+                                               record_type: :mcp_configuration
+                                             })
       end
     end
   end

@@ -20,7 +20,7 @@ module Ruboty
       on(/remove mcp (?<name>\S+)/, name: 'remove_mcp', description: 'Remove the specified MCP server')
       on(/list mcps?/, name: 'list_mcp', description: 'List configured MCP servers')
 
-      on(/set system prompt "(?<prompt>.+)"/, name: 'set_system_prompt', description: 'Set system prompt')
+      on(/set system prompt "(?<prompt>.+?)"(?: in (?<scope>user|global) scope)?/, name: 'set_system_prompt', description: 'Set system prompt')
       on(/show system prompt/, name: 'show_system_prompt', description: 'Show system prompt')
 
       on(/add ai memory "(?<prompt>.+)"/, name: 'add_ai_memory', description: 'Add a new AI memory')
