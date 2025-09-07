@@ -21,6 +21,8 @@ module Ruboty
         %a{memorized}
         def database: () -> Ruboty::AiAgent::Database
 
+        # @rbs %a{memorized}
+        %a{memorized}
         def user: () -> Ruboty::AiAgent::User
       end
     end

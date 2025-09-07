@@ -6,6 +6,7 @@ module Ruboty
     module Actions
       class Base
         @database: Ruboty::AiAgent::Database
+        @user: Ruboty::AiAgent::User
       end
     end
   end
