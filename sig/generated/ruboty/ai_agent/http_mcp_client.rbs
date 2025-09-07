@@ -45,7 +45,10 @@ module Ruboty
       # @rbs return: Array[Hash[String, untyped]]
       def send_request: (method: String, ?params: untyped, ?id: untyped) ?{ (Hash[String, untyped]) -> void } -> Array[Hash[String, untyped]]
 
-      def handle_response: (untyped response) ?{ (?) -> untyped } -> untyped
+      # @rbs response: Net::HTTPResponse
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: Array[Hash[String, untyped]]
+      def handle_response: (Net::HTTPResponse response) ?{ (Hash[String, untyped]) -> void } -> Array[Hash[String, untyped]]
 
       # @rbs response: Net::HTTPResponse
       # @rbs &block: ? (Hash[String, untyped]) -> void
