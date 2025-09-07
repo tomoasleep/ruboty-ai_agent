@@ -130,7 +130,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         user.mcp_configurations.add(
           Ruboty::AiAgent::McpConfiguration.new(
             name: 'calc_server',
-            transport: 'http',
+            transport: :http,
             headers: {},
             url: 'http://localhost:3000'
           )

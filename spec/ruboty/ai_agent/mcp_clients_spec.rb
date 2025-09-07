@@ -24,7 +24,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
         [
           Ruboty::AiAgent::McpConfiguration.new(
             name: 'test_server',
-            transport: 'http',
+            transport: :http,
             url: 'http://localhost:3000/mcp',
             headers: { 'Authorization' => 'Bearer token' }
           )
@@ -76,7 +76,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       [
         Ruboty::AiAgent::McpConfiguration.new(
           name: 'test_server',
-          transport: 'http',
+          transport: :http,
           url: 'http://localhost:3000'
         )
       ]
@@ -139,8 +139,8 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       [
         Ruboty::AiAgent::McpConfiguration.new(
           name: 'test_server',
-          transport: 'http',
-          url: 'http://localhost:3000'
+          transport: :http,
+          url: 'http://localhost:3001'
         )
       ]
     end
