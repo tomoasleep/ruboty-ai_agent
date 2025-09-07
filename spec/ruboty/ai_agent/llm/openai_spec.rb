@@ -61,6 +61,12 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
                                                      total_tokens: 70
                                                    })
       end
+
+      it 'includes token limit information in the response' do
+        response = complete
+
+        expect(response.message.token_limit).to eq(400_000)
+      end
     end
 
     context 'with tools' do

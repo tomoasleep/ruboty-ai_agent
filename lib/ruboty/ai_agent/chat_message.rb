@@ -14,6 +14,7 @@ module Ruboty
       attr_reader :tool_name #: String?
       attr_reader :tool_arguments #: Hash[Symbol | String, untyped]?
       attr_reader :token_usage #: Hash[Symbol, Integer]?
+      attr_reader :token_limit #: Integer?
 
       # @rbs role: Symbol
       # @rbs content: String
@@ -21,13 +22,15 @@ module Ruboty
       # @rbs ?tool_name: String?
       # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
       # @rbs ?token_usage: Hash[Symbol, Integer]?
-      def initialize(role:, content:, tool_call_id: nil, tool_name: nil, tool_arguments: nil, token_usage: nil)
+      # @rbs ?token_limit: Integer?
+      def initialize(role:, content:, tool_call_id: nil, tool_name: nil, tool_arguments: nil, token_usage: nil, token_limit: nil)
         @role = role
         @content = content
         @tool_call_id = tool_call_id
         @tool_name = tool_name
         @tool_arguments = tool_arguments
         @token_usage = token_usage
+        @token_limit = token_limit
       end
 
       def to_h #: Hash[Symbol, untyped]
@@ -37,7 +40,8 @@ module Ruboty
           tool_call_id:,
           tool_name:,
           tool_arguments:,
-          token_usage:
+          token_usage:,
+          token_limit:
         }
       end
 

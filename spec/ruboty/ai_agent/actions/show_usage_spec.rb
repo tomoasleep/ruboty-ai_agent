@@ -37,8 +37,9 @@ RSpec.describe Ruboty::AiAgent::Actions::ShowUsage do
 
     context 'when there is a message with token usage' do
       let(:token_usage) { { prompt_tokens: 50, completion_tokens: 20, total_tokens: 70 } }
+      let(:token_limit) { 128_000 }
       let(:message_with_usage) do
-        instance_double('Ruboty::AiAgent::ChatMessage', token_usage: token_usage)
+        instance_double('Ruboty::AiAgent::ChatMessage', token_usage: token_usage, token_limit: token_limit)
       end
       let(:message_without_usage) do
         instance_double('Ruboty::AiAgent::ChatMessage', token_usage: nil)
@@ -52,14 +53,35 @@ RSpec.describe Ruboty::AiAgent::Actions::ShowUsage do
       it 'replies with formatted token usage' do
         action.call
 
-        expected_message = <<~MESSAGE
-          Token Usage:
-          - Prompt tokens: 50
-          - Completion tokens: 20
-          - Total tokens: 70
-        MESSAGE
+        expected_message = [
+          'Token Usage:',
+          '- Prompt tokens: 50',
+          '- Completion tokens: 20',
+          '- Total tokens: 70',
+          '- Token limit: 128,000',
+          '- Usage: 0.05%'
+        ].join("\n")
 
         expect(message).to have_received(:reply).with(expected_message)
+      end
+
+      context 'when token limit is not available' do
+        let(:message_with_usage) do
+          instance_double('Ruboty::AiAgent::ChatMessage', token_usage: token_usage, token_limit: nil)
+        end
+
+        it 'replies with formatted token usage without limit information' do
+          action.call
+
+          expected_message = [
+            'Token Usage:',
+            '- Prompt tokens: 50',
+            '- Completion tokens: 20',
+            '- Total tokens: 70'
+          ].join("\n")
+
+          expect(message).to have_received(:reply).with(expected_message)
+        end
       end
     end
 

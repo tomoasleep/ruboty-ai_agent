@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'openai'
+require_relative 'openai/model'
 
 module Ruboty
   module AiAgent
@@ -15,6 +16,11 @@ module Ruboty
         def initialize(client:, model:)
           @client = client
           @model = model
+        end
+
+        # @rbs %a{memorized}
+        def model_info #: Model
+          @model_info ||= Model.new(model)
         end
 
         # @rbs messages: Array[ChatMessage]
@@ -161,7 +167,8 @@ module Ruboty
               tool_call_id: tool_call&.id,
               tool_name: tool&.name,
               tool_arguments:,
-              token_usage:
+              token_usage:,
+              token_limit: model_info.token_limit
             ),
             tool:,
             tool_call_id: tool_call&.id,

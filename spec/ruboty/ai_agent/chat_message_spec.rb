@@ -16,7 +16,8 @@ RSpec.describe Ruboty::AiAgent::ChatMessage do
                                   tool_call_id: nil,
                                   tool_name: nil,
                                   tool_arguments: nil,
-                                  token_usage: nil
+                                  token_usage: nil,
+                                  token_limit: nil
                                 })
       end
     end
@@ -29,7 +30,8 @@ RSpec.describe Ruboty::AiAgent::ChatMessage do
           tool_call_id: 'call_456',
           tool_name: 'calculator',
           tool_arguments: { expression: '2+2' },
-          token_usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 }
+          token_usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+          token_limit: 128_000
         )
       end
 
@@ -40,7 +42,8 @@ RSpec.describe Ruboty::AiAgent::ChatMessage do
                                   tool_call_id: 'call_456',
                                   tool_name: 'calculator',
                                   tool_arguments: { expression: '2+2' },
-                                  token_usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 }
+                                  token_usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
+                                  token_limit: 128_000
                                 })
       end
     end
@@ -97,21 +100,30 @@ RSpec.describe Ruboty::AiAgent::ChatMessage do
     end
   end
 
-  describe 'token usage' do
-    context 'with token usage' do
+  describe 'token usage and limit' do
+    context 'with token usage and limit' do
       let(:token_usage) { { prompt_tokens: 50, completion_tokens: 20, total_tokens: 70 } }
-      let(:message) { described_class.new(role: :assistant, content: 'Hello', token_usage: token_usage) }
+      let(:token_limit) { 128_000 }
+      let(:message) { described_class.new(role: :assistant, content: 'Hello', token_usage: token_usage, token_limit: token_limit) }
 
       it 'stores and retrieves token usage' do
         expect(message.token_usage).to eq(token_usage)
       end
+
+      it 'stores and retrieves token limit' do
+        expect(message.token_limit).to eq(token_limit)
+      end
     end
 
-    context 'without token usage' do
+    context 'without token usage and limit' do
       let(:message) { described_class.new(role: :user, content: 'Hi') }
 
       it 'returns nil for token usage' do
         expect(message.token_usage).to be_nil
+      end
+
+      it 'returns nil for token limit' do
+        expect(message.token_limit).to be_nil
       end
     end
   end
