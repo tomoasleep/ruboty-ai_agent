@@ -6,6 +6,7 @@ module Ruboty
     module Commands
       autoload :Base, 'ruboty/ai_agent/commands/base'
       autoload :Clear, 'ruboty/ai_agent/commands/clear'
+      autoload :Compact, 'ruboty/ai_agent/commands/compact'
 
       # @rbs message: Ruboty::Message
       # @rbs chat_thread: ChatThread
@@ -13,6 +14,10 @@ module Ruboty
       def self.builtins(message:, chat_thread:)
         [
           Commands::Clear.new(
+            message:,
+            chat_thread:
+          ),
+          Commands::Compact.new(
             message:,
             chat_thread:
           )
