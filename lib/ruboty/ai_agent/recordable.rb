@@ -36,10 +36,11 @@ module Ruboty
         def instantiate_recursively(value)
           case value
           when Hash
-            if convertable?(value)
-              record_from_hash(value)
+            transformed = value.transform_values { |v| instantiate_recursively(v) }
+            if convertable?(transformed)
+              record_from_hash(transformed)
             else
-              value.transform_values { |v| instantiate_recursively(v) }
+              transformed
             end
           when Array
             value.map { |v| instantiate_recursively(v) }
