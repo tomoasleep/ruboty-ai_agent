@@ -3,15 +3,15 @@
 require 'spec_helper'
 
 RSpec.describe Ruboty::AiAgent::CachedValue do
-  let(:data) { [{ 'name' => 'get_weather', 'description' => 'Get weather info' }] }
-  let(:expires_at) { Time.now + 600 }
-
   subject(:cache) do
     described_class.new(
       data: data,
       expires_at: expires_at
     )
   end
+
+  let(:data) { [{ 'name' => 'get_weather', 'description' => 'Get weather info' }] }
+  let(:expires_at) { Time.now + 600 }
 
   describe '#initialize' do
     it 'sets all attributes correctly' do
@@ -45,13 +45,13 @@ RSpec.describe Ruboty::AiAgent::CachedValue do
   end
 
   describe '#to_h' do
-    subject { cache.to_h }
+    subject(to_h) { cache.to_h }
 
     it 'converts to hash with correct keys' do
-      expect(subject).to include(
+      expect(to_h).to include(
         data: data
       )
-      expect(Time.parse(subject[:expires_at])).to eq(cache.expires_at.round)
+      expect(Time.parse(to_h[:expires_at])).to eq(cache.expires_at.round)
     end
   end
 end

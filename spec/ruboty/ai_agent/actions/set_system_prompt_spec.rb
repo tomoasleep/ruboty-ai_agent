@@ -3,13 +3,13 @@
 RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
   include DatabaseFactory
 
-  let(:robot) { instance_double('Ruboty::Robot', brain:) }
+  let(:robot) { instance_double(Ruboty::Robot, brain:) }
   let(:brain) { create_brain }
   let(:message) do
-    instance_double('Ruboty::Message', from_name: 'test_user', robot:).tap do |message|
-      allow(message).to receive(:[]).with(:scope).and_return(scope)
-      allow(message).to receive(:[]).with(:prompt).and_return('Test prompt')
-      allow(message).to receive(:reply)
+    instance_double(Ruboty::Message, from_name: 'test_user', robot:).tap do |message|
+      allow(message).to have_received(:[]).with(:scope).and_return(scope)
+      allow(message).to have_received(:[]).with(:prompt).and_return('Test prompt')
+      allow(message).to have_received(:reply)
     end
   end
   let(:action) { described_class.new(message) }

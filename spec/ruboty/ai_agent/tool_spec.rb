@@ -35,21 +35,25 @@ RSpec.describe Ruboty::AiAgent::Tool do
 
       context 'with upcase operation' do
         let(:params) { { text: 'Hello', operation: 'upcase' } }
+
         it { is_expected.to eq('HELLO') }
       end
 
       context 'with downcase operation' do
         let(:params) { { text: 'WORLD', operation: 'downcase' } }
+
         it { is_expected.to eq('world') }
       end
 
       context 'with reverse operation' do
         let(:params) { { text: 'Ruby', operation: 'reverse' } }
+
         it { is_expected.to eq('ybuR') }
       end
 
       context 'with unknown operation' do
         let(:params) { { text: 'Test', operation: 'unknown' } }
+
         it { is_expected.to eq('Test') }
       end
     end
@@ -66,11 +70,13 @@ RSpec.describe Ruboty::AiAgent::Tool do
 
       context 'with empty parameters' do
         let(:params) { {} }
+
         it { is_expected.to be_nil }
       end
 
       context 'with some parameters' do
         let(:params) { { some: 'params' } }
+
         it { is_expected.to be_nil }
       end
     end
@@ -132,16 +138,19 @@ RSpec.describe Ruboty::AiAgent::Tool do
 
       context 'with minimal parameters' do
         let(:params) { { location: 'Tokyo' } }
+
         it { is_expected.to eq('Weather in Tokyo: Sunny, 25°C') }
       end
 
       context 'with fahrenheit units' do
         let(:params) { { location: 'New York', units: 'fahrenheit' } }
+
         it { is_expected.to eq('Weather in New York: Sunny, 77°F') }
       end
 
       context 'with forecast enabled' do
         let(:params) { { location: 'London', include_forecast: true } }
+
         it { is_expected.to eq('Weather in London: Sunny, 25°C | Tomorrow: Cloudy') }
       end
     end

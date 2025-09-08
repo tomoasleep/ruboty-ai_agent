@@ -61,7 +61,7 @@ RSpec.describe Ruboty::AiAgent::ChatMessage do
       )
     end
 
-    let(:tool) { instance_double('Ruboty::AiAgent::Tool', name: 'weather') }
+    let(:tool) { instance_double(Ruboty::AiAgent::Tool, name: 'weather') }
     let(:tool_call_id) { 'call_789' }
     let(:tool_arguments) { { location: 'Tokyo' } }
     let(:tool_response) { 'Sunny, 25°C' }

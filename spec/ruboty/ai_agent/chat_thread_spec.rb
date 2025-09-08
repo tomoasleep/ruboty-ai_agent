@@ -14,9 +14,9 @@ RSpec.describe Ruboty::AiAgent::ChatThread do
     subject { described_class.find_or_create(database: database, id: id) }
 
     it 'creates a new ChatThread instance' do
-      expect(subject).to be_a(described_class)
-      expect(subject.database).to eq(database)
-      expect(subject.id).to eq(id)
+      expect(chat_thread).to be_a(described_class)
+      expect(chat_thread.database).to eq(database)
+      expect(chat_thread.id).to eq(id)
     end
   end
 
@@ -30,10 +30,10 @@ RSpec.describe Ruboty::AiAgent::ChatThread do
   describe '#messages' do
     subject(:messages) { chat_thread.messages }
 
-    let(:messages_instance) { instance_double('Ruboty::AiAgent::ChatThreadMessages') }
+    let(:messages_instance) { instance_double(Ruboty::AiAgent::ChatThreadMessages) }
 
     before do
-      allow(Ruboty::AiAgent::ChatThreadMessages).to receive(:new)
+      allow(Ruboty::AiAgent::ChatThreadMessages).to have_received(:new)
         .with(database: database, chat_thread_id: id)
         .and_return(messages_instance)
     end

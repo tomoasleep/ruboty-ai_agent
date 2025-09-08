@@ -11,4 +11,5 @@ gem 'rbs-inline', require: false
 gem 'rubocop'
 gem 'rubocop-rake'
 gem 'rubocop-rbs_inline'
+gem 'rubocop-rspec'
 gem 'steep', require: false

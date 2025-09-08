@@ -29,23 +29,22 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
   let(:message) do
     # Actions::Chat expects a message with reply method and [] accessor
     message = original_message
-    allow(message).to receive(:reply)
-    allow(message).to receive(:[]).with(:body).and_return(body)
+    allow(message).to have_received(:reply)
+    allow(message).to have_received(:[]).with(:body).and_return(body)
     message
   end
 
   before do
     # Stub ENV variables
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with('OPENAI_API_KEY', nil).and_return('test_api_key')
-    allow(ENV).to receive(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-5')
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:[]).with('DEBUG').and_return(nil)
-    allow(ENV).to receive(:[]).with('OPENAI_ORG_ID').and_return(nil)
+    allow(ENV).to have_received(:fetch).and_call_original
+    allow(ENV).to have_received(:fetch).with('OPENAI_API_KEY', nil).and_return('test_api_key')
+    allow(ENV).to have_received(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-5')
+    allow(ENV).to have_received(:[]).and_call_original
+    allow(ENV).to have_received(:[]).with('DEBUG').and_return(nil)
+    allow(ENV).to have_received(:[]).with('OPENAI_ORG_ID').and_return(nil)
 
     # Allow action to use real database
-    allow(action).to receive(:database).and_return(database)
-    allow(action).to receive(:robot).and_return(robot)
+    allow(action).to receive_messages(database: database, robot: robot)
   end
 
   describe '#call' do
@@ -75,14 +74,14 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       end
 
       it 'replies with assistant message' do
-        expect(message).to receive(:reply).with('Hello! How can I help you today?')
+        expect(message).to have_received(:reply).with('Hello! How can I help you today?')
         call_action
       end
 
       describe 'conversation history preservation' do
         subject(:second_call) do
           action.call
-          allow(message).to receive(:[]).with(:body).and_return(second_body)
+          allow(message).to have_received(:[]).with(:body).and_return(second_body)
 
           # Setup second API call stub
           stub_openai_chat_completion_with_content(
@@ -214,12 +213,12 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       end
 
       it 'notifies about tool call' do
-        expect(message).to receive(:reply).with(
+        expect(message).to have_received(:reply).with(
           'Calling tool calculator with arguments {expression: "21 * 2"}',
           streaming: true
         )
-        expect(message).to receive(:reply).with('Tool response: ["42"]')
-        expect(message).to receive(:reply).with('The answer is 42.')
+        expect(message).to have_received(:reply).with('Tool response: ["42"]')
+        expect(message).to have_received(:reply).with('The answer is 42.')
 
         call_action
       end
@@ -264,7 +263,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       end
 
       it 'replies with error message' do
-        expect(message).to receive(:reply).with(/エラーが発生しました/)
+        expect(message).to have_received(:reply).with(/エラーが発生しました/)
         call_action
       end
     end

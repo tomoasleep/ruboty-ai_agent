@@ -14,9 +14,9 @@ RSpec.describe Ruboty::AiAgent::User do
     subject { described_class.find_or_create(database: database, id: id) }
 
     it 'creates a new User instance' do
-      expect(subject).to be_a(described_class)
-      expect(subject.database).to eq(database)
-      expect(subject.id).to eq(id)
+      expect(user).to be_a(described_class)
+      expect(user.database).to eq(database)
+      expect(user.id).to eq(id)
     end
   end
 
@@ -30,10 +30,10 @@ RSpec.describe Ruboty::AiAgent::User do
   describe '#mcp_configurations' do
     subject(:mcp_configurations) { user.mcp_configurations }
 
-    let(:mcp_configurations_instance) { instance_double('Ruboty::AiAgent::UserMcpConfigurations') }
+    let(:mcp_configurations_instance) { instance_double(Ruboty::AiAgent::UserMcpConfigurations) }
 
     before do
-      allow(Ruboty::AiAgent::UserMcpConfigurations).to receive(:new)
+      allow(Ruboty::AiAgent::UserMcpConfigurations).to have_received(:new)
         .with(database: database, user_id: id)
         .and_return(mcp_configurations_instance)
     end
@@ -61,10 +61,10 @@ RSpec.describe Ruboty::AiAgent::User do
   describe '#ai_memories' do
     subject(:ai_memories) { user.ai_memories }
 
-    let(:ai_memories_instance) { instance_double('Ruboty::AiAgent::UserAiMemories') }
+    let(:ai_memories_instance) { instance_double(Ruboty::AiAgent::UserAiMemories) }
 
     before do
-      allow(Ruboty::AiAgent::UserAiMemories).to receive(:new)
+      allow(Ruboty::AiAgent::UserAiMemories).to have_received(:new)
         .with(database: database, user_id: id)
         .and_return(ai_memories_instance)
     end

@@ -6,10 +6,6 @@ require 'webmock/rspec'
 RSpec.describe Ruboty::AiAgent::Agent do
   include UserFactory
 
-  let(:llm) { instance_double('Ruboty::AiAgent::LLM::OpenAI') }
-  let(:messages) { [] }
-  let(:tools) { [] }
-
   subject(:agent) do
     described_class.new(
       llm: llm,
@@ -18,19 +14,26 @@ RSpec.describe Ruboty::AiAgent::Agent do
     )
   end
 
+  let(:llm) { instance_double(Ruboty::AiAgent::LLM::OpenAI) }
+  let(:messages) { [] }
+  let(:tools) { [] }
+
   describe '#initialize' do
     describe '#llm' do
       subject { agent.llm }
+
       it { is_expected.to eq(llm) }
     end
 
     describe '#messages' do
       subject { agent.messages }
+
       it { is_expected.to eq(messages) }
     end
 
     describe '#tools' do
       subject { agent.tools }
+
       it { is_expected.to eq(tools) }
     end
 
@@ -50,26 +53,27 @@ RSpec.describe Ruboty::AiAgent::Agent do
 
       describe '#messages' do
         subject { agent.messages }
+
         it { is_expected.to eq(messages) }
       end
 
       describe '#tools' do
         subject { agent.tools }
+
         it { is_expected.to eq(tools) }
       end
     end
   end
 
   describe '#complete' do
-    let(:llm_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
-    let(:response_message) { Ruboty::AiAgent::ChatMessage.new(role: :assistant, content: 'Test response') }
-
     subject(:complete_response) { agent.complete }
 
+    let(:llm_response) { instance_double(Ruboty::AiAgent::LLM::Response) }
+    let(:response_message) { Ruboty::AiAgent::ChatMessage.new(role: :assistant, content: 'Test response') }
+
     before do
-      allow(llm).to receive(:complete).and_return(llm_response)
-      allow(llm_response).to receive(:message).and_return(response_message)
-      allow(llm_response).to receive(:tool).and_return(nil)
+      allow(llm).to have_received(:complete).and_return(llm_response)
+      allow(llm_response).to receive_messages(message: response_message, tool: nil)
     end
 
     describe 'LLM interaction' do
@@ -108,16 +112,12 @@ RSpec.describe Ruboty::AiAgent::Agent do
       end
       let(:tool_response_message) { Ruboty::AiAgent::ChatMessage.new(role: :tool, content: tool_response) }
 
-      let(:second_response) { instance_double('Ruboty::AiAgent::LLM::Response') }
+      let(:second_response) { instance_double(Ruboty::AiAgent::LLM::Response) }
 
       before do
-        allow(llm_response).to receive(:tool).and_return(tool)
-        allow(llm_response).to receive(:tool_call_id).and_return(tool_call_id)
-        allow(llm_response).to receive(:tool_arguments).and_return(tool_arguments)
-        allow(llm_response).to receive(:call_tool).and_return(tool_response)
-        allow(llm_response).to receive(:message).and_return(tool_message)
+        allow(llm_response).to receive_messages(tool: tool, tool_call_id: tool_call_id, tool_arguments: tool_arguments, call_tool: tool_response, message: tool_message)
 
-        allow(Ruboty::AiAgent::ChatMessage).to receive(:from_llm_response)
+        allow(Ruboty::AiAgent::ChatMessage).to have_received(:from_llm_response)
           .with(
             tool: tool,
             tool_call_id: tool_call_id,
@@ -127,9 +127,8 @@ RSpec.describe Ruboty::AiAgent::Agent do
           .and_return(tool_response_message)
 
         # Setup second LLM call after tool execution
-        allow(second_response).to receive(:message).and_return(response_message)
-        allow(second_response).to receive(:tool).and_return(nil)
-        allow(llm).to receive(:complete).and_return(llm_response, second_response)
+        allow(second_response).to receive_messages(message: response_message, tool: nil)
+        allow(llm).to have_received(:complete).and_return(llm_response, second_response)
       end
 
       it 'handles tool call and returns final response' do
@@ -192,7 +191,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
     end
 
     describe '#on_response' do
-      let(:response) { instance_double('Ruboty::AiAgent::LLM::Response') }
+      let(:response) { instance_double(Ruboty::AiAgent::LLM::Response) }
 
       it 'calls callback with response event' do
         callback_result = nil

@@ -10,6 +10,8 @@ RSpec.describe Ruboty::AiAgent::Database do
   let(:brain_data) { {} }
 
   describe '#data' do
+    subject(:data) { database.data }
+
     let(:brain) do
       Ruboty::Brains::Memory.new.tap do |brain|
         brain.data.merge!(
@@ -22,7 +24,6 @@ RSpec.describe Ruboty::AiAgent::Database do
     end
 
     let(:database) { described_class.new(brain) }
-    subject(:data) { database.data }
 
     it 'returns existing data in the namespace' do
       expect(data).to eq({ user1: { name: 'Alice' } })
@@ -41,7 +42,7 @@ RSpec.describe Ruboty::AiAgent::Database do
     end
 
     it 'calls User.find_or_create' do
-      expect(Ruboty::AiAgent::User).to receive(:find_or_create)
+      expect(Ruboty::AiAgent::User).to have_received(:find_or_create)
         .with(database: database, id: user_id)
         .and_return('user_instance')
 
@@ -61,7 +62,7 @@ RSpec.describe Ruboty::AiAgent::Database do
     end
 
     it 'calls ChatThread.find_or_create' do
-      expect(Ruboty::AiAgent::ChatThread).to receive(:find_or_create)
+      expect(Ruboty::AiAgent::ChatThread).to have_received(:find_or_create)
         .with(database: database, id: thread_id)
         .and_return('thread_instance')
 

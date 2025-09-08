@@ -27,21 +27,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     context 'fetching nested user data' do
       let(:keys) { [:users, 'user1', :name] }
+
       it { is_expected.to eq('Alice') }
     end
 
     context 'fetching settings' do
       let(:keys) { %i[settings theme] }
+
       it { is_expected.to eq('dark') }
     end
 
     context 'fetching non-existent user' do
       let(:keys) { [:users, 'user3'] }
+
       it { is_expected.to be_nil }
     end
 
     context 'fetching non-existent key' do
       let(:keys) { [:non_existent] }
+
       it { is_expected.to be_nil }
     end
 
@@ -133,21 +137,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     context 'getting hash keys' do
       let(:keys) { [:users] }
+
       it { is_expected.to contain_exactly('user1', 'user2', 'user3') }
     end
 
     context 'getting array indices' do
       let(:keys) { [:items] }
+
       it { is_expected.to eq([0, 1, 2]) }
     end
 
     context 'getting top-level keys' do
       let(:keys) { [] }
+
       it { is_expected.to contain_exactly(:users, :items) }
     end
 
     context 'getting keys for non-existent path' do
       let(:keys) { [:non_existent] }
+
       it { is_expected.to eq([]) }
     end
   end
@@ -165,21 +173,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     context 'checking existing key' do
       let(:keys) { [:users] }
+
       it { is_expected.to be true }
     end
 
     context 'checking nested existing key' do
       let(:keys) { [:users, 'user1'] }
+
       it { is_expected.to be true }
     end
 
     context 'checking non-existent key' do
       let(:keys) { [:non_existent] }
+
       it { is_expected.to be false }
     end
 
     context 'checking non-existent nested key' do
       let(:keys) { [:users, 'user2'] }
+
       it { is_expected.to be false }
     end
   end
@@ -216,7 +228,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       end
 
       it 'converts to hasified value' do
-        subject
+        store_value
         expect(database.data.dig(*at)).to eq({
                                                name: 'data',
                                                transport: :http,
@@ -240,16 +252,19 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     context 'getting length of arrays' do
       let(:keys) { [:users] }
+
       it { is_expected.to eq(3) }
     end
 
     context 'getting length of hashes' do
       let(:keys) { [:config] }
+
       it { is_expected.to eq(2) }
     end
 
     context 'getting length for non-existent paths' do
       let(:keys) { [:non_existent] }
+
       it { is_expected.to eq(0) }
     end
   end

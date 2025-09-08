@@ -17,13 +17,13 @@ RSpec.describe Ruboty::AiAgent::Actions::ListAiCommands do
       to: to,
       robot: robot
     )
-    allow(msg).to receive(:reply)
+    allow(msg).to have_received(:reply)
     msg
   end
 
   describe '#call' do
     it 'replies with /clear command information' do
-      expect(message).to receive(:reply) do |reply_content|
+      expect(message).to have_received(:reply) do |reply_content|
         expect(reply_content).to include('/\\/clear/')
         expect(reply_content).to include('Clear the chat history.')
       end

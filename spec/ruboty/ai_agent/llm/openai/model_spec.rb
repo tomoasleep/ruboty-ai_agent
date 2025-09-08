@@ -5,6 +5,7 @@ require 'spec_helper'
 RSpec.describe Ruboty::AiAgent::LLM::OpenAI::Model do
   describe '#initialize' do
     subject(:model) { described_class.new(model_name) }
+
     let(:model_name) { 'gpt-4' }
 
     it 'sets the model name' do

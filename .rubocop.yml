@@ -11,6 +11,7 @@
 plugins:
   - rubocop-rake
   - rubocop-rbs_inline
+  - rubocop-rspec
 
 AllCops:
   TargetRubyVersion: 3.1
@@ -32,6 +33,23 @@ Layout/LeadingCommentSpace:
 
 Metrics:
   Enabled: false
+
+RSpec/ExampleLength:
+  Max: 7
+  CountAsOne: ["array", "heredoc", "method_call"]
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/SpecFilePathFormat:
+  CustomTransform:
+    OpenAI: openai
 
 Style/CommentedKeyword:
   Enabled: false # because of RBS annotations
