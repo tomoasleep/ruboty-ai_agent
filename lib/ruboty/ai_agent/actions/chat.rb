@@ -38,7 +38,7 @@ module Ruboty
             case event[:type]
             when :new_message
               chat_thread.messages << event[:message]
-              message.reply(event[:message].content) if event[:message].content
+              message.reply(event[:message].content) if event[:message].content.length.positive?
             when :tool_call
               message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]}",
                             streaming: true)
