@@ -25,11 +25,11 @@ module Ruboty
       end
 
       # Calculate usage percentage if token limit is available
-      # @rbs return: Float?
+      # @rbs return: (Float | nil)
       def usage_percentage
         return nil unless token_limit
 
-        (total_tokens.to_f / token_limit * 100).round(2)
+        (total_tokens.to_f / token_limit * 100).round(2).to_f
       end
 
       def to_h #: Hash[Symbol, untyped]

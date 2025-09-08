@@ -21,8 +21,8 @@ module Ruboty
       def initialize: (prompt_tokens: Integer, completion_tokens: Integer, total_tokens: Integer, ?token_limit: untyped) -> untyped
 
       # Calculate usage percentage if token limit is available
-      # @rbs return: Float?
-      def usage_percentage: () -> Float?
+      # @rbs return: (Float | nil)
+      def usage_percentage: () -> (Float | nil)
 
       def to_h: () -> Hash[Symbol, untyped]
     end

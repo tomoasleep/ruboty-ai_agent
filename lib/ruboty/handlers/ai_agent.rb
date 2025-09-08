@@ -32,8 +32,6 @@ module Ruboty
       on(%r{remove ai command /(?<name>\S+)}, name: 'remove_ai_command', description: 'Remove the specified AI command')
       on(/list ai commands?/, name: 'list_ai_commands', description: 'List AI commands')
 
-      on(%r{/usage}, name: 'show_usage', description: 'Show token usage information for the latest AI response')
-
       def chat(message)
         Ruboty::AiAgent::Actions::Chat.call(message)
       end
@@ -80,10 +78,6 @@ module Ruboty
 
       def list_ai_commands(message)
         Ruboty::AiAgent::Actions::ListAiCommands.call(message)
-      end
-
-      def show_usage(message)
-        Ruboty::AiAgent::Actions::ShowUsage.call(message)
       end
     end
   end

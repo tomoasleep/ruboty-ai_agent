@@ -27,8 +27,6 @@ module Ruboty
       def remove_ai_command: (untyped message) -> untyped
 
       def list_ai_commands: (untyped message) -> untyped
-
-      def show_usage: (untyped message) -> untyped
     end
   end
 end

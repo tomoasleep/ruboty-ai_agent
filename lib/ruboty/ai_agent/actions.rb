@@ -17,7 +17,6 @@ module Ruboty
       autoload :RemoveMcp, 'ruboty/ai_agent/actions/remove_mcp'
       autoload :SetSystemPrompt, 'ruboty/ai_agent/actions/set_system_prompt'
       autoload :ShowSystemPrompt, 'ruboty/ai_agent/actions/show_system_prompt'
-      autoload :ShowUsage, 'ruboty/ai_agent/actions/show_usage'
     end
   end
 end

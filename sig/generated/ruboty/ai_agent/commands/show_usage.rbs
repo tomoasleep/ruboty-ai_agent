@@ -1,0 +1,26 @@
+# Generated from lib/ruboty/ai_agent/commands/show_usage.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Commands
+      # Show token usage information for the latest AI response
+      class ShowUsage < Base
+        attr_reader message: Ruboty::Message
+
+        attr_reader chat_thread: Ruboty::AiAgent::ChatThread
+
+        # @rbs message: Ruboty::Message
+        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
+        def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
+
+        def call: () -> void
+
+        private
+
+        # @rbs number: Integer
+        # @rbs return: String
+        def format_number: (Integer number) -> String
+      end
+    end
+  end
+end
