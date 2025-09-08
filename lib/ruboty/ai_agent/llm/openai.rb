@@ -7,6 +7,7 @@ module Ruboty
     module LLM
       # LLM interface for OpenAI's chat completion API.
       class OpenAI
+        autoload :Model, 'ruboty/ai_agent/llm/openai/model'
         attr_reader :client #: OpenAI::Client
         attr_reader :model #: String
 
@@ -15,6 +16,11 @@ module Ruboty
         def initialize(client:, model:)
           @client = client
           @model = model
+        end
+
+        # @rbs %a{memorized}
+        def model_info #: Model
+          @model_info ||= Model.new(model)
         end
 
         # @rbs messages: Array[ChatMessage]
@@ -124,6 +130,15 @@ module Ruboty
           choice = openai_response.choices.first
           tool_call = choice.message.tool_calls&.first
 
+          token_usage = if openai_response.usage
+                          TokenUsage.new(
+                            prompt_tokens: openai_response.usage.prompt_tokens,
+                            completion_tokens: openai_response.usage.completion_tokens,
+                            total_tokens: openai_response.usage.total_tokens,
+                            token_limit: model_info.token_limit
+                          )
+                        end
+
           if tool_call
             tool = tools.find do |t|
               if tool_call.type == :function
@@ -152,7 +167,8 @@ module Ruboty
               content: choice.message.content || '',
               tool_call_id: tool_call&.id,
               tool_name: tool&.name,
-              tool_arguments:
+              tool_arguments:,
+              token_usage:
             ),
             tool:,
             tool_call_id: tool_call&.id,

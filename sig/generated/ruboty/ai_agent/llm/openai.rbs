@@ -13,6 +13,10 @@ module Ruboty
         # @rbs model: String
         def initialize: (client: OpenAI::Client, model: String) -> untyped
 
+        # @rbs %a{memorized}
+        %a{memorized}
+        def model_info: () -> Model
+
         # @rbs messages: Array[ChatMessage]
         # @rbs tools: Array[Tool]
         # @rbs return: Response

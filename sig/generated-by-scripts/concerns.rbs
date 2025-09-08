@@ -13,5 +13,10 @@ module Ruboty
       prepend Recordable::PrependMethods
     end
 
+    class TokenUsage
+      extend Recordable::ClassMethods
+      prepend Recordable::PrependMethods
+    end
+
   end
 end

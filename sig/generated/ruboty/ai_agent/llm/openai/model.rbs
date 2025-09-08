@@ -1,0 +1,21 @@
+# Generated from lib/ruboty/ai_agent/llm/openai/model.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module LLM
+      class OpenAI
+        # Model information and token limit estimation
+        class Model
+          attr_reader name: String
+
+          # @rbs name: String
+          def initialize: (String name) -> untyped
+
+          # Estimate token limit based on model name
+          # @rbs return: Integer
+          def token_limit: () -> Integer
+        end
+      end
+    end
+  end
+end

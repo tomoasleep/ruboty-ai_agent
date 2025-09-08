@@ -23,6 +23,16 @@ end
 
 module Ruboty
   module AiAgent
+    module LLM
+      class OpenAI
+        @model_info: Model
+      end
+    end
+  end
+end
+
+module Ruboty
+  module AiAgent
     class User
       @mcp_configurations: UserMcpConfigurations
       @ai_memories: UserAiMemories

@@ -1,0 +1,30 @@
+# Generated from lib/ruboty/ai_agent/token_usage.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Token usage information from LLM responses
+    class TokenUsage
+      include Recordable
+
+      attr_reader prompt_tokens: Integer
+
+      attr_reader completion_tokens: Integer
+
+      attr_reader total_tokens: Integer
+
+      attr_reader token_limit: Integer?
+
+      # @rbs prompt_tokens: Integer
+      # @rbs completion_tokens: Integer
+      # @rbs total_tokens: Integer
+      # @rbs ?token_limit: Integer?
+      def initialize: (prompt_tokens: Integer, completion_tokens: Integer, total_tokens: Integer, ?token_limit: untyped) -> untyped
+
+      # Calculate usage percentage if token limit is available
+      # @rbs return: (Float | nil)
+      def usage_percentage: () -> (Float | nil)
+
+      def to_h: () -> Hash[Symbol, untyped]
+    end
+  end
+end
