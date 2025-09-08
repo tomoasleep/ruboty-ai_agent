@@ -36,6 +36,7 @@ module Ruboty
     class User
       @mcp_configurations: UserMcpConfigurations
       @ai_memories: UserAiMemories
+      @mcp_tools_caches: UserMcpToolsCaches
     end
   end
 end

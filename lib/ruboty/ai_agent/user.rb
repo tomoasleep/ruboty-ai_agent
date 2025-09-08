@@ -23,6 +23,12 @@ module Ruboty
         @mcp_configurations ||= UserMcpConfigurations.new(database: database, user_id: id)
       end
 
+      def mcp_clients #: Array[UserMcpClient]
+        mcp_configurations.all_values.map do |config|
+          UserMcpClient.new(user: self, mcp_name: config.name)
+        end
+      end
+
       # @rbs %a{memorized}
       def ai_memories #: UserAiMemories
         @ai_memories ||= UserAiMemories.new(database: database, user_id: id)
@@ -35,6 +41,11 @@ module Ruboty
       # @rbs prompt: String?
       def system_prompt=(prompt)
         database.store(prompt, at: [:users, id, :system_prompt])
+      end
+
+      # @rbs %a{memorized}
+      def mcp_tools_caches #: UserMcpToolsCaches
+        @mcp_tools_caches ||= UserMcpToolsCaches.new(database: database, user_id: id)
       end
     end
   end

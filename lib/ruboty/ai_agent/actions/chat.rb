@@ -17,9 +17,7 @@ module Ruboty
           )
 
           commands = Commands.builtins(message:, chat_thread:)
-          tools =  McpClients.new(
-            user.mcp_configurations.all_values
-          ).available_tools
+          tools = McpClients.new(user.mcp_clients).available_tools
 
           commands.each do |command|
             return command.call if command.match?(body_param)

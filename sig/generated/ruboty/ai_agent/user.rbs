@@ -16,6 +16,8 @@ module Ruboty
       %a{memorized}
       def mcp_configurations: () -> UserMcpConfigurations
 
+      def mcp_clients: () -> Array[UserMcpClient]
+
       # @rbs %a{memorized}
       %a{memorized}
       def ai_memories: () -> UserAiMemories
@@ -24,6 +26,10 @@ module Ruboty
 
       # @rbs prompt: String?
       def system_prompt=: (String? prompt) -> untyped
+
+      # @rbs %a{memorized}
+      %a{memorized}
+      def mcp_tools_caches: () -> UserMcpToolsCaches
     end
   end
 end

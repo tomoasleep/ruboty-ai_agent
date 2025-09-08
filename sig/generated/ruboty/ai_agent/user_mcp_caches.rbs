@@ -1,0 +1,44 @@
+# Generated from lib/ruboty/ai_agent/user_mcp_caches.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Manage MCP caches for a specific user.
+    # @abstract
+    # @rbs generic D < Object
+    class UserMcpCaches[D < Object] < UserAssociations[CachedValue[D]]
+      def self.cache_type_key: () -> Symbol?
+
+      def self.cache_type_key=: (Symbol?) -> Symbol?
+
+      def self.cache_duration: () -> Integer?
+
+      def self.cache_duration=: (Integer?) -> Integer?
+
+      def self.association_key: () -> Symbol
+
+      def cache_type_key: () -> Symbol
+
+      def cache_duration: () -> Integer
+
+      # @rbs key: String)
+      # @rbs &block: () -> (D | CachedValue[D])
+      # @rbs return: D
+      def fetch_or_store_data: (String key) { () -> (D | CachedValue[D]) } -> D
+
+      # @rbs key: String
+      # @rbs return: D?
+      def fetch_data: (String key) -> D?
+
+      # @rbs override
+      def all: ...
+
+      # @rbs override
+      def fetch: ...
+
+      # @rbs key: String
+      # @rbs data: D
+      # @rbs return: void
+      def store_data: (D data, key: String) -> void
+    end
+  end
+end

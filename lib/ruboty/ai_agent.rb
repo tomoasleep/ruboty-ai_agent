@@ -21,6 +21,7 @@ module Ruboty
     autoload :GlobalSettings, 'ruboty/ai_agent/global_settings'
     autoload :HttpMcpClient, 'ruboty/ai_agent/http_mcp_client'
     autoload :LLM, 'ruboty/ai_agent/llm'
+    autoload :CachedValue, 'ruboty/ai_agent/cached_value'
     autoload :McpClient, 'ruboty/ai_agent/mcp_client'
     autoload :McpClients, 'ruboty/ai_agent/mcp_clients'
     autoload :McpConfiguration, 'ruboty/ai_agent/mcp_configuration'
@@ -31,6 +32,9 @@ module Ruboty
     autoload :User, 'ruboty/ai_agent/user'
     autoload :UserAiMemories, 'ruboty/ai_agent/user_ai_memories'
     autoload :UserAssociations, 'ruboty/ai_agent/user_associations'
+    autoload :UserMcpCaches, 'ruboty/ai_agent/user_mcp_caches'
+    autoload :UserMcpClient, 'ruboty/ai_agent/user_mcp_client'
     autoload :UserMcpConfigurations, 'ruboty/ai_agent/user_mcp_configurations'
+    autoload :UserMcpToolsCaches, 'ruboty/ai_agent/user_mcp_tools_caches'
   end
 end

@@ -4,14 +4,15 @@ module Ruboty
   module AiAgent
     # Manages multiple MCP (Model Context Protocol) clients
     class McpClients
-      attr_reader :clients
+      attr_reader :clients #: Array[UserMcpClient]
 
-      # @rbs mcp_configurations: Array[McpConfiguration]
-      def initialize(mcp_configurations = [])
-        @clients = initialize_mcp_clients(mcp_configurations)
+      # @rbs clients: Array[UserMcpClient]
+      def initialize(clients)
+        @clients = clients
       end
 
-      def available_tools #: Array[Tool]
+      # @rbs return: Array[Tool]
+      def available_tools
         clients.flat_map do |client|
           tool_defs = client.list_tools
           tool_defs.map do |tool_def|
@@ -27,32 +28,20 @@ module Ruboty
         end
       end
 
+      # @rbs function_name: String
+      # @rbs arguments: Hash[String, untyped]
+      # @rbs return: untyped
       def execute_tool(function_name, arguments)
         clients.each do |mcp_client|
           tools = mcp_client.list_tools
           return mcp_client.call_tool(function_name, arguments) if tools.any? { |t| t['name'] == function_name }
         end
+        nil
       end
 
+      # @rbs return: bool
       def any?
         @clients.any?
-      end
-
-      private
-
-      # @rbs mcp_configurations: Array[McpConfiguration]
-      def initialize_mcp_clients(mcp_configurations)
-        mcp_configurations.map do |server_config|
-          case server_config.transport
-          when :http
-            HttpMcpClient.new(
-              url: server_config.url,
-              headers: server_config.headers || {}
-            )
-          else
-            raise "Unknown MCP server type: #{server_config.transport}"
-          end
-        end
       end
     end
   end

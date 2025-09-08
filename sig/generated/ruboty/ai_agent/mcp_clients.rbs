@@ -4,21 +4,21 @@ module Ruboty
   module AiAgent
     # Manages multiple MCP (Model Context Protocol) clients
     class McpClients
-      attr_reader clients: untyped
+      attr_reader clients: Array[UserMcpClient]
 
-      # @rbs mcp_configurations: Array[McpConfiguration]
-      def initialize: (?Array[McpConfiguration] mcp_configurations) -> untyped
+      # @rbs clients: Array[UserMcpClient]
+      def initialize: (Array[UserMcpClient] clients) -> untyped
 
+      # @rbs return: Array[Tool]
       def available_tools: () -> Array[Tool]
 
-      def execute_tool: (untyped function_name, untyped arguments) -> untyped
+      # @rbs function_name: String
+      # @rbs arguments: Hash[String, untyped]
+      # @rbs return: untyped
+      def execute_tool: (String function_name, Hash[String, untyped] arguments) -> untyped
 
-      def any?: () -> untyped
-
-      private
-
-      # @rbs mcp_configurations: Array[McpConfiguration]
-      def initialize_mcp_clients: (Array[McpConfiguration] mcp_configurations) -> untyped
+      # @rbs return: bool
+      def any?: () -> bool
     end
   end
 end

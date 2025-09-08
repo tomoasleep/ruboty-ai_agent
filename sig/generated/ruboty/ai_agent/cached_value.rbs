@@ -1,0 +1,28 @@
+# Generated from lib/ruboty/ai_agent/cached_value.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Cache for MCP operations
+    # @rbs generic D < Object
+    class CachedValue[D < Object]
+      include Recordable
+
+      attr_reader expires_at: Time
+
+      attr_reader data: D
+
+      # @rbs data: D
+      # @rbs expires_at: Time
+      def initialize: (data: D, expires_at: Time) -> untyped
+
+      # @rbs return: Hash[Symbol, untyped]
+      def to_h: () -> Hash[Symbol, untyped]
+
+      # @rbs return: bool
+      def expired?: () -> bool
+
+      # @rbs return: bool
+      def valid?: () -> bool
+    end
+  end
+end

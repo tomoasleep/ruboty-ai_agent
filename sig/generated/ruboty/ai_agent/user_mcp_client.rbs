@@ -1,0 +1,58 @@
+# Generated from lib/ruboty/ai_agent/user_mcp_client.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Wrapper for MCP client with caching support for a specific user
+    class UserMcpClient
+      attr_reader user: User
+
+      attr_reader mcp_name: String
+
+      # @rbs user: User
+      # @rbs mcp_name: String
+      # @rbs return: void
+      def initialize: (user: User, mcp_name: String) -> void
+
+      # @rbs return: Array[tool_def]
+      def list_tools: () -> Array[tool_def]
+
+      # @rbs name: String
+      # @rbs arguments: Hash[String, untyped]
+      # @rbs &block: ? (Hash[String, untyped]) -> void
+      # @rbs return: untyped
+      def call_tool: (String name, ?Hash[String, untyped] arguments) ?{ (Hash[String, untyped]) -> void } -> untyped
+
+      # @rbs return: untyped
+      def list_prompts: () -> untyped
+
+      # @rbs name: String
+      # @rbs arguments: Hash[String, untyped]
+      # @rbs return: untyped
+      def get_prompt: (String name, ?Hash[String, untyped] arguments) -> untyped
+
+      # @rbs return: untyped
+      def list_resources: () -> untyped
+
+      # @rbs uri: String
+      # @rbs return: untyped
+      def read_resource: (String uri) -> untyped
+
+      # @rbs return: untyped
+      def ping: () -> untyped
+
+      # @rbs return: untyped
+      def initialize_session: () -> untyped
+
+      # @rbs return: untyped
+      def cleanup_session: () -> untyped
+
+      private
+
+      # @rbs return: McpConfiguration
+      def configuration: () -> McpConfiguration
+
+      # @rbs return: HttpMcpClient
+      def mcp_client: () -> HttpMcpClient
+    end
+  end
+end

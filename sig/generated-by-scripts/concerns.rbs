@@ -3,6 +3,11 @@
 
 module Ruboty
   module AiAgent
+    class CachedValue[D < Object]
+      extend Recordable::ClassMethods
+      prepend Recordable::PrependMethods
+    end
+
     class ChatMessage
       extend Recordable::ClassMethods
       prepend Recordable::PrependMethods

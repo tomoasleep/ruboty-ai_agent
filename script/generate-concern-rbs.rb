@@ -96,9 +96,6 @@ class ConcernRbsGenerator
       loader.add(path: dir)
     end
 
-    # Add RBS files directly in sig directory
-    loader.add(path: Pathname('sig'))
-
     loader.add(path: Pathname('.gem_rbs_collection'))
     loader.load(env: @env)
 
@@ -217,16 +214,65 @@ class ConcernRbsGenerator
 
         next unless concern
 
+        # Get type parameters from Ruby source file
+        type_params = extract_type_parameters_from_source(type_name)
+
         includers << {
           name: type_name.to_s,
           type_name: type_name,
           is_class: is_class,
-          concern: concern
+          concern: concern,
+          type_params: type_params
         }
       end
     end
 
     includers
+  end
+
+  def extract_type_parameters_from_source(type_name)
+    # Convert type name to file path
+    # e.g., ::Ruboty::AiAgent::CachedValue -> lib/ruboty/ai_agent/cached_value.rb
+    path_parts = type_name.to_s.sub(/^::/, '').split('::').map do |part|
+      part.gsub(/([A-Z]+)([A-Z][a-z])|([a-z\d])([A-Z])/) do
+        "#{Regexp.last_match(1) || Regexp.last_match(3)}_#{Regexp.last_match(2) || Regexp.last_match(4)}"
+      end.downcase
+    end
+
+    file_path = @lib_path / "#{path_parts.join('/')}.rb"
+    return nil unless file_path.exist?
+
+    content = file_path.read
+    lines = content.lines
+
+    # Find the class/module definition line
+    class_or_module_name = type_name.to_s.split('::').last
+
+    lines.each_with_index do |line, index|
+      # Look for @rbs generic comment before class/module definition
+      next unless line =~ /^\s*#\s*@rbs\s+generic\s+(.+)$/
+
+      type_params_str = Regexp.last_match(1).strip
+      # Check if next non-comment line is the class/module definition
+      next_line_index = index + 1
+      while next_line_index < lines.length
+        next_line = lines[next_line_index]
+        # Skip comment lines and empty lines
+        break unless next_line =~ /^\s*(#|$)/
+
+        next_line_index += 1
+      end
+
+      next unless next_line_index < lines.length
+
+      next_line = lines[next_line_index]
+      if next_line =~ /^\s*(class|module)\s+#{Regexp.escape(class_or_module_name)}\b/
+        # Parse type parameters (e.g., "D" or "K, V")
+        return type_params_str.split(',').map(&:strip)
+      end
+    end
+
+    nil
   end
 
   def resolve_type_name(name, current_namespace)
@@ -266,7 +312,13 @@ class ConcernRbsGenerator
         simple_name = includer[:name].sub(/^::/, '').split('::').last
         keyword = includer[:is_class] ? 'class' : 'module'
 
-        content << ('  ' * indent_level) + "#{keyword} #{simple_name}"
+        # Add type parameters if present
+        if includer[:type_params] && !includer[:type_params].empty?
+          type_params_str = "[#{includer[:type_params].join(', ')}]"
+          content << ('  ' * indent_level) + "#{keyword} #{simple_name}#{type_params_str}"
+        else
+          content << ('  ' * indent_level) + "#{keyword} #{simple_name}"
+        end
 
         concern = includer[:concern]
         concern_simple_name = concern[:name].sub(/^::/, '').split('::').last

@@ -1,0 +1,11 @@
+# Generated from lib/ruboty/ai_agent/user_mcp_tools_caches.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    type tool_def = Hash[Symbol | String, untyped]
+
+    # Manage tools cache for a specific user and server.
+    class UserMcpToolsCaches < UserMcpCaches[Array[tool_def]]
+    end
+  end
+end
