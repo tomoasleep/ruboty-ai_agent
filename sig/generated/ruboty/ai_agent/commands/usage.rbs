@@ -1,10 +1,10 @@
-# Generated from lib/ruboty/ai_agent/commands/show_usage.rb with RBS::Inline
+# Generated from lib/ruboty/ai_agent/commands/usage.rb with RBS::Inline
 
 module Ruboty
   module AiAgent
     module Commands
       # Show token usage information for the latest AI response
-      class ShowUsage < Base
+      class Usage < Base
         attr_reader message: Ruboty::Message
 
         attr_reader chat_thread: Ruboty::AiAgent::ChatThread

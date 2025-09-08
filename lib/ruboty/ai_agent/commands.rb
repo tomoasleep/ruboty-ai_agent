@@ -7,7 +7,7 @@ module Ruboty
       autoload :Base, 'ruboty/ai_agent/commands/base'
       autoload :Clear, 'ruboty/ai_agent/commands/clear'
       autoload :Compact, 'ruboty/ai_agent/commands/compact'
-      autoload :ShowUsage, 'ruboty/ai_agent/commands/show_usage'
+      autoload :Usage, 'ruboty/ai_agent/commands/usage'
 
       # @rbs message: Ruboty::Message
       # @rbs chat_thread: ChatThread
@@ -22,7 +22,7 @@ module Ruboty
             message:,
             chat_thread:
           ),
-          Commands::ShowUsage.new(
+          Commands::Usage.new(
             message:,
             chat_thread:
           )

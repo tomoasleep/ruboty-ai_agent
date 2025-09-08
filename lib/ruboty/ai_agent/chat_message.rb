@@ -27,11 +27,7 @@ module Ruboty
         @tool_call_id = tool_call_id
         @tool_name = tool_name
         @tool_arguments = tool_arguments
-        @token_usage = if token_usage.is_a?(Hash) && Recordable.convertable?(token_usage)
-                         Recordable.instantiate_recursively(token_usage)
-                       else
-                         token_usage
-                       end
+        @token_usage = token_usage
       end
 
       def to_h #: Hash[Symbol, untyped]

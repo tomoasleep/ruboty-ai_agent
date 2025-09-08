@@ -4,7 +4,7 @@ module Ruboty
   module AiAgent
     module Commands
       # Show token usage information for the latest AI response
-      class ShowUsage < Base
+      class Usage < Base
         on(%r{/usage}, name: 'show_usage', description: 'Show token usage information for the latest AI response')
 
         attr_reader :message #: Ruboty::Message
