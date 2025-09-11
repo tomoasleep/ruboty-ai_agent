@@ -25,25 +25,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       }
     end
 
-    context 'fetching nested user data' do
+    context 'when fetching nested user data' do
       let(:keys) { [:users, 'user1', :name] }
 
       it { is_expected.to eq('Alice') }
     end
 
-    context 'fetching settings' do
+    context 'when fetching settings' do
       let(:keys) { %i[settings theme] }
 
       it { is_expected.to eq('dark') }
     end
 
-    context 'fetching non-existent user' do
+    context 'when fetching non-existent user' do
       let(:keys) { [:users, 'user3'] }
 
       it { is_expected.to be_nil }
     end
 
-    context 'fetching non-existent key' do
+    context 'when fetching non-existent key' do
       let(:keys) { [:non_existent] }
 
       it { is_expected.to be_nil }
@@ -93,7 +93,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       }
     end
 
-    context 'deleting from hash' do
+    context 'when deleting from hash' do
       let(:keys) { [:users, 'user1'] }
 
       it 'deletes the specified key' do
@@ -102,7 +102,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       end
     end
 
-    context 'deleting from array' do
+    context 'when deleting from array' do
       let(:keys) { [:items, 1] }
 
       it 'deletes item at specified index' do
@@ -111,7 +111,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       end
     end
 
-    context 'deleting with out of bounds index' do
+    context 'when deleting with out of bounds index' do
       let(:keys) { [:items, 10] }
 
       it 'does nothing for out of bounds index' do
@@ -135,25 +135,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       }
     end
 
-    context 'getting hash keys' do
+    context 'when getting hash keys' do
       let(:keys) { [:users] }
 
       it { is_expected.to contain_exactly('user1', 'user2', 'user3') }
     end
 
-    context 'getting array indices' do
+    context 'when getting array indices' do
       let(:keys) { [:items] }
 
       it { is_expected.to eq([0, 1, 2]) }
     end
 
-    context 'getting top-level keys' do
+    context 'when getting top-level keys' do
       let(:keys) { [] }
 
       it { is_expected.to contain_exactly(:users, :items) }
     end
 
-    context 'getting keys for non-existent path' do
+    context 'when getting keys for non-existent path' do
       let(:keys) { [:non_existent] }
 
       it { is_expected.to eq([]) }
@@ -171,25 +171,25 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       }
     end
 
-    context 'checking existing key' do
+    context 'when checking existing key' do
       let(:keys) { [:users] }
 
       it { is_expected.to be true }
     end
 
-    context 'checking nested existing key' do
+    context 'when checking nested existing key' do
       let(:keys) { [:users, 'user1'] }
 
       it { is_expected.to be true }
     end
 
-    context 'checking non-existent key' do
+    context 'when checking non-existent key' do
       let(:keys) { [:non_existent] }
 
       it { is_expected.to be false }
     end
 
-    context 'checking non-existent nested key' do
+    context 'when checking non-existent nested key' do
       let(:keys) { [:users, 'user2'] }
 
       it { is_expected.to be false }
@@ -207,7 +207,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       expect(database.fetch(:users, 'user3')).to eq(value)
     end
 
-    context 'creating nested structure' do
+    context 'when creating nested structure' do
       let(:value) { { enabled: true } }
       let(:at) { %i[deeply nested config] }
 
@@ -250,19 +250,19 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
       }
     end
 
-    context 'getting length of arrays' do
+    context 'when getting length of arrays' do
       let(:keys) { [:users] }
 
       it { is_expected.to eq(3) }
     end
 
-    context 'getting length of hashes' do
+    context 'when getting length of hashes' do
       let(:keys) { [:config] }
 
       it { is_expected.to eq(2) }
     end
 
-    context 'getting length for non-existent paths' do
+    context 'when getting length for non-existent paths' do
       let(:keys) { [:non_existent] }
 
       it { is_expected.to eq(0) }

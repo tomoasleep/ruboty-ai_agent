@@ -39,7 +39,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_ping(
         base_url: base_url,
@@ -58,7 +58,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_list_tools(
         base_url: base_url,
@@ -79,7 +79,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_call_tool(
         base_url: base_url,
@@ -97,7 +97,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
       before do
         # Mock ensure_initialized to avoid automatic initialization
-        allow(client).to have_received(:ensure_initialized)
+        allow(client).to receive(:ensure_initialized)
 
         stub_mcp_call_tool_streaming(
           base_url: base_url,
@@ -129,7 +129,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_list_prompts(
         base_url: base_url,
@@ -153,7 +153,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_get_prompt(
         base_url: base_url,
@@ -177,7 +177,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_list_resources(
         base_url: base_url,
@@ -200,7 +200,7 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
 
     before do
       # Mock ensure_initialized to avoid automatic initialization
-      allow(client).to have_received(:ensure_initialized)
+      allow(client).to receive(:ensure_initialized)
 
       stub_mcp_read_resource(
         base_url: base_url,
@@ -236,8 +236,9 @@ RSpec.describe Ruboty::AiAgent::HttpMcpClient do
       end
 
       it 'does nothing' do
-        expect(Net::HTTP).not_to have_received(:new)
+        allow(Net::HTTP).to receive(:new)
         client.cleanup_session
+        expect(Net::HTTP).not_to have_received(:new)
       end
     end
   end

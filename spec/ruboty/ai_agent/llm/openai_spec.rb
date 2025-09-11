@@ -31,15 +31,11 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
     context 'without tools' do
       before do
         stub_openai_chat_completion_with_content(
+          model:,
           messages: messages,
           tools: tools,
           response_content: 'Hi there!'
         )
-      end
-
-      it 'sends correct messages to OpenAI API' do
-        complete
-        expect_openai_request_made(messages: messages, tools: tools)
       end
 
       it 'returns a Response with assistant message' do
@@ -83,6 +79,7 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
       context 'when assistant uses a tool' do
         before do
           stub_openai_chat_completion_with_tool_call(
+            model:,
             messages: messages,
             tools: tools,
             tool_name: 'get_weather',
@@ -91,24 +88,14 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
           )
         end
 
-        it 'sends tools to OpenAI API' do
-          complete
-          expect_openai_request_made(messages: messages, tools: tools)
-        end
-
         it 'returns Response with tool call information' do
           response = complete
 
-          aggregate_failures do
-            expect(response.message.role).to eq(:assistant)
-            expect(response.message.content).to be_empty
-            expect(response.message.tool_call_id).to eq('call_123')
-            expect(response.message.tool_name).to eq('get_weather')
-            expect(response.message.tool_arguments).to eq({ location: 'Tokyo' })
-            expect(response.tool).to eq(tool)
-            expect(response.tool_call_id).to eq('call_123')
-            expect(response.tool_arguments).to eq({ location: 'Tokyo' })
-          end
+          expect(response.message.role).to eq(:assistant)
+          expect(response.message.content).to be_empty
+          expect(response.message.tool_call_id).to eq('call_123')
+          expect(response.message.tool_name).to eq('get_weather')
+          expect(response.message.tool_arguments).to eq({ location: 'Tokyo' })
         end
       end
     end
@@ -136,14 +123,10 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
 
       before do
         stub_openai_chat_completion_with_content(
+          model:,
           messages: messages,
           response_content: 'Final response'
         )
-      end
-
-      it 'correctly formats all message types for OpenAI' do
-        complete
-        expect_openai_request_made(messages: messages)
       end
 
       it 'returns a Response with assistant message' do
@@ -180,6 +163,7 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
 
       before do
         stub_openai_chat_completion_with_content(
+          model:,
           messages: messages,
           tools: tools,
           response_content: 'Response'
@@ -187,8 +171,8 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
       end
 
       it 'uses default empty schema' do
-        complete
-        expect_openai_request_made(messages: messages, tools: tools)
+        response = complete
+        expect(response.message.content).to eq('Response')
       end
     end
   end

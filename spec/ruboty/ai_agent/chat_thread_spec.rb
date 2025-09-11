@@ -33,7 +33,7 @@ RSpec.describe Ruboty::AiAgent::ChatThread do
     let(:messages_instance) { instance_double(Ruboty::AiAgent::ChatThreadMessages) }
 
     before do
-      allow(Ruboty::AiAgent::ChatThreadMessages).to have_received(:new)
+      allow(Ruboty::AiAgent::ChatThreadMessages).to receive(:new)
         .with(database: database, chat_thread_id: id)
         .and_return(messages_instance)
     end

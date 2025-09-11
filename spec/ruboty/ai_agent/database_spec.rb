@@ -42,11 +42,13 @@ RSpec.describe Ruboty::AiAgent::Database do
     end
 
     it 'calls User.find_or_create' do
-      expect(Ruboty::AiAgent::User).to have_received(:find_or_create)
+      allow(Ruboty::AiAgent::User).to receive(:find_or_create)
         .with(database: database, id: user_id)
         .and_return('user_instance')
 
       expect(user_result).to eq('user_instance')
+      expect(Ruboty::AiAgent::User).to have_received(:find_or_create)
+        .with(database: database, id: user_id)
     end
   end
 
@@ -62,11 +64,13 @@ RSpec.describe Ruboty::AiAgent::Database do
     end
 
     it 'calls ChatThread.find_or_create' do
-      expect(Ruboty::AiAgent::ChatThread).to have_received(:find_or_create)
+      allow(Ruboty::AiAgent::ChatThread).to receive(:find_or_create)
         .with(database: database, id: thread_id)
         .and_return('thread_instance')
 
       expect(thread_result).to eq('thread_instance')
+      expect(Ruboty::AiAgent::ChatThread).to have_received(:find_or_create)
+        .with(database: database, id: thread_id)
     end
   end
 end

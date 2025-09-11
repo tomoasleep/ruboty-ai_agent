@@ -7,49 +7,31 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
   describe 'usage command' do
     include OpenAIMockHelper
     include McpMockHelper
+    include RobotFactory
 
-    subject(:action) { described_class.new(message) }
+    subject(:receive_message) { robot.receive(body: "#{robot.name} #{body}", from:, to:) }
 
-    let(:robot) { Ruboty::Robot.new }
+    let(:robot) { create_robot(env:) }
     let(:brain) { robot.brain }
     let(:database) { Ruboty::AiAgent::Database.new(brain) }
+    let(:env) do
+      {
+        'OPENAI_API_KEY' => 'test_api_key',
+        'OPENAI_MODEL' => 'gpt-5-nano',
+        'DEBUG' => nil,
+        'OPENAI_ORG_ID' => nil
+      }
+    end
 
     let(:from) { 'test_user' }
     let(:to) { 'ruboty' }
     let(:body) { '/usage' }
 
-    let(:original_message) do
-      Ruboty::Message.new(
-        body: body,
-        from: from,
-        to: to,
-        robot: robot
-      )
+    def said_messages #: Array[Hash[untyped, untyped]]
+      robot.adapter.messages
     end
 
-    let(:message) do
-      message = original_message
-      allow(message).to have_received(:reply)
-      allow(message).to have_received(:[]).with(:body).and_return(body)
-      message
-    end
-
-    before do
-      # Stub ENV variables
-      allow(ENV).to have_received(:fetch).and_call_original
-      allow(ENV).to have_received(:fetch).with('OPENAI_API_KEY', nil).and_return('test_api_key')
-      allow(ENV).to have_received(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-5')
-      allow(ENV).to have_received(:[]).and_call_original
-      allow(ENV).to have_received(:[]).with('DEBUG').and_return(nil)
-      allow(ENV).to have_received(:[]).with('OPENAI_ORG_ID').and_return(nil)
-
-      # Allow action to use real database
-      allow(action).to receive_messages(database: database, robot: robot)
-    end
-
-    describe '#call with /usage command' do
-      subject(:call_action) { action.call }
-
+    describe 'with /usage command' do
       let(:chat_thread) { database.chat_thread(from) }
 
       context 'when there is a message with token usage' do
@@ -73,13 +55,9 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'replies with formatted token usage information' do
-          expected_text = 'Token usage: 1,000 (prompt) + 500 (completion) = 1,500 (total) / 128,000 (1.17%)'
-          expect(message).to have_received(:reply).with(expected_text)
-          call_action
-        end
+          receive_message
 
-        it 'does not call OpenAI API' do
-          expect { call_action }.not_to raise_error
+          expect(said_messages).to include(a_hash_including(body: 'Token usage: 1,000 (prompt) + 500 (completion) = 1,500 (total) / 128,000 (1.17%)'))
         end
       end
 
@@ -103,9 +81,9 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'replies with token usage information without limit' do
-          expected_text = 'Token usage: 750 (prompt) + 250 (completion) = 1,000 (total)'
-          expect(message).to have_received(:reply).with(expected_text)
-          call_action
+          receive_message
+
+          expect(said_messages).to include(a_hash_including(body: 'Token usage: 750 (prompt) + 250 (completion) = 1,000 (total)'))
         end
       end
 
@@ -126,15 +104,17 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'replies with no token usage found message' do
-          expect(message).to have_received(:reply).with('No token usage information found.')
-          call_action
+          receive_message
+
+          expect(said_messages).to include(a_hash_including(body: 'No token usage information found.'))
         end
       end
 
       context 'when chat thread is empty' do
         it 'replies with no token usage found message' do
-          expect(message).to have_received(:reply).with('No token usage information found.')
-          call_action
+          receive_message
+
+          expect(said_messages).to include(a_hash_including(body: 'No token usage information found.'))
         end
       end
 
@@ -168,9 +148,9 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             end
 
             it 'matches and executes the usage command' do
-              expected_text = 'Token usage: 100 (prompt) + 50 (completion) = 150 (total) / 128,000 (0.12%)'
-              expect(message).to have_received(:reply).with(expected_text)
-              call_action
+              receive_message
+
+              expect(said_messages).to include(a_hash_including(body: 'Token usage: 100 (prompt) + 50 (completion) = 150 (total) / 128,000 (0.12%)'))
             end
           end
         end
@@ -189,8 +169,9 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'processes as normal chat message' do
-          expect(message).to have_received(:reply).with('Did you mean to check token usage? Use /usage command.')
-          call_action
+          receive_message
+
+          expect(said_messages).to include(a_hash_including(body: 'Did you mean to check token usage? Use /usage command.'))
         end
       end
 
@@ -237,9 +218,9 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'shows the first message with token usage found' do
-          expected_text = 'Token usage: 200 (prompt) + 100 (completion) = 300 (total) / 128,000 (0.23%)'
-          expect(message).to have_received(:reply).with(expected_text)
-          call_action
+          receive_message
+
+          expect(said_messages).to include(a_hash_including(body: 'Token usage: 200 (prompt) + 100 (completion) = 300 (total) / 128,000 (0.23%)'))
         end
       end
     end

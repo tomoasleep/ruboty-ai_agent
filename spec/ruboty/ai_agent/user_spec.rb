@@ -33,7 +33,7 @@ RSpec.describe Ruboty::AiAgent::User do
     let(:mcp_configurations_instance) { instance_double(Ruboty::AiAgent::UserMcpConfigurations) }
 
     before do
-      allow(Ruboty::AiAgent::UserMcpConfigurations).to have_received(:new)
+      allow(Ruboty::AiAgent::UserMcpConfigurations).to receive(:new)
         .with(database: database, user_id: id)
         .and_return(mcp_configurations_instance)
     end
@@ -64,7 +64,7 @@ RSpec.describe Ruboty::AiAgent::User do
     let(:ai_memories_instance) { instance_double(Ruboty::AiAgent::UserAiMemories) }
 
     before do
-      allow(Ruboty::AiAgent::UserAiMemories).to have_received(:new)
+      allow(Ruboty::AiAgent::UserAiMemories).to receive(:new)
         .with(database: database, user_id: id)
         .and_return(ai_memories_instance)
     end

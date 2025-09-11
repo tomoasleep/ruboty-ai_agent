@@ -1,31 +1,45 @@
 # frozen_string_literal: true
 
 RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
-  include DatabaseFactory
+  include OpenAIMockHelper
+  include RobotFactory
 
-  let(:robot) { instance_double(Ruboty::Robot, brain:) }
-  let(:brain) { create_brain }
-  let(:message) do
-    instance_double(Ruboty::Message, from_name: 'test_user', robot:).tap do |message|
-      allow(message).to have_received(:[]).with(:scope).and_return(scope)
-      allow(message).to have_received(:[]).with(:prompt).and_return('Test prompt')
-      allow(message).to have_received(:reply)
-    end
+  subject(:call_robot) { robot.receive(body: full_body, from:, to:) }
+
+  let(:robot) { create_robot(env:) }
+  let(:brain) { robot.brain }
+  let(:database) { Ruboty::AiAgent::Database.new(brain) }
+  let(:env) do
+    {
+      'OPENAI_API_KEY' => 'test_api_key',
+      'OPENAI_MODEL' => 'gpt-5-nano',
+      'DEBUG' => nil,
+      'OPENAI_ORG_ID' => nil
+    }
   end
-  let(:action) { described_class.new(message) }
 
-  describe '#call' do
+  let(:from) { 'test_user' }
+  let(:to) { 'ruboty' }
+  let(:full_body) { "#{robot.name} set #{scope_str}system prompt \"#{prompt}\"" }
+  let(:scope_str) { scope ? "#{scope} " : '' }
+  let(:prompt) { 'Test prompt' }
+
+  def said_messages
+    robot.adapter.messages
+  end
+
+  describe 'when setting system prompt' do
     context 'with user scope (default)' do
       let(:scope) { nil }
 
       it 'sets user system prompt' do
-        action.call
-        expect(message).to have_received(:reply).with('Set user system prompt: Test prompt')
+        call_robot
+        expect(said_messages).to include(a_hash_including(body: 'Set user system prompt: Test prompt'))
       end
 
       it 'stores the prompt in user data' do
-        action.call
-        expect(action.database.data.dig(:users, 'test_user', :system_prompt)).to eq('Test prompt')
+        call_robot
+        expect(database.data.dig(:users, from, :system_prompt)).to eq('Test prompt')
       end
     end
 
@@ -33,8 +47,8 @@ RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
       let(:scope) { 'user' }
 
       it 'sets user system prompt' do
-        action.call
-        expect(message).to have_received(:reply).with('Set user system prompt: Test prompt')
+        call_robot
+        expect(said_messages).to include(a_hash_including(body: 'Set user system prompt: Test prompt'))
       end
     end
 
@@ -42,22 +56,31 @@ RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
       let(:scope) { 'global' }
 
       it 'sets global system prompt' do
-        action.call
-        expect(message).to have_received(:reply).with('Set global system prompt: Test prompt')
+        call_robot
+        expect(said_messages).to include(a_hash_including(body: 'Set global system prompt: Test prompt'))
       end
 
       it 'stores the prompt in global data' do
-        action.call
-        expect(action.database.data.dig(:global_settings, :system_prompt)).to eq('Test prompt')
+        call_robot
+        expect(database.data.dig(:global_settings, :system_prompt)).to eq('Test prompt')
       end
     end
 
     context 'with invalid scope' do
       let(:scope) { 'invalid' }
 
+      before do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: 'set invalid system prompt "Test prompt"' }
+          ],
+          response_content: 'Use /user or /global to specify the scope.'
+        )
+      end
+
       it 'returns error message' do
-        action.call
-        expect(message).to have_received(:reply).with("Error: Invalid scope 'invalid'. Use 'user' or 'global'.")
+        call_robot
+        expect(said_messages).to include(a_hash_including(body: 'Use /user or /global to specify the scope.'))
       end
     end
   end

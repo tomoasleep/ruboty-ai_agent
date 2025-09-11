@@ -72,7 +72,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
     let(:response_message) { Ruboty::AiAgent::ChatMessage.new(role: :assistant, content: 'Test response') }
 
     before do
-      allow(llm).to have_received(:complete).and_return(llm_response)
+      allow(llm).to receive(:complete).and_return(llm_response)
       allow(llm_response).to receive_messages(message: response_message, tool: nil)
     end
 
@@ -117,7 +117,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
       before do
         allow(llm_response).to receive_messages(tool: tool, tool_call_id: tool_call_id, tool_arguments: tool_arguments, call_tool: tool_response, message: tool_message)
 
-        allow(Ruboty::AiAgent::ChatMessage).to have_received(:from_llm_response)
+        allow(Ruboty::AiAgent::ChatMessage).to receive(:from_llm_response)
           .with(
             tool: tool,
             tool_call_id: tool_call_id,
@@ -128,7 +128,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
 
         # Setup second LLM call after tool execution
         allow(second_response).to receive_messages(message: response_message, tool: nil)
-        allow(llm).to have_received(:complete).and_return(llm_response, second_response)
+        allow(llm).to receive(:complete).and_return(llm_response, second_response)
       end
 
       it 'handles tool call and returns final response' do

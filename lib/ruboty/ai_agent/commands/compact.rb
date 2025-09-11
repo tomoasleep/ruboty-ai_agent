@@ -59,11 +59,13 @@ module Ruboty
           )
 
           summary_prompt = ChatMessage.new(
-            role: :user,
-            content: "Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:\n\n#{format_messages_for_summary(messages)}"
+            role: :system,
+            content: <<~TEXT
+              Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:
+            TEXT
           )
 
-          response = llm.complete(messages: [summary_prompt])
+          response = llm.complete(messages: [summary_prompt, *messages])
           response.message.content
         end
 

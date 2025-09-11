@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module OpenAIMockHelper
-  def stub_openai_chat_completion(messages:, tools: [], response_content: nil, response_tool_calls: nil)
+  def stub_openai_chat_completion(messages:, tools: [], response_content: nil, response_tool_calls: nil, model: nil)
+    model ||= 'gpt-5-nano'
     request_body = {
-      model: 'gpt-5',
+      model:,
       messages: format_messages_for_request(messages),
       tools: format_tools_for_request(tools)
     }
@@ -23,8 +24,9 @@ module OpenAIMockHelper
   end
 
   def stub_openai_chat_completion_with_tool_call(messages:, tools:, tool_name:, tool_arguments:,
-                                                 tool_call_id: 'call_123')
+                                                 tool_call_id: 'call_123', model: nil)
     stub_openai_chat_completion(
+      model:,
       messages: messages,
       tools: tools,
       response_tool_calls: [
@@ -40,12 +42,35 @@ module OpenAIMockHelper
     )
   end
 
-  def stub_openai_chat_completion_with_content(messages:, response_content:, tools: [])
+  def stub_openai_chat_completion_with_content(messages:, response_content:, tools: [], model: nil)
     stub_openai_chat_completion(
+      model:,
       messages: messages,
       tools: tools,
       response_content: response_content
     )
+  end
+
+  def stub_openai_chat_completion_with_error(messages:, tools: [], model: nil)
+    model ||= 'gpt-5-nano'
+    request_body = {
+      model:,
+      messages: format_messages_for_request(messages),
+      tools: format_tools_for_request(tools)
+    }
+
+    stub_request(:post, 'https://api.openai.com/v1/chat/completions')
+      .with(body: hash_including(request_body))
+      .to_return(
+        status: 500,
+        body: {
+          message: 'Internal server error',
+          type: 'server_error',
+          param: nil,
+          code: 'internal_error'
+        }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
   end
 
   private
@@ -151,18 +176,5 @@ module OpenAIMockHelper
         total_tokens: 70
       }
     }
-  end
-
-  def expect_openai_request_made(messages: nil, tools: nil)
-    expectation = a_request(:post, 'https://api.openai.com/v1/chat/completions')
-
-    if messages || tools
-      body_hash = {}
-      body_hash[:messages] = format_messages_for_request(messages) if messages
-      body_hash[:tools] = format_tools_for_request(tools) if tools
-      expectation = expectation.with(body: hash_including(body_hash))
-    end
-
-    expect(expectation).to have_been_made.once
   end
 end

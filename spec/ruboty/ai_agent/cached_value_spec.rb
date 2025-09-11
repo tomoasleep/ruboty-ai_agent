@@ -45,13 +45,13 @@ RSpec.describe Ruboty::AiAgent::CachedValue do
   end
 
   describe '#to_h' do
-    subject(to_h) { cache.to_h }
+    subject(:to_h_result) { cache.to_h }
 
     it 'converts to hash with correct keys' do
-      expect(to_h).to include(
+      expect(to_h_result).to include(
         data: data
       )
-      expect(Time.parse(to_h[:expires_at])).to eq(cache.expires_at.round)
+      expect(Time.parse(to_h_result[:expires_at])).to eq(cache.expires_at.round)
     end
   end
 end

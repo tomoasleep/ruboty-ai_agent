@@ -3,32 +3,36 @@
 require 'spec_helper'
 
 RSpec.describe Ruboty::AiAgent::Actions::ListAiCommands do
-  subject(:action) { described_class.new(message) }
+  include RobotFactory
 
-  let(:robot) { Ruboty::Robot.new }
+  subject(:call_robot) { robot.receive(body: "#{robot.name} #{body}", from:, to:) }
+
+  let(:robot) { create_robot(env:) }
+  let(:env) do
+    {
+      'OPENAI_API_KEY' => 'test_api_key',
+      'OPENAI_MODEL' => 'gpt-5-nano',
+      'DEBUG' => nil,
+      'OPENAI_ORG_ID' => nil
+    }
+  end
   let(:from) { 'test_user' }
   let(:to) { 'ruboty' }
   let(:body) { 'list ai commands' }
 
-  let(:message) do
-    msg = Ruboty::Message.new(
-      body: body,
-      from: from,
-      to: to,
-      robot: robot
-    )
-    allow(msg).to have_received(:reply)
-    msg
+  def said_messages
+    robot.adapter.messages
   end
 
-  describe '#call' do
+  describe 'when listing ai commands' do
     it 'replies with /clear command information' do
-      expect(message).to have_received(:reply) do |reply_content|
-        expect(reply_content).to include('/\\/clear/')
-        expect(reply_content).to include('Clear the chat history.')
-      end
+      call_robot
 
-      action.call
+      expect(said_messages).to include(
+        a_hash_including(
+          body: a_string_matching(%r{/clear.*Clear the chat history}m)
+        )
+      )
     end
   end
 end

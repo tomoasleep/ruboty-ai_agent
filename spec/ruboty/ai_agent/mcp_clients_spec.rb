@@ -23,7 +23,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
     context 'with user mcp clients' do
       subject(:mcp_clients) { described_class.new(clients) }
 
-      let(:mock_client) { instance_double(UserMcpClient) }
+      let(:mock_client) { instance_double(Ruboty::AiAgent::UserMcpClient) }
       let(:clients) { [mock_client] }
 
       describe '#any?' do
@@ -37,7 +37,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
   describe '#available_tools' do
     subject(:mcp_clients) { described_class.new(clients) }
 
-    let(:mock_client) { instance_double(UserMcpClient) }
+    let(:mock_client) { instance_double(Ruboty::AiAgent::UserMcpClient) }
     let(:clients) { [mock_client] }
 
     context 'when tools are available' do
@@ -60,7 +60,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       end
 
       before do
-        allow(mock_client).to have_received(:list_tools).and_return(mcp_tools)
+        allow(mock_client).to receive(:list_tools).and_return(mcp_tools)
       end
 
       it 'returns tools as Tool objects' do
@@ -76,17 +76,17 @@ RSpec.describe Ruboty::AiAgent::McpClients do
   describe '#execute_tool' do
     subject(:mcp_clients) { described_class.new(clients) }
 
-    let(:mock_client) { instance_double(UserMcpClient) }
+    let(:mock_client) { instance_double(Ruboty::AiAgent::UserMcpClient) }
     let(:clients) { [mock_client] }
 
     context 'when tool exists' do
       subject(:execute_result) { mcp_clients.execute_tool('get_weather', location: 'Tokyo') }
 
       before do
-        allow(mock_client).to have_received(:list_tools).and_return([
-                                                                      { 'name' => 'get_weather' }
-                                                                    ])
-        allow(mock_client).to have_received(:call_tool)
+        allow(mock_client).to receive(:list_tools).and_return([
+                                                                { 'name' => 'get_weather' }
+                                                              ])
+        allow(mock_client).to receive(:call_tool)
           .with('get_weather', { location: 'Tokyo' })
           .and_return('Sunny, 25°C')
       end
@@ -98,7 +98,7 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       subject(:execute_result) { mcp_clients.execute_tool('nonexistent_tool', {}) }
 
       before do
-        allow(mock_client).to have_received(:list_tools).and_return([])
+        allow(mock_client).to receive(:list_tools).and_return([])
       end
 
       it 'returns nil' do

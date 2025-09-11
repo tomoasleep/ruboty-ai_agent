@@ -7,45 +7,52 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
   describe 'compact command' do
     include OpenAIMockHelper
     include McpMockHelper
+    include RobotFactory
 
-    subject(:action) { described_class.new(message) }
+    subject(:call_robot) { robot.receive(body: "#{robot.name} #{body}", from:, to:) }
 
-    let(:robot) { Ruboty::Robot.new }
+    let(:robot) { create_robot(env:) }
     let(:brain) { robot.brain }
     let(:database) { Ruboty::AiAgent::Database.new(brain) }
+    let(:env) do
+      {
+        'OPENAI_API_KEY' => 'test_api_key',
+        'OPENAI_MODEL' => 'gpt-5-nano',
+        'DEBUG' => nil,
+        'OPENAI_ORG_ID' => nil
+      }
+    end
 
     let(:from) { 'test_user' }
     let(:to) { 'ruboty' }
     let(:body) { '/compact' }
+    let(:model) { 'gpt-5-nano' }
 
-    let(:original_message) do
-      Ruboty::Message.new(
-        body: body,
-        from: from,
-        to: to,
-        robot: robot
+    def said_messages
+      robot.adapter.messages
+    end
+
+    def compact_command_message
+      {
+        role: 'system',
+        content: <<~TEXT
+          Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:
+        TEXT
+      }
+    end
+
+    def stub_compact(response_content:, messages: [])
+      stub_openai_chat_completion_with_content(
+        model:,
+        messages: [
+          compact_command_message,
+          *messages
+        ],
+        response_content:
       )
     end
 
-    let(:message) do
-      message = original_message
-      allow(message).to have_received(:reply)
-      allow(message).to have_received(:[]).with(:body).and_return(body)
-      message
-    end
-
-    before do
-      allow(ENV).to have_received(:fetch).and_call_original
-      allow(ENV).to have_received(:fetch).with('OPENAI_API_KEY', nil).and_return('test_api_key')
-      allow(ENV).to have_received(:fetch).with('OPENAI_MODEL', 'gpt-5-nano').and_return('gpt-5')
-      allow(ENV).to have_received(:[]).and_call_original
-      allow(ENV).to have_received(:[]).with('DEBUG').and_return(nil)
-      allow(ENV).to have_received(:[]).with('OPENAI_ORG_ID').and_return(nil)
-    end
-
-    describe '#call with /compact command' do
-      subject(:call_action) { action.call }
-
+    describe 'with /compact command' do
       let(:chat_thread) { database.chat_thread(from) }
 
       context 'when there is existing chat history' do
@@ -75,20 +82,15 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             )
           )
 
-          stub_openai_chat_completion_with_content(
-            messages: [
-              {
-                role: 'user',
-                content: "Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:\n\nuser: Hello, AI!\nassistant: Hello! How can I help you today?\nuser: What is the weather?\nassistant: I cannot check the weather in real-time."
-              }
-            ],
+          stub_compact(
+            messages: chat_thread.messages.all_values.map { |m| { role: m.role.to_s, content: m.content } },
             response_content: 'User asked about weather, AI explained limitations of real-time information.'
           )
         end
 
         it 'compacts the chat history with a summary' do
           expect(chat_thread.messages.all_values.length).to eq(4)
-          call_action
+          call_robot
           messages = chat_thread.messages.all_values
           expect(messages.length).to eq(1)
           expect(messages[0]).to have_attributes(
@@ -98,29 +100,25 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         end
 
         it 'replies with compact confirmation message' do
-          expect(message).to have_received(:reply).with('Chat history has been compacted with a summary.')
-          call_action
-        end
-
-        it 'calls OpenAI API to generate summary' do
-          call_action
+          call_robot
+          expect(said_messages).to include(a_hash_including(body: 'Chat history has been compacted with a summary.'))
         end
       end
 
       context 'when chat thread is empty' do
         it 'replies with no history message' do
-          expect(message).to have_received(:reply).with('No chat history to compact.')
-          call_action
+          call_robot
+          expect(said_messages).to include(a_hash_including(body: 'No chat history to compact.'))
         end
 
         it 'keeps the chat thread empty' do
           expect(chat_thread.messages.all_values).to be_empty
-          call_action
+          call_robot
           expect(chat_thread.messages.all_values).to be_empty
         end
 
         it 'does not call OpenAI API' do
-          expect { call_action }.not_to raise_error
+          expect { call_robot }.not_to raise_error
         end
       end
 
@@ -143,20 +141,15 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
                 )
               )
 
-              stub_openai_chat_completion_with_content(
-                messages: [
-                  {
-                    role: 'user',
-                    content: "Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:\n\nuser: Test message"
-                  }
-                ],
+              stub_compact(
+                messages: chat_thread.messages.all_values.map { |m| { role: m.role.to_s, content: m.content } },
                 response_content: 'User sent test message.'
               )
             end
 
             it 'matches and executes the compact command' do
-              expect(message).to have_received(:reply).with('Chat history has been compacted with a summary.')
-              call_action
+              call_robot
+              expect(said_messages).to include(a_hash_including(body: 'Chat history has been compacted with a summary.'))
             end
           end
         end
@@ -174,6 +167,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           )
 
           stub_openai_chat_completion_with_content(
+            model:,
             messages: [
               { role: 'user', content: 'Previous message' },
               { role: 'user', content: body }
@@ -184,13 +178,13 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
 
         it 'does not compact the chat thread' do
           initial_count = chat_thread.messages.all_values.length
-          call_action
+          call_robot
           expect(chat_thread.messages.all_values.length).to be > initial_count
         end
 
         it 'processes as normal chat message' do
-          expect(message).to have_received(:reply).with('Did you mean to compact the chat history? Use /compact command.')
-          call_action
+          call_robot
+          expect(said_messages).to include(a_hash_including(body: 'Did you mean to compact the chat history? Use /compact command.'))
         end
       end
 
@@ -203,23 +197,44 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             )
           )
 
-          allow_any_instance_of(Ruboty::AiAgent::LLM::OpenAI).to have_received(:complete).and_raise(StandardError.new('API Error'))
+          stub_openai_chat_completion_with_error(
+            model:,
+            messages: [
+              compact_command_message,
+              {
+                role: 'user',
+                content: 'Test message'
+              }
+            ]
+          )
         end
 
         it 'handles error gracefully' do
-          expect(message).to have_received(:reply).with('エラーが発生しました: API Error')
-          call_action
+          call_robot
+          expect(said_messages).to include(a_hash_including(body: 'エラーが発生しました: Internal server error'))
         end
 
         it 'does not modify chat thread on error' do
           initial_count = chat_thread.messages.all_values.length
-          call_action
+          call_robot
           expect(chat_thread.messages.all_values.length).to eq(initial_count)
         end
       end
 
-      context 'after compacting, new conversation can continue with summary context' do
-        it 'can continue conversation with summary context' do
+      context 'when conversation continues after compacting' do
+        subject(:call_robot_second) do
+          stub_openai_chat_completion_with_content(
+            messages: [
+              { role: 'system', content: 'Previous conversation summary: User asked about weather, got response.' },
+              { role: 'user', content: 'Tell me more about that' }
+            ],
+            response_content: 'Based on our previous weather discussion, I can provide more details.'
+          )
+
+          robot.receive(body: "#{robot.name} Tell me more about that", from:, to:)
+        end
+
+        before do
           chat_thread.messages.add(
             Ruboty::AiAgent::ChatMessage.new(
               role: :user,
@@ -233,54 +248,32 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
             )
           )
 
-          stub_openai_chat_completion_with_content(
+          stub_compact(
             messages: [
-              {
-                role: 'user',
-                content: "Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:\n\nuser: Old conversation about weather\nassistant: Weather response"
-              }
+              { role: 'user', content: 'Old conversation about weather' },
+              { role: 'assistant', content: 'Weather response' }
             ],
             response_content: 'User asked about weather, got response.'
           )
+        end
 
-          expect(message).to have_received(:reply).with('Chat history has been compacted with a summary.')
-          call_action
+        it 'can continue conversation with summary context' do
+          call_robot
+          expect(said_messages).to include(a_hash_including(body: 'Chat history has been compacted with a summary.'))
+          expect(chat_thread.messages.all_values).to match([
+                                                             have_attributes(
+                                                               role: :system,
+                                                               content: 'Previous conversation summary: User asked about weather, got response.'
+                                                             )
+                                                           ])
 
-          messages = chat_thread.messages.all_values
-          expect(messages.length).to eq(1)
-          expect(messages[0]).to have_attributes(
-            role: :system,
-            content: 'Previous conversation summary: User asked about weather, got response.'
-          )
-
-          second_message = Ruboty::Message.new(
-            body: 'Tell me more about that',
-            from: from,
-            to: to,
-            robot: robot
-          )
-          allow(second_message).to have_received(:reply)
-          allow(second_message).to have_received(:[]).with(:body).and_return('Tell me more about that')
-
-          second_action = described_class.new(second_message)
-          allow(second_action).to receive_messages(database: database, robot: robot)
-
-          stub_openai_chat_completion_with_content(
-            messages: [
-              { role: 'system', content: 'Previous conversation summary: User asked about weather, got response.' },
-              { role: 'user', content: 'Tell me more about that' }
-            ],
-            response_content: 'Based on our previous weather discussion, I can provide more details.'
-          )
-
-          expect(second_message).to have_received(:reply).with('Based on our previous weather discussion, I can provide more details.')
-          second_action.call
-
-          final_messages = database.chat_thread(from).messages.all_values
-          expect(final_messages.length).to eq(3)
-          expect(final_messages[0]).to have_attributes(role: :system)
-          expect(final_messages[1]).to have_attributes(role: :user, content: 'Tell me more about that')
-          expect(final_messages[2]).to have_attributes(role: :assistant, content: 'Based on our previous weather discussion, I can provide more details.')
+          call_robot_second
+          expect(said_messages).to include(a_hash_including(body: 'Based on our previous weather discussion, I can provide more details.'))
+          expect(chat_thread.messages.all_values).to match([
+                                                             have_attributes(role: :system),
+                                                             have_attributes(role: :user, content: 'Tell me more about that'),
+                                                             have_attributes(role: :assistant, content: 'Based on our previous weather discussion, I can provide more details.')
+                                                           ])
         end
       end
     end
