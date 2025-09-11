@@ -9,7 +9,7 @@ module Ruboty
           user_prompt = user.system_prompt
           global_prompt = database.global_settings.system_prompt
 
-          reply = []
+          reply = [] #: Array[String]
           reply << if user_prompt
                      "User system prompt: #{user_prompt}"
                    else
