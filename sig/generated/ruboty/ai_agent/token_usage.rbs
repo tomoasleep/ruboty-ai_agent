@@ -24,6 +24,10 @@ module Ruboty
       # @rbs return: (Float | nil)
       def usage_percentage: () -> (Float | nil)
 
+      # Check if usage percentage exceeds auto compact threshold
+      # @rbs return: bool
+      def over_auto_compact_threshold?: () -> bool
+
       def to_h: () -> Hash[Symbol, untyped]
     end
   end

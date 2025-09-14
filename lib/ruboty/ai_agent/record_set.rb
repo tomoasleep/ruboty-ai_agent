@@ -15,6 +15,10 @@ module Ruboty
         raise NotImplementedError, 'Subclasses must implement the namespace_keys method'
       end
 
+      def empty? #: boolish
+        length.zero?
+      end
+
       def length #: Integer
         database.len(*namespace_keys)
       end

@@ -14,16 +14,6 @@ module Ruboty
         def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
 
         def call: () -> void
-
-        private
-
-        # @rbs messages: Array[ChatMessage]
-        # @rbs return: String
-        def generate_summary: (Array[ChatMessage] messages) -> String
-
-        # @rbs messages: Array[ChatMessage]
-        # @rbs return: String
-        def format_messages_for_summary: (Array[ChatMessage] messages) -> String
       end
     end
   end

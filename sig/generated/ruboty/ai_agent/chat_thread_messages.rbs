@@ -8,6 +8,20 @@ module Ruboty
       def add: (ChatMessage message) -> void
 
       alias << add
+
+      # Check if any message's token usage exceeds auto compact threshold
+      # @rbs return: bool
+      def over_auto_compact_threshold?: () -> bool
+
+      # Compact chat messages by summarizing them
+      # @rbs llm: LLM::OpenAI
+      # @rbs return: void
+      def compact: (llm: LLM::OpenAI) -> void
+
+      # Generate summary of chat messages
+      # @rbs llm: LLM::OpenAI
+      # @rbs return: String
+      def summarize: (llm: LLM::OpenAI) -> String
     end
   end
 end

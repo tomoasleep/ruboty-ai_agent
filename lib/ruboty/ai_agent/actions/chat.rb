@@ -9,12 +9,7 @@ module Ruboty
 
         # @rbs override
         def call
-          llm = LLM::OpenAI.new(
-            client: OpenAI::Client.new(
-              api_key: ENV.fetch('OPENAI_API_KEY', nil)
-            ),
-            model: ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
-          )
+          llm = LLM::OpenAI.new
 
           commands = Commands.builtins(message:, chat_thread:)
           tools = McpClients.new(user.mcp_clients).available_tools
@@ -39,6 +34,8 @@ module Ruboty
             when :new_message
               chat_thread.messages << event[:message]
               message.reply(event[:message].content) if event[:message].content.length.positive?
+
+              chat_thread.messages.compact(llm:) if chat_thread.messages.over_auto_compact_threshold?
             when :tool_call
               message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]}",
                             streaming: true)

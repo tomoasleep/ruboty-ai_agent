@@ -11,11 +11,11 @@ module Ruboty
         attr_reader :client #: OpenAI::Client
         attr_reader :model #: String
 
-        # @rbs client: OpenAI::Client
-        # @rbs model: String
-        def initialize(client:, model:)
-          @client = client
-          @model = model
+        # @rbs ?client: OpenAI::Client
+        # @rbs ?model: String
+        def initialize(client: nil, model: nil)
+          @client = client || ::OpenAI::Client.new(api_key: ENV.fetch('OPENAI_API_KEY', nil))
+          @model = model || ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
         end
 
         # @rbs %a{memorized}

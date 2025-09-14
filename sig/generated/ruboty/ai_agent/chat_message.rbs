@@ -28,6 +28,9 @@ module Ruboty
 
       def to_h: () -> Hash[Symbol, untyped]
 
+      # @rbs return: bool
+      def tool_call?: () -> bool
+
       def self.from_llm_response: (tool: untyped, tool_call_id: untyped, tool_arguments: untyped, tool_response: untyped) -> ChatMessage
     end
   end

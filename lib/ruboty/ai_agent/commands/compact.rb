@@ -20,14 +20,12 @@ module Ruboty
         end
 
         def call #: void
-          messages = chat_thread.messages.all_values
-
-          if messages.empty?
+          if chat_thread.messages.empty?
             message.reply('No chat history to compact.')
             return
           end
 
-          summary = generate_summary(messages)
+          summary = chat_thread.messages.summarize(llm: LLM::OpenAI.new)
 
           chat_thread.clear
           chat_thread.messages.add(
@@ -44,37 +42,6 @@ module Ruboty
           else
             message.reply("エラーが発生しました: #{e.message}")
           end
-        end
-
-        private
-
-        # @rbs messages: Array[ChatMessage]
-        # @rbs return: String
-        def generate_summary(messages)
-          llm = LLM::OpenAI.new(
-            client: OpenAI::Client.new(
-              api_key: ENV.fetch('OPENAI_API_KEY', nil)
-            ),
-            model: ENV.fetch('OPENAI_MODEL', 'gpt-5-nano')
-          )
-
-          summary_prompt = ChatMessage.new(
-            role: :system,
-            content: <<~TEXT
-              Please summarize the following conversation in a concise manner, capturing the key topics, decisions, and context that would be helpful for continuing the conversation:
-            TEXT
-          )
-
-          response = llm.complete(messages: [summary_prompt, *messages])
-          response.message.content
-        end
-
-        # @rbs messages: Array[ChatMessage]
-        # @rbs return: String
-        def format_messages_for_summary(messages)
-          messages.map do |msg|
-            "#{msg.role}: #{msg.content}"
-          end.join("\n")
         end
       end
     end

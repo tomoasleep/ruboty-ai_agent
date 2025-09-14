@@ -41,6 +41,11 @@ module Ruboty
         }
       end
 
+      # @rbs return: bool
+      def tool_call?
+        !!(tool_call_id && !tool_call_id.empty?)
+      end
+
       def self.from_llm_response(
         tool:,
         tool_call_id:,

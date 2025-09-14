@@ -11,6 +11,8 @@ module Ruboty
 
       def namespace_keys: () -> Array[Database::keynable]
 
+      def empty?: () -> boolish
+
       def length: () -> Integer
 
       def all: () -> untyped

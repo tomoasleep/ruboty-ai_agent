@@ -9,9 +9,9 @@ module Ruboty
 
         attr_reader model: String
 
-        # @rbs client: OpenAI::Client
-        # @rbs model: String
-        def initialize: (client: OpenAI::Client, model: String) -> untyped
+        # @rbs ?client: OpenAI::Client
+        # @rbs ?model: String
+        def initialize: (?client: untyped, ?model: untyped) -> untyped
 
         # @rbs %a{memorized}
         %a{memorized}

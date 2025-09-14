@@ -32,6 +32,16 @@ module Ruboty
         (total_tokens.to_f / token_limit * 100).round(2).to_f
       end
 
+      # Check if usage percentage exceeds auto compact threshold
+      # @rbs return: bool
+      def over_auto_compact_threshold?
+        percentage = usage_percentage
+        return false unless percentage
+
+        threshold = ENV.fetch('AUTO_COMPACT_THRESHOLD', 80).to_f
+        percentage >= threshold
+      end
+
       def to_h #: Hash[Symbol, untyped]
         {
           prompt_tokens:,
