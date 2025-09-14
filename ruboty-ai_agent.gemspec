@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
     spec.metadata['changelog_uri'] = 'https://github.com/tomoasleep/ruboty-ai_agent/blob/main/CHANGELOG.md'
   else
     raise 'RubyGems 2.0 or newer is required to protect against ' \
-      'public gem pushes.'
+          'public gem pushes.'
   end
 
   # Specify which files should be added to the gem when it is released.
@@ -38,12 +38,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 2'
-  spec.add_development_dependency 'rake', '~> 13'
-  spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'webmock', '~> 3.0'
-
   spec.add_dependency 'event_stream_parser', '~> 1.0'
   spec.add_dependency 'openai', '~> 0.22.0'
   spec.add_dependency 'ruboty', '~> 1.3'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end

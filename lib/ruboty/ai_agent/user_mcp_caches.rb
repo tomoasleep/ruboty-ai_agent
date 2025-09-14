@@ -57,12 +57,12 @@ module Ruboty
 
       # @rbs override
       def all
-        super().reject { |(_key, cache)| cache.expired? }
+        super.reject { |(_key, cache)| cache.expired? }
       end
 
       # @rbs override
       def fetch(key)
-        cache = super(key)
+        cache = super
 
         if cache&.expired?
           remove(key)

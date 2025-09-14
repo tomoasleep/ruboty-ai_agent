@@ -7,7 +7,7 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
 
   subject(:llm) { described_class.new(client: client, model: model) }
 
-  let(:client) { ::OpenAI::Client.new(api_key: 'test_token') }
+  let(:client) { OpenAI::Client.new(api_key: 'test_token') }
   let(:model) { 'gpt-5' }
 
   describe '#initialize' do

@@ -51,7 +51,7 @@ module Ruboty
 
       # @rbs name: String
       # @rbs &block: ? (Hash[String, untyped]) -> void
-      def call_tool(name, arguments = {}, &block)
+      def call_tool(name, arguments = {}, &)
         ensure_initialized
         results = send_request(
           method: 'tools/call',
@@ -59,7 +59,7 @@ module Ruboty
             name: name,
             arguments: arguments
           },
-          &block
+          &
         )
 
         results.flat_map { |res| res.dig('result', 'content') || [] }

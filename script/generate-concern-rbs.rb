@@ -303,7 +303,7 @@ class ConcernRbsGenerator
 
       # Open namespaces
       namespace_parts.each do |part|
-        content << ('  ' * indent_level) + "module #{part}"
+        content << (('  ' * indent_level) + "module #{part}")
         indent_level += 1
       end
 
@@ -315,17 +315,17 @@ class ConcernRbsGenerator
         # Add type parameters if present
         if includer[:type_params] && !includer[:type_params].empty?
           type_params_str = "[#{includer[:type_params].join(', ')}]"
-          content << ('  ' * indent_level) + "#{keyword} #{simple_name}#{type_params_str}"
+          content << (('  ' * indent_level) + "#{keyword} #{simple_name}#{type_params_str}")
         else
-          content << ('  ' * indent_level) + "#{keyword} #{simple_name}"
+          content << (('  ' * indent_level) + "#{keyword} #{simple_name}")
         end
 
         concern = includer[:concern]
         concern_simple_name = concern[:name].sub(/^::/, '').split('::').last
 
-        content << ('  ' * (indent_level + 1)) + "extend #{concern_simple_name}::ClassMethods" if concern[:has_class_methods]
+        content << (('  ' * (indent_level + 1)) + "extend #{concern_simple_name}::ClassMethods") if concern[:has_class_methods]
 
-        content << ('  ' * (indent_level + 1)) + "prepend #{concern_simple_name}::PrependMethods" if concern[:has_prepend_methods]
+        content << (('  ' * (indent_level + 1)) + "prepend #{concern_simple_name}::PrependMethods") if concern[:has_prepend_methods]
 
         content << "#{'  ' * indent_level}end"
         content << ''

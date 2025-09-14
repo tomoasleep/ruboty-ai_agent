@@ -101,15 +101,15 @@ class MemorizedIvarRbsGenerator
 
       # Open namespaces
       parts[0...-1].each do |part|
-        content << ('  ' * indent_level) + "module #{part}"
+        content << (('  ' * indent_level) + "module #{part}")
         indent_level += 1
       end
 
       # Class declaration with instance variables
-      content << ('  ' * indent_level) + "class #{parts.last}"
+      content << (('  ' * indent_level) + "class #{parts.last}")
 
       methods.each do |method|
-        content << ('  ' * (indent_level + 1)) + "@#{method.ivar_name}: #{method.return_type}"
+        content << (('  ' * (indent_level + 1)) + "@#{method.ivar_name}: #{method.return_type}")
       end
 
       content << "#{'  ' * indent_level}end"
@@ -188,9 +188,7 @@ class MemorizedIvarRbsGenerator
 
     def extract_constant_name(constant_path)
       case constant_path
-      when Prism::ConstantReadNode
-        constant_path.name.to_s
-      when Prism::ConstantPathNode
+      when Prism::ConstantReadNode, Prism::ConstantPathNode
         constant_path.name.to_s
       end
     end
@@ -248,11 +246,8 @@ class MemorizedIvarRbsGenerator
           return result if result
         end
         nil
-      when Prism::InstanceVariableOperatorWriteNode, Prism::InstanceVariableOrWriteNode
-        # This handles @ivar ||= ...
-        node.name.to_s.delete('@')
-      when Prism::InstanceVariableWriteNode
-        # This handles @ivar = ...
+      when Prism::InstanceVariableOperatorWriteNode, Prism::InstanceVariableOrWriteNode, Prism::InstanceVariableWriteNode
+        # This handles @ivar ||= ... or @ivar = ...
         node.name.to_s.delete('@')
       else
         # Recursively search in child nodes

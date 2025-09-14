@@ -26,8 +26,8 @@ module Ruboty
       # @rbs arguments: Hash[String, untyped]
       # @rbs &block: ? (Hash[String, untyped]) -> void
       # @rbs return: untyped
-      def call_tool(name, arguments = {}, &block)
-        mcp_client.call_tool(name, arguments, &block)
+      def call_tool(name, arguments = {}, &)
+        mcp_client.call_tool(name, arguments, &)
       end
 
       # @rbs return: untyped

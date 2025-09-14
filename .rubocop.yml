@@ -15,6 +15,7 @@ plugins:
 
 AllCops:
   TargetRubyVersion: 3.1
+  NewCops: enable
 
 Naming/AccessorMethodName:
   Exclude:

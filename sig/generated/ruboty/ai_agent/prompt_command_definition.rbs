@@ -18,10 +18,6 @@ module Ruboty
     # User-defined command model
     class PromptCommandDefinition
       include Recordable
-
-      # @rbs name: String
-      # @rbs prompt: String
-      def initialize: (name: String, prompt: String) -> untyped
     end
   end
 end

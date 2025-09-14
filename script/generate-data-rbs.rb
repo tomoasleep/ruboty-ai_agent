@@ -127,9 +127,7 @@ class DataClassRbsGenerator
 
     def extract_constant_name(constant_path)
       case constant_path
-      when Prism::ConstantReadNode
-        constant_path.name.to_s
-      when Prism::ConstantPathNode
+      when Prism::ConstantReadNode, Prism::ConstantPathNode
         constant_path.name.to_s
       end
     end
@@ -242,7 +240,7 @@ class DataClassRbsGenerator
     end
 
     def indent(string, level:)
-      '  ' * level + string
+      ('  ' * level) + string
     end
   end
 end
