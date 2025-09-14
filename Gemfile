@@ -7,6 +7,7 @@ git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 # Specify your gem's dependencies in ruboty-ai_agent.gemspec
 gemspec
 
+gem 'bump', '~> 0.10.0'
 gem 'bundler', '~> 2'
 gem 'rake', '~> 13'
 gem 'rspec', '~> 3.0'
