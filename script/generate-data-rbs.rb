@@ -31,7 +31,7 @@ class Processor
     puts "Scanning Ruby files in #{@lib_path}..."
 
     @lib_path.glob('**/*.rb').map do |file|
-      puts "Processing #{file}..."
+      puts "Processing #{file}..." if ENV['DEBUG']
       content = file.read
 
       parsed = Prism.parse(content)
