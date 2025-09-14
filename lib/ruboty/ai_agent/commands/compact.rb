@@ -4,22 +4,10 @@ module Ruboty
   module AiAgent
     module Commands
       # Compact chat history by summarizing it
-      class Compact < Base
+      class Compact < BuiltinBase
         on(%r{/compact}, name: 'compact', description: 'Compact the chat history by summarizing it.')
 
-        attr_reader :message #: Ruboty::Message
-        attr_reader :chat_thread #: Ruboty::AiAgent::ChatThread
-
-        # @rbs message: Ruboty::Message
-        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
-        def initialize(message:, chat_thread:)
-          @message = message
-          @chat_thread = chat_thread
-
-          super()
-        end
-
-        def call #: void
+        def call(*) #: void
           if chat_thread.messages.empty?
             message.reply('No chat history to compact.')
             return

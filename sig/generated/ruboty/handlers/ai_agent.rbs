@@ -4,29 +4,29 @@ module Ruboty
   module Handlers
     # Handler for AI agent commands
     class AiAgent < Base
-      def chat: (untyped message) -> untyped
+      def chat: (untyped message) -> true
 
-      def add_mcp: (untyped message) -> untyped
+      def add_mcp: (untyped message) -> true
 
-      def remove_mcp: (untyped message) -> untyped
+      def remove_mcp: (untyped message) -> true
 
-      def list_mcp: (untyped message) -> untyped
+      def list_mcp: (untyped message) -> true
 
-      def set_system_prompt: (untyped message) -> untyped
+      def set_system_prompt: (untyped message) -> true
 
-      def show_system_prompt: (untyped message) -> untyped
+      def show_system_prompt: (untyped message) -> true
 
-      def add_ai_memory: (untyped message) -> untyped
+      def add_ai_memory: (untyped message) -> true
 
-      def remove_ai_memory: (untyped message) -> untyped
+      def remove_ai_memory: (untyped message) -> true
 
-      def list_ai_memories: (untyped message) -> untyped
+      def list_ai_memories: (untyped message) -> true
 
-      def add_ai_command: (untyped message) -> untyped
+      def add_ai_command: (untyped message) -> true
 
-      def remove_ai_command: (untyped message) -> untyped
+      def remove_ai_command: (untyped message) -> true
 
-      def list_ai_commands: (untyped message) -> untyped
+      def list_ai_commands: (untyped message) -> true
     end
   end
 end

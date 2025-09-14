@@ -1,0 +1,27 @@
+# Generated from lib/ruboty/ai_agent/commands/prompt_command.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module Commands
+      # Compact chat history by summarizing it
+      class PromptCommand < Base
+        attr_reader definition: Ruboty::AiAgent::PromptCommandDefinition
+
+        # @rbs definition: Ruboty::AiAgent::PromptCommandDefinition
+        # @rbs message: Ruboty::Message
+        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
+        def initialize: (definition: Ruboty::AiAgent::PromptCommandDefinition, message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
+
+        # @rbs commandline: String
+        # @rbs return: boolish
+        def match?: (String commandline) -> boolish
+
+        def pattern: () -> Regexp
+
+        # @rbs commandline: String
+        # @rbs return: String
+        def call: (commandline: String) -> String
+      end
+    end
+  end
+end

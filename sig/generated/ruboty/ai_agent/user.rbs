@@ -30,6 +30,10 @@ module Ruboty
       # @rbs %a{memorized}
       %a{memorized}
       def mcp_tools_caches: () -> UserMcpToolsCaches
+
+      # @rbs %a{memorized}
+      %a{memorized}
+      def prompt_command_definitions: () -> UserPromptCommandDefinitions
     end
   end
 end

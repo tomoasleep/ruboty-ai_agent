@@ -10,6 +10,10 @@ module Ruboty
         def name_param: () -> String
 
         def prompt_param: () -> String
+
+        # @rbs str: String
+        # @rbs return: String
+        def undump_string: (String str) -> String
       end
     end
   end

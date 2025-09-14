@@ -25,6 +25,7 @@ module Ruboty
     autoload :McpClient, 'ruboty/ai_agent/mcp_client'
     autoload :McpClients, 'ruboty/ai_agent/mcp_clients'
     autoload :McpConfiguration, 'ruboty/ai_agent/mcp_configuration'
+    autoload :PromptCommandDefinition, 'ruboty/ai_agent/prompt_command_definition'
     autoload :Recordable, 'ruboty/ai_agent/recordable'
     autoload :RecordSet, 'ruboty/ai_agent/record_set'
     autoload :TokenUsage, 'ruboty/ai_agent/token_usage'
@@ -36,5 +37,6 @@ module Ruboty
     autoload :UserMcpClient, 'ruboty/ai_agent/user_mcp_client'
     autoload :UserMcpConfigurations, 'ruboty/ai_agent/user_mcp_configurations'
     autoload :UserMcpToolsCaches, 'ruboty/ai_agent/user_mcp_tools_caches'
+    autoload :UserPromptCommandDefinitions, 'ruboty/ai_agent/user_prompt_command_definitions'
   end
 end

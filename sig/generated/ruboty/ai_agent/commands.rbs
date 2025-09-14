@@ -6,8 +6,8 @@ module Ruboty
     module Commands
       # @rbs message: Ruboty::Message
       # @rbs chat_thread: ChatThread
-      # @rbs return: Array[Commands::Base]
-      def self.builtins: (message: Ruboty::Message, chat_thread: ChatThread) -> Array[Commands::Base]
+      # @rbs return: Array[Commands::BuiltinBase]
+      def self.builtins: (message: Ruboty::Message, chat_thread: ChatThread) -> Array[Commands::BuiltinBase]
     end
   end
 end

@@ -6,34 +6,22 @@ module Ruboty
       # Base class for commands.
       # @abstract
       class Base
-        class Matcher < Data
-          attr_reader pattern(): untyped
+        attr_reader message: Ruboty::Message
 
-          attr_reader description(): untyped
+        attr_reader chat_thread: Ruboty::AiAgent::ChatThread
 
-          attr_reader name(): untyped
-
-          def self.new: (untyped pattern, untyped description, untyped name) -> instance
-                      | (pattern: untyped, description: untyped, name: untyped) -> instance
-
-          def self.members: () -> [ :pattern, :description, :name ]
-
-          def members: () -> [ :pattern, :description, :name ]
-        end
-
-        def self.matchers: () -> Array[Matcher]
-
-        def self.on: (untyped pattern, name: untyped, description: untyped) -> untyped
+        # @rbs message: Ruboty::Message
+        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
+        def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
 
         # @rbs *args: untyped
-        # @rbs return: void
-        def call: (*untyped args) -> void
+        # @rbs return: untyped
+        def call: (*untyped args) -> untyped
 
         # @rbs commandline: String
         # @rbs return: boolish
+        # @abstract
         def match?: (String commandline) -> boolish
-
-        def matchers: () -> Array[Matcher]
       end
     end
   end

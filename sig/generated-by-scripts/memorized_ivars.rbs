@@ -37,6 +37,7 @@ module Ruboty
       @mcp_configurations: UserMcpConfigurations
       @ai_memories: UserAiMemories
       @mcp_tools_caches: UserMcpToolsCaches
+      @prompt_command_definitions: UserPromptCommandDefinitions
     end
   end
 end

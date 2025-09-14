@@ -4,16 +4,8 @@ module Ruboty
   module AiAgent
     module Commands
       # Show token usage information for the latest AI response
-      class Usage < Base
-        attr_reader message: Ruboty::Message
-
-        attr_reader chat_thread: Ruboty::AiAgent::ChatThread
-
-        # @rbs message: Ruboty::Message
-        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
-        def initialize: (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> untyped
-
-        def call: () -> void
+      class Usage < BuiltinBase
+        def call: (*untyped) -> void
 
         private
 

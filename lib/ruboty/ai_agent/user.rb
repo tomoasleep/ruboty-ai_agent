@@ -47,6 +47,11 @@ module Ruboty
       def mcp_tools_caches #: UserMcpToolsCaches
         @mcp_tools_caches ||= UserMcpToolsCaches.new(database: database, user_id: id)
       end
+
+      # @rbs %a{memorized}
+      def prompt_command_definitions #: UserPromptCommandDefinitions
+        @prompt_command_definitions ||= UserPromptCommandDefinitions.new(database: database, user_id: id)
+      end
     end
   end
 end

@@ -1,0 +1,12 @@
+# Generated from lib/ruboty/ai_agent/user_prompt_command_definitions.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # User-defined commands record set
+    class UserPromptCommandDefinitions < UserAssociations[PromptCommandDefinition]
+      # @rbs command: PromptCommandDefinition
+      # @rbs return: PromptCommandDefinition
+      def add: (PromptCommandDefinition command) -> PromptCommandDefinition
+    end
+  end
+end

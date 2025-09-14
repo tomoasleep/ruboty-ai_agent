@@ -11,6 +11,12 @@ module Ruboty
         def call: ...
 
         def body_param: () -> String
+
+        private
+
+        # @rbs body: String
+        # @rbs return: void
+        def complete_chat: (String body) -> void
       end
     end
   end

@@ -6,32 +6,29 @@ module Ruboty
       # Base class for commands.
       # @abstract
       class Base
-        Matcher = Data.define(:pattern, :description, :name)
+        attr_reader :message #: Ruboty::Message
+        attr_reader :chat_thread #: Ruboty::AiAgent::ChatThread
 
-        class << self
-          def matchers #: Array[Matcher]
-            @matchers ||= []
-          end
+        # @rbs message: Ruboty::Message
+        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
+        def initialize(message:, chat_thread:)
+          @message = message
+          @chat_thread = chat_thread
 
-          def on(pattern, name:, description:)
-            matchers << Matcher.new(pattern:, description:, name:)
-          end
+          super()
         end
 
         # @rbs *args: untyped
-        # @rbs return: void
+        # @rbs return: untyped
         def call(*args)
           raise NotImplementedError
         end
 
         # @rbs commandline: String
         # @rbs return: boolish
+        # @abstract
         def match?(commandline)
-          matchers.any? { |matcher| /\A\s*#{matcher.pattern}/.match?(commandline) }
-        end
-
-        def matchers #: Array[Matcher]
-          self.class.matchers
+          raise NotImplementedError
         end
       end
     end

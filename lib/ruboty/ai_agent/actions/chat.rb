@@ -9,18 +9,34 @@ module Ruboty
 
         # @rbs override
         def call
-          llm = LLM::OpenAI.new
+          user.prompt_command_definitions.all_values.each do |definition|
+            command = Commands::PromptCommand.new(definition:, message:, chat_thread:)
+            if command.match?(body_param)
+              new_prompt = command.call(commandline: body_param)
+              return complete_chat(new_prompt)
+            end
+          end
 
-          commands = Commands.builtins(message:, chat_thread:)
-          tools = McpClients.new(user.mcp_clients).available_tools
-
-          commands.each do |command|
+          builtin_commands = Commands.builtins(message:, chat_thread:)
+          builtin_commands.each do |command|
             return command.call if command.match?(body_param)
           end
 
+          complete_chat(body_param)
+        end
+
+        def body_param #: String
+          message[:body]
+        end
+
+        private
+
+        # @rbs body: String
+        # @rbs return: void
+        def complete_chat(body)
           chat_thread.messages << ChatMessage.new(
             role: :user,
-            content: body_param
+            content: body
           )
 
           messages = [] #: Array[ChatMessage]
@@ -32,6 +48,9 @@ module Ruboty
           messages << ChatMessage.new(role: :system, content: user_prompt) if user_prompt
 
           messages += chat_thread.messages.all_values
+
+          llm = LLM::OpenAI.new
+          tools = McpClients.new(user.mcp_clients).available_tools
 
           agent = Agent.new(
             llm:,
@@ -60,10 +79,6 @@ module Ruboty
           else
             message.reply("エラーが発生しました: #{e.message}")
           end
-        end
-
-        def body_param #: String
-          message[:body]
         end
       end
     end

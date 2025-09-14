@@ -1,0 +1,27 @@
+# Generated from lib/ruboty/ai_agent/prompt_command_definition.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    class PromptCommandDefinition < Data
+      attr_reader name(): String
+
+      attr_reader prompt(): String
+
+      def self.new: (String name, String prompt) -> instance
+                  | (name: String, prompt: String) -> instance
+
+      def self.members: () -> [ :name, :prompt ]
+
+      def members: () -> [ :name, :prompt ]
+    end
+
+    # User-defined command model
+    class PromptCommandDefinition
+      include Recordable
+
+      # @rbs name: String
+      # @rbs prompt: String
+      def initialize: (name: String, prompt: String) -> untyped
+    end
+  end
+end

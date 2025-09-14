@@ -24,7 +24,7 @@ RSpec.describe Ruboty::AiAgent::Actions::ListAiCommands do
     robot.adapter.messages
   end
 
-  describe 'when listing ai commands' do
+  describe 'when listing commands' do
     it 'replies with /clear command information' do
       call_robot
 
@@ -33,6 +33,22 @@ RSpec.describe Ruboty::AiAgent::Actions::ListAiCommands do
           body: a_string_matching(%r{/clear.*Clear the chat history}m)
         )
       )
+    end
+
+    context 'when a user-defined command is defined' do
+      before do
+        robot.receive(body: "#{robot.name} add ai command /test Some prompt", from:, to:)
+      end
+
+      it 'replies with /clear command information' do
+        call_robot
+
+        expect(said_messages).to include(
+          a_hash_including(
+            body: a_string_matching(%r{/test.*Some prompt}m)
+          )
+        )
+      end
     end
   end
 end

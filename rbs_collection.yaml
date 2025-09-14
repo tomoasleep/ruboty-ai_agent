@@ -18,6 +18,7 @@ gems:
   - name: net-http
   - name: json
   - name: optparse
+  - name: shellwords
 #   # If you want to avoid installing rbs files for gems, you can specify them here.
 #   - name: GEM_NAME
 #     ignore: true
