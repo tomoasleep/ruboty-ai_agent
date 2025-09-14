@@ -15,14 +15,14 @@ module Ruboty
       attr_reader :tool_arguments #: Hash[Symbol | String, untyped]?
       attr_reader :token_usage #: TokenUsage?
 
-      # @rbs role: Symbol
+      # @rbs role: Symbol | String
       # @rbs content: String
       # @rbs ?tool_call_id: String?
       # @rbs ?tool_name: String?
       # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
       # @rbs ?token_usage: TokenUsage?
       def initialize(role:, content:, tool_call_id: nil, tool_name: nil, tool_arguments: nil, token_usage: nil)
-        @role = role
+        @role = role.to_sym
         @content = content
         @tool_call_id = tool_call_id
         @tool_name = tool_name

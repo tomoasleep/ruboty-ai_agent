@@ -11,7 +11,7 @@ module Ruboty
         @database = database
       end
 
-      def namespace_keys #: Array[Database::keynable]
+      def namespace_keys #: Array[Database::query_key]
         raise NotImplementedError, 'Subclasses must implement the namespace_keys method'
       end
 
@@ -42,26 +42,26 @@ module Ruboty
         database.keys(*namespace_keys)
       end
 
-      # @rbs key: Database::keynable
+      # @rbs key: Database::query_key
       # @rbs return: Record | nil
       def fetch(key)
         database.fetch(*namespace_keys, key)
       end
 
-      # @rbs key: Database::keynable
+      # @rbs key: Database::query_key
       # @rbs record: Record
       # @rbs return: void
       def store(record, key:)
         database.store(record, at: [*namespace_keys, key])
       end
 
-      # @rbs key: Database::keynable
+      # @rbs key: Database::query_key
       # @rbs return: void
       def remove(key)
         database.delete(*namespace_keys, key)
       end
 
-      # @rbs key: Database::keynable
+      # @rbs key: Database::query_key
       # @rbs return: boolish
       def key?(key)
         database.key?(*namespace_keys, key)

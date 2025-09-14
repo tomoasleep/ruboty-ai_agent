@@ -4,6 +4,8 @@ module Ruboty
   module AiAgent
     type transports = :http | :websocket
 
+    type transports_str = "http" | "websocket"
+
     class McpConfiguration < Data
       attr_reader name(): String
 
@@ -26,10 +28,10 @@ module Ruboty
       include Recordable
 
       # @rbs name: String
-      # @rbs transport: transports
+      # @rbs transport: transports | transports_str
       # @rbs url: String
       # @rbs headers: Hash[String, String]?
-      def initialize: (name: String, transport: transports, url: String, ?headers: Hash[String, String]?) -> untyped
+      def initialize: (name: String, transport: transports | transports_str, url: String, ?headers: Hash[String, String]?) -> untyped
     end
   end
 end

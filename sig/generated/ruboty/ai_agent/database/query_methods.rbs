@@ -7,32 +7,38 @@ module Ruboty
         def data: () -> Hash[keynable, untyped]
       end
 
+      type query_key = keynable | Symbol | nil
+
       # @rbs module-self _WithData
       module QueryMethods : _WithData
-        # @rbs *keys: keynable
-        # @rbs return: untyped
-        def fetch: (*keynable keys) -> untyped
-
-        # @rbs *keys: keynable
-        # @rbs return: Integer
-        def len: (*keynable keys) -> Integer
-
-        # @rbs *keys: keynable
-        # @rbs return: void
-        def delete: (*keynable keys) -> void
-
-        # @rbs *keys: keynable
+        # @rbs keys: Array[query_key]
         # @rbs return: Array[keynable]
-        def keys: (*keynable keys) -> Array[keynable]
+        def self.keys_to_keynable: (Array[query_key] keys) -> Array[keynable]
 
-        # @rbs *keys: keynable
+        # @rbs *keys: query_key
+        # @rbs return: untyped
+        def fetch: (*query_key keys) -> untyped
+
+        # @rbs *keys: query_key
+        # @rbs return: Integer
+        def len: (*query_key keys) -> Integer
+
+        # @rbs *keys: query_key
+        # @rbs return: void
+        def delete: (*query_key keys) -> void
+
+        # @rbs *keys: query_key
+        # @rbs return: Array[keynable]
+        def keys: (*query_key keys) -> Array[keynable]
+
+        # @rbs *keys: query_key
         # @rbs return: boolish
-        def key?: (*keynable keys) -> boolish
+        def key?: (*query_key keys) -> boolish
 
-        # @rbs at: Array[keynable]
+        # @rbs at: Array[query_key]
         # @rbs value: untyped
         # @rbs return: void
-        def store: (untyped value, at: Array[keynable]) -> void
+        def store: (untyped value, at: Array[query_key]) -> void
       end
     end
   end

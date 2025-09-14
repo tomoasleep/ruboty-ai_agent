@@ -5,7 +5,7 @@ module Ruboty
     # Memorize and retrieve information using Ruboty's brain.
     class Database
       # @rbs!
-      #   type keynable = Symbol | String | Integer
+      #   type keynable = String | Integer
 
       autoload :QueryMethods, 'ruboty/ai_agent/database/query_methods'
 

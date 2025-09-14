@@ -38,5 +38,14 @@ module Ruboty
     autoload :UserMcpConfigurations, 'ruboty/ai_agent/user_mcp_configurations'
     autoload :UserMcpToolsCaches, 'ruboty/ai_agent/user_mcp_tools_caches'
     autoload :UserPromptCommandDefinitions, 'ruboty/ai_agent/user_prompt_command_definitions'
+
+    # Ensure all recordables are loaded
+    [
+      CachedValue,
+      ChatMessage,
+      McpConfiguration,
+      PromptCommandDefinition,
+      TokenUsage
+    ]
   end
 end

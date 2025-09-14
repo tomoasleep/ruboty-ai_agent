@@ -18,13 +18,13 @@ module Ruboty
 
       attr_reader token_usage: TokenUsage?
 
-      # @rbs role: Symbol
+      # @rbs role: Symbol | String
       # @rbs content: String
       # @rbs ?tool_call_id: String?
       # @rbs ?tool_name: String?
       # @rbs ?tool_arguments: Hash[Symbol | String, untyped]?
       # @rbs ?token_usage: TokenUsage?
-      def initialize: (role: Symbol, content: String, ?tool_call_id: untyped, ?tool_name: untyped, ?tool_arguments: untyped, ?token_usage: untyped) -> untyped
+      def initialize: (role: Symbol | String, content: String, ?tool_call_id: untyped, ?tool_name: untyped, ?tool_arguments: untyped, ?token_usage: untyped) -> untyped
 
       def to_h: () -> Hash[Symbol, untyped]
 

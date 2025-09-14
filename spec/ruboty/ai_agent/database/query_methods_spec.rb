@@ -14,13 +14,13 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     let(:brain_data) do
       {
-        users: {
-          'user1' => { name: 'Alice', age: 30 },
-          'user2' => { name: 'Bob', age: 25 }
+        'users' => {
+          'user1' => { 'name' => 'Alice', 'age' => 30 },
+          'user2' => { 'name' => 'Bob', 'age' => 25 }
         },
-        settings: {
-          theme: 'dark',
-          notifications: true
+        'settings' => {
+          'theme' => 'dark',
+          'notifications' => true
         }
       }
     end
@@ -52,15 +52,15 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
     context 'with Recordable objects' do
       let(:brain_data) do
         {
-          users: {
+          'users' => {
             'user1' => {
-              mcp_configurations: {
+              'mcp_configurations' => {
                 'test' => {
-                  name: 'test',
-                  transport: :http,
-                  headers: {},
-                  url: 'http://localhost:3000/mcp',
-                  record_type: :mcp_configuration
+                  'name' => 'test',
+                  'transport' => 'http',
+                  'headers' => {},
+                  'url' => 'http://localhost:3000/mcp',
+                  'record_type' => 'mcp_configuration'
                 }
               }
             }
@@ -85,11 +85,11 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     let(:brain_data) do
       {
-        users: {
-          'user1' => { name: 'Alice' },
-          'user2' => { name: 'Bob' }
+        'users' => {
+          'user1' => { 'name' => 'Alice' },
+          'user2' => { 'name' => 'Bob' }
         },
-        items: %w[item1 item2 item3]
+        'items' => %w[item1 item2 item3]
       }
     end
 
@@ -98,7 +98,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
       it 'deletes the specified key' do
         delete_item
-        expect(database.fetch(:users)).to eq({ 'user2' => { name: 'Bob' } })
+        expect(database.fetch(:users)).to eq({ 'user2' => { 'name' => 'Bob' } })
       end
     end
 
@@ -126,12 +126,12 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     let(:brain_data) do
       {
-        users: {
+        'users' => {
           'user1' => {},
           'user2' => {},
           'user3' => {}
         },
-        items: %w[a b c]
+        'items' => %w[a b c]
       }
     end
 
@@ -150,7 +150,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
     context 'when getting top-level keys' do
       let(:keys) { [] }
 
-      it { is_expected.to contain_exactly(:users, :items) }
+      it { is_expected.to contain_exactly('users', 'items') }
     end
 
     context 'when getting keys for non-existent path' do
@@ -165,8 +165,8 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     let(:brain_data) do
       {
-        users: {
-          'user1' => { name: 'Alice' }
+        'users' => {
+          'user1' => { 'name' => 'Alice' }
         }
       }
     end
@@ -199,7 +199,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
   describe '#store' do
     subject(:store_value) { database.store(value, at: at) }
 
-    let(:value) { { name: 'Charlie', age: 35 } }
+    let(:value) { { 'name' => 'Charlie', 'age' => 35 } }
     let(:at) { [:users, 'user3'] }
 
     it 'stores value at specified path' do
@@ -208,7 +208,7 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
     end
 
     context 'when creating nested structure' do
-      let(:value) { { enabled: true } }
+      let(:value) { { 'enabled' => true } }
       let(:at) { %i[deeply nested config] }
 
       it 'creates nested structure if needed' do
@@ -229,13 +229,13 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
       it 'converts to hasified value' do
         store_value
-        expect(database.data.dig(*at)).to eq({
-                                               name: 'data',
-                                               transport: :http,
-                                               headers: {},
-                                               url: 'http://localhost:3000/mcp',
-                                               record_type: :mcp_configuration
-                                             })
+        expect(database.data.dig(*at.map(&:to_s))).to eq({
+                                                           'name' => 'data',
+                                                           'transport' => :http,
+                                                           'headers' => {},
+                                                           'url' => 'http://localhost:3000/mcp',
+                                                           'record_type' => :mcp_configuration
+                                                         })
       end
     end
   end
@@ -245,8 +245,8 @@ RSpec.describe Ruboty::AiAgent::Database::QueryMethods do
 
     let(:brain_data) do
       {
-        users: %w[user1 user2 user3],
-        config: { a: 1, b: 2 }
+        'users' => %w[user1 user2 user3],
+        'config' => { 'a' => 1, 'b' => 2 }
       }
     end
 

@@ -39,7 +39,7 @@ RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
 
       it 'stores the prompt in user data' do
         call_robot
-        expect(database.data.dig(:users, from, :system_prompt)).to eq('Test prompt')
+        expect(database.fetch(:users, from, :system_prompt)).to eq('Test prompt')
       end
     end
 
@@ -62,7 +62,7 @@ RSpec.describe Ruboty::AiAgent::Actions::SetSystemPrompt do
 
       it 'stores the prompt in global data' do
         call_robot
-        expect(database.data.dig(:global_settings, :system_prompt)).to eq('Test prompt')
+        expect(database.fetch(:global_settings, :system_prompt)).to eq('Test prompt')
       end
     end
 

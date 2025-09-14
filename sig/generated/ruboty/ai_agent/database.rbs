@@ -4,7 +4,7 @@ module Ruboty
   module AiAgent
     # Memorize and retrieve information using Ruboty's brain.
     class Database
-      type keynable = Symbol | String | Integer
+      type keynable = String | Integer
 
       include QueryMethods
 

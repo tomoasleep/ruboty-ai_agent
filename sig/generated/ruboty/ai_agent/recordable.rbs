@@ -3,7 +3,7 @@
 module Ruboty
   module AiAgent
     interface _WithToH
-      def to_h: () -> Hash[Database::keynable, untyped]
+      def to_h: () -> Hash[Symbol, untyped]
     end
 
     # Convertable between Hash and Recordable bidirectionally.
@@ -15,9 +15,9 @@ module Ruboty
 
       def self.record_types: () -> Hash[Symbol, Class]
 
-      # @rbs hash: Hash[Symbol, untyped]?
+      # @rbs hash: Hash[Symbol | String, untyped]?
       # @rbs return: bool
-      def self.convertable?: (Hash[Symbol, untyped]? hash) -> bool
+      def self.convertable?: (Hash[Symbol | String, untyped]? hash) -> bool
 
       # @rbs value: untyped
       # @rbs return: untyped
@@ -31,9 +31,9 @@ module Ruboty
       # @rbs return: Hash[Database::keynable, untyped]
       def self.record_to_hash: (Recordable record) -> Hash[Database::keynable, untyped]
 
-      # @rbs hash: Hash[Symbol, untyped]
+      # @rbs hash: Hash[Symbol | String, untyped]
       # @rbs return: Recordable
-      def self.record_from_hash: (Hash[Symbol, untyped] hash) -> Recordable
+      def self.record_from_hash: (Hash[Symbol | String, untyped] hash) -> Recordable
 
       # @rbs module-self Class
       module ClassMethods : Class
@@ -45,7 +45,7 @@ module Ruboty
 
       # @rbs module-self Recordable::ClassMethods.instance
       module PrependMethods : Recordable::ClassMethods
-        def to_h: () -> Hash[Database::keynable, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
       end
 
       # @rbs %a{pure}

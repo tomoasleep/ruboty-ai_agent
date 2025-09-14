@@ -4,7 +4,7 @@ module Ruboty
   module AiAgent
     # @rbs!
     #   interface _WithToH
-    #     def to_h: () -> Hash[Database::keynable, untyped]
+    #     def to_h: () -> Hash[Symbol, untyped]
     #   end
 
     # Convertable between Hash and Recordable bidirectionally.
@@ -22,12 +22,12 @@ module Ruboty
           @record_types ||= {}
         end
 
-        # @rbs hash: Hash[Symbol, untyped]?
+        # @rbs hash: Hash[Symbol | String, untyped]?
         # @rbs return: bool
         def convertable?(hash)
           return false unless hash.is_a?(Hash)
 
-          type = hash[:record_type]
+          type = (hash[:record_type] || hash['record_type'])&.to_sym
           type && record_types.include?(type)
         end
 
@@ -54,9 +54,9 @@ module Ruboty
         def hashify_recursively(value)
           case value
           when Recordable
-            hashify_recursively(value.to_h)
+            hashify_recursively(record_to_hash(value))
           when Hash
-            value.transform_values { |v| hashify_recursively(v) }
+            value.transform_values { |v| hashify_recursively(v) }.transform_keys(&:to_s)
           when Array
             value.map { |v| hashify_recursively(v) }
           else
@@ -67,13 +67,15 @@ module Ruboty
         # @rbs record: Recordable
         # @rbs return: Hash[Database::keynable, untyped]
         def record_to_hash(record)
-          record.to_h
+          record.to_h.transform_keys(&:to_s)
         end
 
-        # @rbs hash: Hash[Symbol, untyped]
+        # @rbs hash: Hash[Symbol | String, untyped]
         # @rbs return: Recordable
         def record_from_hash(hash)
-          type = hash[:record_type]
+          hash = hash.transform_keys(&:to_sym)
+
+          type = hash[:record_type]&.to_sym
           klass = record_types[type]
           raise "Unknown record type: #{type}" unless klass
 
@@ -98,7 +100,7 @@ module Ruboty
 
       # @rbs module-self Recordable::ClassMethods.instance
       module PrependMethods
-        def to_h #: Hash[Database::keynable, untyped]
+        def to_h #: Hash[Symbol, untyped]
           {
             record_type: record_type,
             **super
