@@ -23,9 +23,19 @@ module Ruboty
             content: body_param
           )
 
+          messages = [] #: Array[ChatMessage]
+
+          global_prompt = database.global_settings.system_prompt
+          messages << ChatMessage.new(role: :system, content: global_prompt) if global_prompt
+
+          user_prompt = user.system_prompt
+          messages << ChatMessage.new(role: :system, content: user_prompt) if user_prompt
+
+          messages += chat_thread.messages.all_values
+
           agent = Agent.new(
             llm:,
-            messages: chat_thread.messages.all_values,
+            messages:,
             tools:
           )
 

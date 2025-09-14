@@ -245,4 +245,139 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       expect(said_messages).to include(a_hash_including(body: /エラーが発生しました/))
     end
   end
+
+  describe 'system prompt usage in chat' do
+    def set_system_prompt(scope:, prompt:)
+      robot.receive(body: "#{robot.name} set #{scope} system prompt \"#{prompt}\"", from:, to:)
+    end
+
+    def send_chat_message(message)
+      robot.receive(body: "#{robot.name} #{message}", from:, to:)
+    end
+
+    context 'with user system prompt set' do
+      let(:user_prompt) { 'You are a helpful assistant' }
+      let(:chat_message) { 'Hello!' }
+
+      before do
+        set_system_prompt(scope: 'user', prompt: user_prompt)
+      end
+
+      it 'sends user system prompt to OpenAI API' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: user_prompt },
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hi there! How can I help you?'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hi there! How can I help you?')
+      end
+    end
+
+    context 'with global system prompt set' do
+      let(:global_prompt) { 'Be concise in your responses' }
+      let(:chat_message) { 'What is AI?' }
+
+      before do
+        set_system_prompt(scope: 'global', prompt: global_prompt)
+      end
+
+      it 'sends global system prompt to OpenAI API' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: global_prompt },
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'AI is artificial intelligence.'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('AI is artificial intelligence.')
+      end
+    end
+
+    context 'with both global and user system prompts set' do
+      let(:global_prompt) { 'Be concise' }
+      let(:user_prompt) { 'You are a helpful assistant' }
+      let(:chat_message) { 'Hello!' }
+
+      before do
+        set_system_prompt(scope: 'global', prompt: global_prompt)
+        set_system_prompt(scope: 'user', prompt: user_prompt)
+      end
+
+      it 'sends both system prompts in correct order (global first, then user)' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: global_prompt },
+            { role: 'system', content: user_prompt },
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hi! How can I assist you today?'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hi! How can I assist you today?')
+      end
+    end
+
+    context 'without system prompt set' do
+      let(:chat_message) { 'Hello!' }
+
+      it 'sends only user message without system prompts' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hello! How can I help you?'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hello! How can I help you?')
+      end
+    end
+
+    context 'with existing chat history and system prompt' do
+      let(:user_prompt) { 'You are a helpful assistant' }
+      let(:first_message) { 'What is 2+2?' }
+      let(:second_message) { 'Thank you!' }
+
+      before do
+        set_system_prompt(scope: 'user', prompt: user_prompt)
+
+        # First message
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: user_prompt },
+            { role: 'user', content: first_message }
+          ],
+          response_content: '2+2 equals 4.'
+        )
+        send_chat_message(first_message)
+      end
+
+      it 'includes system prompt with all chat history' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: user_prompt },
+            { role: 'user', content: first_message },
+            { role: 'assistant', content: '2+2 equals 4.' },
+            { role: 'user', content: second_message }
+          ],
+          response_content: 'You\'re welcome!'
+        )
+
+        send_chat_message(second_message)
+
+        expect(said_messages.last[:body]).to include('You\'re welcome!')
+      end
+    end
+  end
 end
