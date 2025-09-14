@@ -32,6 +32,7 @@ module Ruboty
         ChatThread.find_or_create(database: self, id: id)
       end
 
+      # @rbs %a{memorized}
       def global_settings #: GlobalSettings
         @global_settings ||= GlobalSettings.find_or_create(database: self)
       end

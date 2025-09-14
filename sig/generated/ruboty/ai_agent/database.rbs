@@ -21,6 +21,8 @@ module Ruboty
 
       def chat_thread: (untyped id) -> ChatThread
 
+      # @rbs %a{memorized}
+      %a{memorized}
       def global_settings: () -> GlobalSettings
     end
   end

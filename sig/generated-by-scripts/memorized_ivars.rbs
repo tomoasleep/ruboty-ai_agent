@@ -23,6 +23,14 @@ end
 
 module Ruboty
   module AiAgent
+    class Database
+      @global_settings: GlobalSettings
+    end
+  end
+end
+
+module Ruboty
+  module AiAgent
     module LLM
       class OpenAI
         @model_info: Model
