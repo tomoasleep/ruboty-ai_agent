@@ -166,6 +166,9 @@ module Ruboty
         else
           handle_response(response, &block)
         end
+      rescue Net::HTTPExceptions, SystemCallError => e
+        error_message = e.is_a?(StandardError) ? e.message : "Unknown error (#{e.class.name})"
+        raise Error, "HTTP request failed: #{error_message}"
       end
 
       # @rbs response: Net::HTTPResponse

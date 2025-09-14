@@ -25,6 +25,9 @@ module Ruboty
               client.call_tool(tool_def['name'], params).to_json
             end
           end
+        rescue HttpMcpClient::Error => e
+          warn "Failed to list tools for MCP client: #{e.message}"
+          []
         end
       end
 
@@ -36,6 +39,9 @@ module Ruboty
           tools = mcp_client.list_tools
           return mcp_client.call_tool(function_name, arguments) if tools.any? { |t| t['name'] == function_name }
         end
+        nil
+      rescue HttpMcpClient::Error => e
+        warn "Failed to execute tool '#{function_name}': #{e.message}"
         nil
       end
 
