@@ -47,6 +47,12 @@ module Ruboty
           user_prompt = user.system_prompt
           messages << ChatMessage.new(role: :system, content: user_prompt) if user_prompt
 
+          ai_memories = user.ai_memories.all || {}
+          unless ai_memories.empty?
+            memory_content = ai_memories.map { |_idx, memory| memory }.join("\n\n")
+            messages << ChatMessage.new(role: :user, content: "My memories:\n#{memory_content}")
+          end
+
           messages += chat_thread.messages.all_values
 
           llm = LLM::OpenAI.new

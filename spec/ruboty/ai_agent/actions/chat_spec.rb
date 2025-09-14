@@ -380,4 +380,126 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       end
     end
   end
+
+  describe 'AI Memory usage in chat' do
+    def add_memory(memory_text)
+      robot.receive(body: "#{robot.name} add ai memory \"#{memory_text}\"", from:, to:)
+    end
+
+    def send_chat_message(message)
+      robot.receive(body: "#{robot.name} #{message}", from:, to:)
+    end
+
+    context 'with AI memories added' do
+      let(:coffee_memory) { 'I like coffee' }
+      let(:color_memory) { 'My favorite color is blue' }
+      let(:chat_message) { 'Hello!' }
+
+      before do
+        add_memory(coffee_memory)
+        add_memory(color_memory)
+      end
+
+      it 'includes AI memories as user message before conversation' do
+        expected_memory_content = "My memories:\n#{coffee_memory}\n\n#{color_memory}"
+
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: expected_memory_content },
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hello! I know you like coffee and your favorite color is blue.'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hello! I know you like coffee and your favorite color is blue.')
+      end
+    end
+
+    context 'with system prompt and AI memories' do
+      let(:user_prompt) { 'You are a helpful assistant' }
+      let(:memory) { 'I am a developer' }
+      let(:chat_message) { 'Hello!' }
+
+      before do
+        robot.receive(body: "#{robot.name} set user system prompt \"#{user_prompt}\"", from:, to:)
+        add_memory(memory)
+      end
+
+      it 'includes system prompt, then AI memories, then conversation' do
+        expected_memory_content = "My memories:\n#{memory}"
+
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'system', content: user_prompt },
+            { role: 'user', content: expected_memory_content },
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hello! I understand you are a developer.'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hello! I understand you are a developer.')
+      end
+    end
+
+    context 'without AI memories' do
+      let(:chat_message) { 'Hello!' }
+
+      it 'does not include memory messages when no memories exist' do
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: chat_message }
+          ],
+          response_content: 'Hello! How can I help you?'
+        )
+
+        send_chat_message(chat_message)
+
+        expect(said_messages.last[:body]).to include('Hello! How can I help you?')
+      end
+    end
+
+    context 'with conversation history and AI memories' do
+      let(:memory) { 'I work at a tech company' }
+      let(:first_message) { 'What is your advice for developers?' }
+      let(:second_message) { 'Thank you!' }
+
+      before do
+        add_memory(memory)
+
+        expected_memory_content = "My memories:\n#{memory}"
+
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: expected_memory_content },
+            { role: 'user', content: first_message }
+          ],
+          response_content: 'Since you work at a tech company, I recommend continuous learning.'
+        )
+
+        send_chat_message(first_message)
+      end
+
+      it 'includes memories only once at the beginning of conversation' do
+        expected_memory_content = "My memories:\n#{memory}"
+
+        stub_openai_chat_completion_with_content(
+          messages: [
+            { role: 'user', content: expected_memory_content },
+            { role: 'user', content: first_message },
+            { role: 'assistant', content: 'Since you work at a tech company, I recommend continuous learning.' },
+            { role: 'user', content: second_message }
+          ],
+          response_content: 'You\'re welcome!'
+        )
+
+        send_chat_message(second_message)
+
+        expect(said_messages.last[:body]).to include('You\'re welcome!')
+      end
+    end
+  end
 end
