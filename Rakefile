@@ -33,6 +33,7 @@ namespace :rbs do
 
   desc 'Run rbs-inline to generate RBS files'
   task :inline do
+    sh('script/clean-orphaned-rbs.sh')
     sh('bundle exec rbs-inline --opt-out --output lib')
   end
 
