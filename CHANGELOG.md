@@ -1,4 +1,5 @@
 ## Unreleased
+## 0.3.0
 
 - Add think tool.
 - Different agent threads are prepared for different slack threads.
