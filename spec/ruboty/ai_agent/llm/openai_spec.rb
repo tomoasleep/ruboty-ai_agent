@@ -95,7 +95,7 @@ RSpec.describe Ruboty::AiAgent::LLM::OpenAI do
           expect(response.message.content).to be_empty
           expect(response.message.tool_call_id).to eq('call_123')
           expect(response.message.tool_name).to eq('get_weather')
-          expect(response.message.tool_arguments).to eq({ location: 'Tokyo' })
+          expect(response.message.tool_arguments).to eq({ 'location' => 'Tokyo' })
         end
       end
     end

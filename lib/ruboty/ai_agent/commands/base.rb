@@ -6,16 +6,21 @@ module Ruboty
       # Base class for commands.
       # @abstract
       class Base
-        attr_reader :message #: Ruboty::Message
-        attr_reader :chat_thread #: Ruboty::AiAgent::ChatThread
+        attr_reader :request #: Request
 
-        # @rbs message: Ruboty::Message
-        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
-        def initialize(message:, chat_thread:)
-          @message = message
-          @chat_thread = chat_thread
+        # @rbs request: Request
+        def initialize(request:)
+          @request = request
 
           super()
+        end
+
+        def message #: Ruboty::Message
+          request.message
+        end
+
+        def chat_thread #: Ruboty::AiAgent::ChatThread
+          request.chat_thread
         end
 
         # @rbs *args: untyped

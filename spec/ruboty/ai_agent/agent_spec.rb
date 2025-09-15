@@ -173,6 +173,7 @@ RSpec.describe Ruboty::AiAgent::Agent do
     end
 
     describe '#on_tool_response' do
+      let(:tool) { create_tool(name: 'test_tool') }
       let(:tool_response) { 'result' }
       let(:message) { Ruboty::AiAgent::ChatMessage.new(role: :tool, content: tool_response) }
 
@@ -180,12 +181,13 @@ RSpec.describe Ruboty::AiAgent::Agent do
         callback_result = nil
         callback = proc { |event| callback_result = event }
 
-        agent.on_tool_response(tool_response: tool_response, message: message, &callback)
+        agent.on_tool_response(tool:, tool_response:, message:, &callback)
 
         expect(callback_result).to eq({
                                         type: :tool_response,
-                                        tool_response: tool_response,
-                                        message: message
+                                        tool:,
+                                        tool_response:,
+                                        message:
                                       })
       end
     end

@@ -10,12 +10,11 @@ module Ruboty
         attr_reader :definition #: Ruboty::AiAgent::PromptCommandDefinition
 
         # @rbs definition: Ruboty::AiAgent::PromptCommandDefinition
-        # @rbs message: Ruboty::Message
-        # @rbs chat_thread: Ruboty::AiAgent::ChatThread
-        def initialize(definition:, message:, chat_thread:)
+        # @rbs request: Ruboty::AiAgent::Request
+        def initialize(definition:, request:)
           @definition = definition
 
-          super(message:, chat_thread:)
+          super(request:)
         end
 
         # @rbs commandline: String

@@ -158,7 +158,7 @@ module Ruboty
                 tool_call #: OpenAI::Models::Chat::ChatCompletionMessageFunctionToolCall
                 .function.arguments
 
-              JSON.parse(arguments, { symbolize_names: true })
+              JSON.parse(arguments)
             end
 
           Response.new(

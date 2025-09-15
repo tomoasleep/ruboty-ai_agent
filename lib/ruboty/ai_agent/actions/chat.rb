@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 module Ruboty
   module AiAgent
     module Actions
@@ -10,14 +12,14 @@ module Ruboty
         # @rbs override
         def call
           user.prompt_command_definitions.all_values.each do |definition|
-            command = Commands::PromptCommand.new(definition:, message:, chat_thread:)
+            command = Commands::PromptCommand.new(definition:, request:)
             if command.match?(body_param)
               new_prompt = command.call(commandline: body_param)
               return complete_chat(new_prompt)
             end
           end
 
-          builtin_commands = Commands.builtins(message:, chat_thread:)
+          builtin_commands = Commands.builtins(request:)
           builtin_commands.each do |command|
             return command.call if command.match?(body_param)
           end
@@ -27,6 +29,11 @@ module Ruboty
 
         def body_param #: String
           message[:body]
+        end
+
+        # @rbs %a{memorized}
+        def request #: Request
+          @request ||= Request.new(message:, chat_thread:)
         end
 
         private
@@ -56,7 +63,10 @@ module Ruboty
           messages += chat_thread.messages.all_values
 
           llm = LLM::OpenAI.new
-          tools = McpClients.new(user.mcp_clients).available_tools
+          tools = [
+            *McpClients.new(user.mcp_clients).available_tools,
+            *ToolDefinitions.builtins(request:).map(&:to_tool)
+          ]
 
           agent = Agent.new(
             llm:,
@@ -72,11 +82,10 @@ module Ruboty
 
               chat_thread.messages.compact(llm:) if chat_thread.messages.over_auto_compact_threshold?
             when :tool_call
-              message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]}",
-                            streaming: true)
+              message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]&.to_json}") unless event[:tool].silent?
             when :tool_response
               chat_thread.messages << event[:message]
-              message.reply("Tool response: #{event[:tool_response].slice(0..100)}")
+              message.reply("Tool response: #{event[:tool_response].slice(0..100)}") unless event[:tool].silent?
             end
           end
         rescue StandardError => e

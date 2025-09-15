@@ -7,7 +7,7 @@ module Ruboty
       class ListAiCommands < Base
         # @rbs override
         def call
-          builtin_commands = Commands.builtins(message:, chat_thread:)
+          builtin_commands = Commands.builtins(request: Request.new(message:, chat_thread:))
 
           builtin_list = builtin_commands.flat_map(&:matchers)
                                          .map { |matcher| "#{matcher.pattern.inspect} - #{matcher.description}" }

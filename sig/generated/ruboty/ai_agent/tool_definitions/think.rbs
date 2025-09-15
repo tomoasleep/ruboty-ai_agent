@@ -1,0 +1,17 @@
+# Generated from lib/ruboty/ai_agent/tool_definitions/think.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module ToolDefinitions
+      # Tool
+      class Think < Base
+        # @rbs arguments: Hash[String, untyped]
+        # @rbs return: String?
+        def call: (Hash[String, untyped] arguments) -> String?
+
+        # @rbs override
+        def silent?: ...
+      end
+    end
+  end
+end

@@ -21,7 +21,7 @@ module Ruboty
 
       def on_tool_call: (tool: untyped, tool_arguments: untyped) ?{ (?) -> untyped } -> untyped
 
-      def on_tool_response: (tool_response: untyped, message: untyped) ?{ (?) -> untyped } -> untyped
+      def on_tool_response: (tool: untyped, tool_response: untyped, message: untyped) ?{ (?) -> untyped } -> untyped
 
       def on_response: (untyped response) ?{ (?) -> untyped } -> untyped
     end

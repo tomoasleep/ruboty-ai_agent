@@ -1,0 +1,52 @@
+# Generated from lib/ruboty/ai_agent/tool_definitions/base.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module ToolDefinitions
+      # Base class for tool definitions
+      # @abstract
+      class Base
+        type input_schema = Hash[String | Symbol, untyped]
+
+        def self.tool_name: () -> String?
+
+        def self.tool_name=: (String) -> String
+
+        def self.tool_title: () -> String?
+
+        def self.tool_title=: (String) -> String
+
+        def self.tool_description: () -> String?
+
+        def self.tool_description=: (String) -> String
+
+        def self.tool_input_schema: () -> input_schema?
+
+        def self.tool_input_schema=: (input_schema) -> input_schema
+
+        def tool_name: () -> String
+
+        def tool_title: () -> String
+
+        def tool_description: () -> String
+
+        def tool_input_schema: () -> input_schema
+
+        # Return true if you want the tool not to produce call logs in the chat.
+        def silent?: () -> boolish
+
+        attr_reader request: Request
+
+        # @rbs request: Request
+        def initialize: (request: Request) -> untyped
+
+        # @abstract
+        # @rbs arguments: Hash[String, untyped]
+        # @rbs return: String?
+        def call: (Hash[String, untyped] arguments) -> String?
+
+        def to_tool: () -> Tool
+      end
+    end
+  end
+end

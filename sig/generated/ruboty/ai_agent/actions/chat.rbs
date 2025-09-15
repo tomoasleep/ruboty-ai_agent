@@ -12,6 +12,10 @@ module Ruboty
 
         def body_param: () -> String
 
+        # @rbs %a{memorized}
+        %a{memorized}
+        def request: () -> Request
+
         private
 
         # @rbs body: String

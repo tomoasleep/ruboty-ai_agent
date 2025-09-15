@@ -22,7 +22,7 @@ module Ruboty
             when Integer
               k
             when NilClass
-              nil
+              ''
             else
               raise ArgumentError, "Invalid key type: #{k.class}"
             end

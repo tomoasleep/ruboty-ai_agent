@@ -11,24 +11,14 @@ module Ruboty
       autoload :Usage, 'ruboty/ai_agent/commands/usage'
       autoload :PromptCommand, 'ruboty/ai_agent/commands/prompt_command'
 
-      # @rbs message: Ruboty::Message
-      # @rbs chat_thread: ChatThread
+      # @rbs request: Request
       # @rbs return: Array[Commands::BuiltinBase]
-      def self.builtins(message:, chat_thread:)
+      def self.builtins(request:)
         [
-          Commands::Clear.new(
-            message:,
-            chat_thread:
-          ),
-          Commands::Compact.new(
-            message:,
-            chat_thread:
-          ),
-          Commands::Usage.new(
-            message:,
-            chat_thread:
-          )
-        ]
+          Commands::Clear,
+          Commands::Compact,
+          Commands::Usage
+        ].map { |cmd_class| cmd_class.new(request: request) }
       end
     end
   end

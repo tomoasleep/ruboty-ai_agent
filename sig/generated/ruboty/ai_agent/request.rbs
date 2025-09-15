@@ -1,0 +1,23 @@
+# Generated from lib/ruboty/ai_agent/request.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    class Request < Data
+      attr_reader message(): Ruboty::Message
+
+      attr_reader chat_thread(): Ruboty::AiAgent::ChatThread
+
+      def self.new: (Ruboty::Message message, Ruboty::AiAgent::ChatThread chat_thread) -> instance
+                  | (message: Ruboty::Message, chat_thread: Ruboty::AiAgent::ChatThread) -> instance
+
+      def self.members: () -> [ :message, :chat_thread ]
+
+      def members: () -> [ :message, :chat_thread ]
+    end
+
+    # Request for chat action from user.
+    class Request
+      def message_body: () -> String
+    end
+  end
+end

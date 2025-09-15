@@ -1,0 +1,12 @@
+# Generated from lib/ruboty/ai_agent/tool_definitions.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Tool Definitions for AI Agent
+    module ToolDefinitions
+      # @rbs request: Request
+      # @rbs return: Array[Base]
+      def self.builtins: (request: Request) -> Array[Base]
+    end
+  end
+end

@@ -15,6 +15,16 @@ end
 
 module Ruboty
   module AiAgent
+    module Actions
+      class Chat
+        @request: Request
+      end
+    end
+  end
+end
+
+module Ruboty
+  module AiAgent
     class ChatThread
       @messages: ChatThreadMessages
     end

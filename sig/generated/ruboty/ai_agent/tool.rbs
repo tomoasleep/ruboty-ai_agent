@@ -12,14 +12,20 @@ module Ruboty
 
       attr_reader input_schema: Hash[untyped, untyped]?
 
-      attr_reader on_call: (^(Hash[String, untyped]) -> String)?
+      attr_reader silent: boolish
+
+      attr_reader on_call: (^(Hash[String, untyped]) -> String?)?
 
       # @rbs name: String
       # @rbs title: String
       # @rbs description: String
       # @rbs input_schema: Hash[untyped, untyped]?
-      # @rbs &on_call: ? (Hash[String, untyped]) -> String
-      def initialize: (name: String, title: String, description: String, input_schema: Hash[untyped, untyped]?) ?{ (Hash[String, untyped]) -> String } -> void
+      # @rbs ?silent: boolish?
+      # @rbs &on_call: ? (Hash[String, untyped]) -> String?
+      def initialize: (name: String, title: String, description: String, input_schema: Hash[untyped, untyped]?, ?silent: untyped) ?{ (Hash[String, untyped]) -> String? } -> void
+
+      # Returns true if the tool should be called silently (without notifying the user).
+      def silent?: () -> boolish
 
       def call: (untyped params) -> String?
     end

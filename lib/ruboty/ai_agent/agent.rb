@@ -41,7 +41,7 @@ module Ruboty
               tool_arguments: response.tool_arguments,
               tool_response:
             )
-            on_tool_response(tool_response:, message: tool_response_message, &)
+            on_tool_response(tool: response.tool, tool_response:, message: tool_response_message, &)
             messages << tool_response_message
           else
             messages << response.message
@@ -59,8 +59,8 @@ module Ruboty
         callback&.call({ type: :tool_call, tool:, tool_arguments: })
       end
 
-      def on_tool_response(tool_response:, message:, &callback)
-        callback&.call({ type: :tool_response, tool_response:, message: })
+      def on_tool_response(tool:, tool_response:, message:, &callback)
+        callback&.call({ type: :tool_response, tool:, tool_response:, message: })
       end
 
       def on_response(response, &callback)

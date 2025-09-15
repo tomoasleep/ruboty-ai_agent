@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module OpenAIMockHelper
-  def stub_openai_chat_completion(messages:, tools: [], response_content: nil, response_tool_calls: nil, model: nil)
+  def stub_openai_chat_completion(messages:, tools: be_truthy, response_content: nil, response_tool_calls: nil, model: nil)
     model ||= 'gpt-5-nano'
     request_body = {
       model:,
@@ -23,8 +23,8 @@ module OpenAIMockHelper
       )
   end
 
-  def stub_openai_chat_completion_with_tool_call(messages:, tools:, tool_name:, tool_arguments:,
-                                                 tool_call_id: 'call_123', model: nil)
+  def stub_openai_chat_completion_with_tool_call(messages:, tool_name:, tool_arguments:,
+                                                 tool_call_id: 'call_123', tools: be_truthy, model: nil)
     stub_openai_chat_completion(
       model:,
       messages: messages,
@@ -42,7 +42,7 @@ module OpenAIMockHelper
     )
   end
 
-  def stub_openai_chat_completion_with_content(messages:, response_content:, tools: [], model: nil)
+  def stub_openai_chat_completion_with_content(messages:, response_content:, tools: be_truthy, model: nil)
     stub_openai_chat_completion(
       model:,
       messages: messages,
@@ -121,6 +121,8 @@ module OpenAIMockHelper
   end
 
   def format_tools_for_request(tools)
+    return tools unless tools.is_a?(Enumerable)
+
     tools.map do |tool|
       case tool
       when Ruboty::AiAgent::Tool

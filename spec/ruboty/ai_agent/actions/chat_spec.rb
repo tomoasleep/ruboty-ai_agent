@@ -143,16 +143,16 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
         messages: [
           { role: 'user', content: body }
         ],
-        tools: [
-          {
-            type: 'function',
-            function: {
-              name: 'calculator',
-              description: 'Performs calculations',
-              parameters: {}
+        tools: including(
+          a_hash_including(
+            'type' => 'function',
+            'function' => {
+              'name' => 'calculator',
+              'description' => 'Performs calculations',
+              'parameters' => {}
             }
-          }
-        ],
+          )
+        ),
         tool_name: 'calculator',
         tool_arguments: { expression: '21 * 2' },
         tool_call_id: 'call_123'
@@ -178,16 +178,16 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           },
           { role: 'tool', tool_call_id: 'call_123', content: '["42"]' }
         ],
-        tools: [
-          {
-            type: 'function',
-            function: {
-              name: 'calculator',
-              description: 'Performs calculations',
-              parameters: {}
+        tools: including(
+          a_hash_including(
+            'type' => 'function',
+            'function' => {
+              'name' => 'calculator',
+              'description' => 'Performs calculations',
+              'parameters' => {}
             }
-          }
-        ],
+          )
+        ),
         response_content: 'The answer is 42.'
       )
     end
@@ -195,9 +195,11 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
     it 'notifies about tool call' do
       receive_message
 
-      expect(said_messages).to include(a_hash_including(body: 'Calling tool calculator with arguments {expression: "21 * 2"}'))
-      expect(said_messages).to include(a_hash_including(body: 'Tool response: ["42"]'))
-      expect(said_messages).to include(a_hash_including(body: 'The answer is 42.'))
+      expect(said_messages).to match([
+                                       a_hash_including(body: 'Calling tool calculator with arguments {"expression":"21 * 2"}'),
+                                       a_hash_including(body: 'Tool response: ["42"]'),
+                                       a_hash_including(body: 'The answer is 42.')
+                                     ])
     end
 
     it 'adds tool messages to chat thread' do
