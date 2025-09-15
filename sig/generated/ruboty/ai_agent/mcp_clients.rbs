@@ -12,11 +12,6 @@ module Ruboty
       # @rbs return: Array[Tool]
       def available_tools: () -> Array[Tool]
 
-      # @rbs function_name: String
-      # @rbs arguments: Hash[String, untyped]
-      # @rbs return: untyped
-      def execute_tool: (String function_name, Hash[String, untyped] arguments) -> untyped
-
       # @rbs return: bool
       def any?: () -> bool
     end

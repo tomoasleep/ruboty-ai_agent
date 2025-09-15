@@ -16,8 +16,9 @@ module Ruboty
         clients.flat_map do |client|
           tool_defs = client.list_tools
           tool_defs.map do |tool_def|
+            tool_name = "mcp_#{client.mcp_name}__#{tool_def['name']}"
             Tool.new(
-              name: tool_def['name'],
+              name: tool_name,
               title: tool_def['title'] || '',
               description: tool_def['description'] || '',
               input_schema: tool_def['inputSchema']
@@ -29,20 +30,6 @@ module Ruboty
           warn "Failed to list tools for MCP client: #{e.message}"
           []
         end
-      end
-
-      # @rbs function_name: String
-      # @rbs arguments: Hash[String, untyped]
-      # @rbs return: untyped
-      def execute_tool(function_name, arguments)
-        clients.each do |mcp_client|
-          tools = mcp_client.list_tools
-          return mcp_client.call_tool(function_name, arguments) if tools.any? { |t| t['name'] == function_name }
-        end
-        nil
-      rescue HttpMcpClient::Error => e
-        warn "Failed to execute tool '#{function_name}': #{e.message}"
-        nil
       end
 
       # @rbs return: bool

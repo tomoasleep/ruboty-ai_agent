@@ -147,13 +147,13 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           a_hash_including(
             'type' => 'function',
             'function' => {
-              'name' => 'calculator',
+              'name' => 'mcp_calc_server__calculator',
               'description' => 'Performs calculations',
               'parameters' => {}
             }
           )
         ),
-        tool_name: 'calculator',
+        tool_name: 'mcp_calc_server__calculator',
         tool_arguments: { expression: '21 * 2' },
         tool_call_id: 'call_123'
       )
@@ -170,7 +170,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
                 id: 'call_123',
                 type: 'function',
                 function: {
-                  name: 'calculator',
+                  name: 'mcp_calc_server__calculator',
                   arguments: '{"expression":"21 * 2"}'
                 }
               }
@@ -182,7 +182,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           a_hash_including(
             'type' => 'function',
             'function' => {
-              'name' => 'calculator',
+              'name' => 'mcp_calc_server__calculator',
               'description' => 'Performs calculations',
               'parameters' => {}
             }
@@ -196,7 +196,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       receive_message
 
       expect(said_messages).to match([
-                                       a_hash_including(body: 'Calling tool calculator with arguments {"expression":"21 * 2"}'),
+                                       a_hash_including(body: 'Calling tool mcp_calc_server__calculator with arguments {"expression":"21 * 2"}'),
                                        a_hash_including(body: 'Tool response: ["42"]'),
                                        a_hash_including(body: 'The answer is 42.')
                                      ])
@@ -207,7 +207,7 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
 
       aggregate_failures do
         expect(messages.any? { |m| m.role == :user }).to be true
-        expect(messages.any? { |m| m.role == :assistant && m.tool_name == 'calculator' }).to be true
+        expect(messages.any? { |m| m.role == :assistant && m.tool_name == 'mcp_calc_server__calculator' }).to be true
         expect(messages.any? { |m| m.role == :tool }).to be true
         expect(messages.any? { |m| m.role == :assistant && m.content == 'The answer is 42.' }).to be true
       end

@@ -60,49 +60,15 @@ RSpec.describe Ruboty::AiAgent::McpClients do
       end
 
       before do
-        allow(mock_client).to receive(:list_tools).and_return(mcp_tools)
+        allow(mock_client).to receive_messages(list_tools: mcp_tools, mcp_name: 'weather_service')
       end
 
-      it 'returns tools as Tool objects' do
+      it 'returns tools as Tool objects with prefixed names' do
         tools = available_tools
         expect(tools.size).to eq(1)
         expect(tools.first).to be_a(Ruboty::AiAgent::Tool)
-        expect(tools.first.name).to eq('get_weather')
+        expect(tools.first.name).to eq('mcp_weather_service__get_weather')
         expect(tools.first.description).to eq('Get weather information')
-      end
-    end
-  end
-
-  describe '#execute_tool' do
-    subject(:mcp_clients) { described_class.new(clients) }
-
-    let(:mock_client) { instance_double(Ruboty::AiAgent::UserMcpClient) }
-    let(:clients) { [mock_client] }
-
-    context 'when tool exists' do
-      subject(:execute_result) { mcp_clients.execute_tool('get_weather', location: 'Tokyo') }
-
-      before do
-        allow(mock_client).to receive(:list_tools).and_return([
-                                                                { 'name' => 'get_weather' }
-                                                              ])
-        allow(mock_client).to receive(:call_tool)
-          .with('get_weather', { location: 'Tokyo' })
-          .and_return('Sunny, 25°C')
-      end
-
-      it { is_expected.to eq('Sunny, 25°C') }
-    end
-
-    context 'when tool does not exist' do
-      subject(:execute_result) { mcp_clients.execute_tool('nonexistent_tool', {}) }
-
-      before do
-        allow(mock_client).to receive(:list_tools).and_return([])
-      end
-
-      it 'returns nil' do
-        expect(execute_result).to be_nil
       end
     end
   end
