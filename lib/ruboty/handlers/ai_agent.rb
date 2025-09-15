@@ -18,7 +18,7 @@ module Ruboty
 
       on(/add mcp (?<name>\S+)\s+(?<config>.+)\z/, name: 'add_mcp', description: 'Add a new MCP server')
       on(/remove mcp (?<name>\S+)/, name: 'remove_mcp', description: 'Remove the specified MCP server')
-      on(/list mcps?/, name: 'list_mcp', description: 'List configured MCP servers')
+      on(/list mcps?(?<with_headers>\s+with\s+headers)?/, name: 'list_mcp', description: 'List configured MCP servers')
 
       on(/set (?:(?<scope>user|global) )?system prompt "(?<prompt>.+?)"/, name: 'set_system_prompt', description: 'Set system prompt')
       on(/show system prompt/, name: 'show_system_prompt', description: 'Show system prompt')

@@ -13,8 +13,9 @@ module Ruboty
             return
           end
 
+          show_headers = !message[:with_headers].nil?
           output = clients.map do |mcp_client|
-            format_mcp_client(mcp_client)
+            format_mcp_client(mcp_client, show_headers: show_headers)
           end.join("\n\n")
 
           message.reply(output)
@@ -23,8 +24,9 @@ module Ruboty
         private
 
         # @rbs client: UserMcpClient
+        # @rbs show_headers: bool
         # @rbs return: String
-        def format_mcp_client(client)
+        def format_mcp_client(client, show_headers: false)
           configuration = client.configuration
 
           tools_info = format_tools(client)
@@ -32,8 +34,9 @@ module Ruboty
             #{configuration.name}:
               Transport: #{configuration.transport}
               URL: #{configuration.url}
-              Headers: #{configuration.headers.to_json}
           TEXT
+
+          mcp_info += "  Headers: #{configuration.headers.to_json}\n" if show_headers
 
           "#{mcp_info}#{tools_info}".chomp
         end

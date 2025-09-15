@@ -10,8 +10,9 @@ module Ruboty
         private
 
         # @rbs client: UserMcpClient
+        # @rbs show_headers: bool
         # @rbs return: String
-        def format_mcp_client: (UserMcpClient client) -> String
+        def format_mcp_client: (UserMcpClient client, ?show_headers: bool) -> String
 
         # @rbs client: UserMcpClient
         # @rbs return: String

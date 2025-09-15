@@ -48,7 +48,6 @@ RSpec.describe Ruboty::AiAgent::Actions::ListMcp do
           test_server:
             Transport: http
             URL: http://example.com
-            Headers: {}
         OUTPUT
         expect(said_messages).to include(
           a_hash_including(
@@ -83,7 +82,6 @@ RSpec.describe Ruboty::AiAgent::Actions::ListMcp do
             test_server:
               Transport: http
               URL: http://example.com
-              Headers: {}
               Tools:
               - get_weather: Get current weather information
               - get_news: Fetch latest news headlines
@@ -112,7 +110,6 @@ RSpec.describe Ruboty::AiAgent::Actions::ListMcp do
             test_server:
               Transport: http
               URL: http://example.com
-              Headers: {}
               Tools:
               - long_tool: #{expected_description}
           OUTPUT
@@ -147,14 +144,50 @@ RSpec.describe Ruboty::AiAgent::Actions::ListMcp do
           server1:
             Transport: http
             URL: http://example1.com
-            Headers: {}
             Tools:
             - tool1: Tool 1
 
           server2:
             Transport: http
             URL: http://example2.com
-            Headers: {}
+        OUTPUT
+        expect(said_messages).to include(
+          a_hash_including(
+            body: expected_output
+          )
+        )
+      end
+    end
+
+    context 'when using "with headers" option' do
+      subject(:call_robot) { robot.receive(body: "#{robot.name} list mcps with headers", from: 'test_user', to: 'ruboty') }
+
+      before do
+        database = Ruboty::AiAgent::Database.new(robot.brain)
+        create_user(database: database, id: 'test_user')
+        create_mcp_configuration(
+          database: database,
+          user_id: 'test_user',
+          name: 'test_server',
+          url: 'http://example.com',
+          headers: { 'Authorization' => 'Bearer token123', 'X-Custom' => 'value' }
+        )
+        stub_mcp_initialize(base_url: 'http://example.com')
+        stub_mcp_list_tools(
+          base_url: 'http://example.com',
+          tools: [{ 'name' => 'get_weather', 'description' => 'Get current weather information' }]
+        )
+      end
+
+      it 'displays headers when using "with headers" option' do
+        call_robot
+        expected_output = <<~OUTPUT.chomp
+          test_server:
+            Transport: http
+            URL: http://example.com
+            Headers: {"Authorization":"Bearer token123","X-Custom":"value"}
+            Tools:
+            - get_weather: Get current weather information
         OUTPUT
         expect(said_messages).to include(
           a_hash_including(
