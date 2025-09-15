@@ -57,9 +57,11 @@ MCP (Model Context Protocol):
 - `add mcp <NAME> <OPTIONS> <URL>` — Add an MCP server
   - Example (HTTP transport with auth header):
     - `add mcp search --transport http --header 'Authorization: Bearer xxx' https://example.com/mcp`
+    - `add mcp search --transport http --bearer-token xxx https://example.com/mcp`
   - Options:
     - `--transport http|sse` (currently only `http` implemented; `sse` is not yet implemented)
     - `--header 'Key: Value'` (repeatable)
+    - `--bearer-token <TOKEN>` (shorthand for `--header 'Authorization: Bearer <TOKEN>'`)
 - `remove mcp <NAME>` — Remove an MCP server
 - `list mcp` / `list mcps` — List configured MCP servers
 

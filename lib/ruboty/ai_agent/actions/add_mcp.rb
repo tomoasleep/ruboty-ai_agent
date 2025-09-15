@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'shellwords'
 
 module Ruboty
   module AiAgent
@@ -58,11 +59,11 @@ module Ruboty
             args: []
           } #: config
 
-          args = config_param.split(/\s+(?=-)/)
+          args = config_param.shellsplit
 
           parser = OptionParser.new do |opts|
             opts.on('--transport TYPE', %w[http sse], 'Transport type (http or sse)') do |t|
-              options[:transport] = t
+              options[:transport] = t.to_sym
             end
 
             opts.on('--header VALUE', 'Add a header (can be specified multiple times)') do |h|
@@ -73,6 +74,10 @@ module Ruboty
               end
 
               options[:headers][key] = value
+            end
+
+            opts.on('--bearer-token TOKEN', 'Set Authorization Bearer token (shorthand for --header "Authorization: Bearer TOKEN")') do |token|
+              options[:headers]['Authorization'] = "Bearer #{token}"
             end
           end
 
