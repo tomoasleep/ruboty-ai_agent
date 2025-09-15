@@ -20,3 +20,11 @@
 ## PR instructions
 
 - Always run `rake autocorrect` before committing.
+
+## CHANGELOG instructions
+
+- When you make changes, please update `CHANGELOG.md` accordingly.
+- Add to the `Unreleased` section at the top.
+- Follow the format used in previous entries.
+- Use English for the changelog entries
+
