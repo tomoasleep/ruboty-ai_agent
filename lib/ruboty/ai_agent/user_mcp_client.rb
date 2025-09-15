@@ -68,14 +68,15 @@ module Ruboty
         mcp_client.cleanup_session
       end
 
-      private
-
       # @rbs return: McpConfiguration
       def configuration
         user.mcp_configurations.all_values.find { |config| config.name == mcp_name } ||
           raise("MCP configuration not found: #{mcp_name}")
       end
 
+      private
+
+      # @rbs %a{memorized}
       # @rbs return: HttpMcpClient
       def mcp_client
         @mcp_client ||= case configuration.transport

@@ -6,6 +6,16 @@ module Ruboty
       # ListMcp action for Ruboty::AiAgent
       class ListMcp < Base
         def call: () -> untyped
+
+        private
+
+        # @rbs client: UserMcpClient
+        # @rbs return: String
+        def format_mcp_client: (UserMcpClient client) -> String
+
+        # @rbs client: UserMcpClient
+        # @rbs return: String
+        def format_tools: (UserMcpClient client) -> String
       end
     end
   end

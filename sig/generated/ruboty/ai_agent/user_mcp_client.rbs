@@ -46,12 +46,14 @@ module Ruboty
       # @rbs return: untyped
       def cleanup_session: () -> untyped
 
-      private
-
       # @rbs return: McpConfiguration
       def configuration: () -> McpConfiguration
 
+      private
+
+      # @rbs %a{memorized}
       # @rbs return: HttpMcpClient
+      %a{memorized}
       def mcp_client: () -> HttpMcpClient
     end
   end

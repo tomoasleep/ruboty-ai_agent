@@ -6,11 +6,55 @@ module Ruboty
       # ListMcp action for Ruboty::AiAgent
       class ListMcp < Base
         def call
-          mcp_configurations = (user.mcp_configurations.all || {}).map do |name, mcp_configuration|
-            "#{name}: #{mcp_configuration.to_h.except(:record_type).to_json}"
+          clients = user.mcp_clients
+
+          if clients.empty?
+            message.reply('No MCP servers found.')
+            return
+          end
+
+          output = clients.map do |mcp_client|
+            format_mcp_client(mcp_client)
+          end.join("\n\n")
+
+          message.reply(output)
+        end
+
+        private
+
+        # @rbs client: UserMcpClient
+        # @rbs return: String
+        def format_mcp_client(client)
+          configuration = client.configuration
+
+          tools_info = format_tools(client)
+          mcp_info = <<~TEXT
+            #{configuration.name}:
+              Transport: #{configuration.transport}
+              URL: #{configuration.url}
+              Headers: #{configuration.headers.to_json}
+          TEXT
+
+          "#{mcp_info}#{tools_info}".chomp
+        end
+
+        # @rbs client: UserMcpClient
+        # @rbs return: String
+        def format_tools(client)
+          tools = client.list_tools
+          return '' if tools.empty?
+
+          tools_output = tools.map do |tool|
+            tool_name = tool['name'] || 'unnamed'
+            description = tool['description'] || 'No description'
+            truncated_description = description.length > 100 ? "#{description[0, 100]}..." : description
+            "  - #{tool_name}: #{truncated_description}"
           end.join("\n")
 
-          message.reply(mcp_configurations.empty? ? 'No memories found.' : mcp_configurations)
+          "  Tools:\n#{tools_output}\n"
+        rescue HttpMcpClient::Error => e
+          warn "Failed to list tools for MCP client: #{e.message}"
+          ''
         end
       end
     end
