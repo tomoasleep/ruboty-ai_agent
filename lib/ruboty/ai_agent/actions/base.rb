@@ -35,7 +35,17 @@ module Ruboty
 
         # @rbs %a{memorized}
         def chat_thread #: Ruboty::AiAgent::ChatThread
-          @chat_thread ||= database.chat_thread(message.from || 'default')
+          @chat_thread ||= database.chat_thread(thread_id)
+        end
+
+        private
+
+        def thread_id #: String
+          if message.respond_to?(:original) && message.original&.dig(:thread_ts)
+            message.original[:thread_ts]
+          else
+            message.from || 'default'
+          end
         end
       end
     end

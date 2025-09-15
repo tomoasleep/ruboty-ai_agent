@@ -504,4 +504,80 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       end
     end
   end
+
+  describe 'Slack thread support' do
+    subject(:receive_message_with_thread) do
+      robot.receive(body: "#{robot.name} #{body}", from:, to:, thread_ts:)
+    end
+
+    let(:thread_ts) { 'thread_123456.789' }
+
+    before do
+      stub_openai_chat_completion_with_content(
+        messages: [
+          { role: 'user', content: body }
+        ],
+        response_content: 'Hello from thread!'
+      )
+    end
+
+    context 'when message has thread_ts' do
+      it 'uses thread_ts as thread identifier' do
+        receive_message_with_thread
+
+        thread_messages = database.chat_thread(thread_ts).messages.all_values
+        expect(thread_messages.any? { |m| m.role == :user && m.content == body }).to be true
+        expect(thread_messages.any? { |m| m.role == :assistant && m.content == 'Hello from thread!' }).to be true
+      end
+
+      it 'keeps thread conversations separate from user conversations' do
+        receive_message_with_thread
+        receive_message
+
+        thread_messages = database.chat_thread(thread_ts).messages.all_values
+        user_messages = database.chat_thread(from).messages.all_values
+
+        expect(thread_messages).not_to eq(user_messages)
+        expect(thread_messages.length).to eq(2)
+        expect(user_messages.length).to eq(2)
+      end
+    end
+
+    context 'when message has no thread_ts' do
+      let(:thread_ts) { nil }
+
+      it 'uses from as thread identifier (fallback behavior)' do
+        receive_message_with_thread
+
+        user_messages = database.chat_thread(from).messages.all_values
+        expect(user_messages.any? { |m| m.role == :user && m.content == body }).to be true
+        expect(user_messages.any? { |m| m.role == :assistant && m.content == 'Hello from thread!' }).to be true
+      end
+    end
+
+    context 'when from is nil but thread_ts exists' do
+      let(:from) { nil }
+
+      it 'uses thread_ts as thread identifier' do
+        receive_message_with_thread
+
+        thread_messages = database.chat_thread(thread_ts).messages.all_values
+        expect(thread_messages.any? { |m| m.role == :user && m.content == body }).to be true
+        expect(thread_messages.any? { |m| m.role == :assistant && m.content == 'Hello from thread!' }).to be true
+      end
+    end
+
+    context 'when both from and thread_ts are nil' do
+      let(:from) { nil }
+      let(:thread_ts) { nil }
+
+      it 'uses default as thread identifier' do
+        receive_message_with_thread
+
+        default_messages = database.chat_thread('default').messages.all_values
+        expect(default_messages.any? { |m| m.role == :user && m.content == body }).to be true
+        expect(default_messages.any? { |m| m.role == :assistant && m.content == 'Hello from thread!' }).to be true
+      end
+    end
+  end
 end

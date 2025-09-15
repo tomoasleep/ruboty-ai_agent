@@ -28,6 +28,10 @@ module Ruboty
         # @rbs %a{memorized}
         %a{memorized}
         def chat_thread: () -> Ruboty::AiAgent::ChatThread
+
+        private
+
+        def thread_id: () -> String
       end
     end
   end
