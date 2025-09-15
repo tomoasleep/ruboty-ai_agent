@@ -17,6 +17,8 @@ Steep::RakeTask.new do |t|
   t.watch.verbose
 end
 
+Bump.changelog = true
+
 task default: %i[rubocop steep spec]
 task autocorrect: %i[rubocop:autocorrect rbs steep spec]
 
