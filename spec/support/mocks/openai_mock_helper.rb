@@ -76,16 +76,20 @@ module OpenAIMockHelper
   private
 
   def format_messages_for_request(messages)
-    messages.map do |msg|
-      case msg
-      when Ruboty::AiAgent::ChatMessage
-        format_chat_message_for_request(msg)
-      when Hash
-        msg
-      else
-        raise ArgumentError, "Unknown message type: #{msg.class}"
+    return messages unless messages.is_a?(Enumerable)
+
+    match(
+      messages.map do |msg|
+        case msg
+        when Ruboty::AiAgent::ChatMessage
+          deep_stringify_keys(format_chat_message_for_request(msg))
+        when Hash, Array
+          deep_stringify_keys(msg)
+        else
+          msg
+        end
       end
-    end
+    )
   end
 
   def format_chat_message_for_request(message)
@@ -178,5 +182,18 @@ module OpenAIMockHelper
         total_tokens: 70
       }
     }
+  end
+
+  def deep_stringify_keys(obj)
+    case obj
+    when Hash
+      obj.each_with_object({}) do |(k, v), h|
+        h[k.to_s] = deep_stringify_keys(v)
+      end
+    when Array
+      obj.map { |v| deep_stringify_keys(v) }
+    else
+      obj
+    end
   end
 end

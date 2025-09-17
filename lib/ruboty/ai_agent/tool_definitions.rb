@@ -6,12 +6,14 @@ module Ruboty
     module ToolDefinitions
       autoload :Base, 'ruboty/ai_agent/tool_definitions/base'
       autoload :Think, 'ruboty/ai_agent/tool_definitions/think'
+      autoload :BotHelp, 'ruboty/ai_agent/tool_definitions/bot_help'
 
       # @rbs request: Request
       # @rbs return: Array[Base]
       def self.builtins(request:)
         [
-          Think
+          Think,
+          BotHelp
         ].map { |tool_def| tool_def.new(request:) }
       end
     end

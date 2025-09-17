@@ -1,0 +1,23 @@
+# Generated from lib/ruboty/ai_agent/tool_definitions/bot_help.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    module ToolDefinitions
+      # Tool for retrieving Ruboty help information
+      class BotHelp < Base
+        # @rbs arguments: Hash[String, untyped]
+        # @rbs return: String?
+        def call: (Hash[String, untyped] arguments) -> String?
+
+        private
+
+        # @rbs filter: String?
+        # @rbs return: Array[String]
+        def filtered_descriptions: (String? filter) -> Array[String]
+
+        # @rbs return: Array[String]
+        def all_descriptions: () -> Array[String]
+      end
+    end
+  end
+end
