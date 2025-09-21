@@ -17,6 +17,8 @@ gemfile do
   gem 'ruboty'
   gem 'ruboty-ai_agent', path: '../'
 
+  gem 'ruby-readability'
+
   # You can add other ruboty plugins here for testing.
   # gem 'ruboty-echo'
   # gem 'ruboty-alias'

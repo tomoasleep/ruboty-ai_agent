@@ -20,6 +20,10 @@ module Ruboty
         #   def self.tool_input_schema=: (input_schema) -> input_schema
 
         class << self
+          def available? #: boolish
+            true
+          end
+
           # @rbs skip
           attr_accessor :tool_name
 

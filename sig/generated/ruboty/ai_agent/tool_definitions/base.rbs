@@ -24,6 +24,8 @@ module Ruboty
 
         def self.tool_input_schema=: (input_schema) -> input_schema
 
+        def self.available?: () -> boolish
+
         def tool_name: () -> String
 
         def tool_title: () -> String

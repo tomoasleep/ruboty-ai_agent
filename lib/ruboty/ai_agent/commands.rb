@@ -18,7 +18,7 @@ module Ruboty
           Commands::Clear,
           Commands::Compact,
           Commands::Usage
-        ].map { |cmd_class| cmd_class.new(request: request) }
+        ].map { |cmd_class| cmd_class.new(request:) }
       end
     end
   end

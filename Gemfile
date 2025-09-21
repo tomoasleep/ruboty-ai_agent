@@ -19,3 +19,5 @@ gem 'rubocop-rake', '~> 0.7.0'
 gem 'rubocop-rbs_inline', '~> 1.4.0'
 gem 'rubocop-rspec', '~> 3.7.0'
 gem 'steep', require: false
+
+gem 'ruby-readability'
