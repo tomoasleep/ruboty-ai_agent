@@ -25,7 +25,7 @@ RSpec.describe Ruboty::AiAgent::ChatThreadMessages do
       end
 
       it 'returns false' do
-        expect(messages.over_auto_compact_threshold?).to be false
+        expect(messages).not_to be_over_auto_compact_threshold
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe Ruboty::AiAgent::ChatThreadMessages do
       end
 
       it 'returns true' do
-        expect(messages.over_auto_compact_threshold?).to be true
+        expect(messages).to be_over_auto_compact_threshold
       end
     end
 
@@ -53,7 +53,7 @@ RSpec.describe Ruboty::AiAgent::ChatThreadMessages do
       end
 
       it 'returns false' do
-        expect(messages.over_auto_compact_threshold?).to be false
+        expect(messages).not_to be_over_auto_compact_threshold
       end
     end
   end

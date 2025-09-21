@@ -11,12 +11,15 @@ module Ruboty
         store(message, key: (keys.last.to_s.to_i || -1) + 1)
       end
 
+      def token_usage #: TokenUsage?
+        all_values.reverse_each.find(&:token_usage)&.token_usage
+      end
+
       alias << add
 
       # Check if any message's token usage exceeds auto compact threshold
-      # @rbs return: bool
-      def over_auto_compact_threshold?
-        all_values.any? { |message| message.token_usage&.over_auto_compact_threshold? }
+      def over_auto_compact_threshold? #: boolish
+        token_usage&.over_auto_compact_threshold?
       end
 
       # Compact chat messages by summarizing them

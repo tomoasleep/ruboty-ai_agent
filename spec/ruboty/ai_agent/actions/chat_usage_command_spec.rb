@@ -217,10 +217,10 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
           )
         end
 
-        it 'shows the first message with token usage found' do
+        it 'shows the last message with token usage found' do
           receive_message
 
-          expect(said_messages).to include(a_hash_including(body: 'Token usage: 200 (prompt) + 100 (completion) = 300 (total) / 128,000 (0.23%)'))
+          expect(said_messages).to include(a_hash_including(body: 'Token usage: 500 (prompt) + 300 (completion) = 800 (total) / 128,000 (0.63%)'))
         end
       end
     end

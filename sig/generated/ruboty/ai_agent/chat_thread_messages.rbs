@@ -7,11 +7,12 @@ module Ruboty
       # @rbs message: ChatMessage
       def add: (ChatMessage message) -> void
 
+      def token_usage: () -> TokenUsage?
+
       alias << add
 
       # Check if any message's token usage exceeds auto compact threshold
-      # @rbs return: bool
-      def over_auto_compact_threshold?: () -> bool
+      def over_auto_compact_threshold?: () -> boolish
 
       # Compact chat messages by summarizing them
       # @rbs llm: LLM::OpenAI

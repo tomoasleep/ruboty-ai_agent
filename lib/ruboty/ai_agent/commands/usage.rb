@@ -8,9 +8,7 @@ module Ruboty
         on(%r{/usage}, name: 'show_usage', description: 'Show token usage information for the latest AI response')
 
         def call(*) #: void
-          latest_message = chat_thread.messages.all_values.find(&:token_usage)
-
-          token_usage = latest_message&.token_usage
+          token_usage = chat_thread.messages.token_usage
 
           if token_usage
             usage_text = "Token usage: #{format_number(token_usage.prompt_tokens)} (prompt) + #{format_number(token_usage.completion_tokens)} (completion) = #{format_number(token_usage.total_tokens)} (total)"
