@@ -90,8 +90,8 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       receive_message
 
       expect(said_messages).to match([
-                                       a_hash_including(body: 'Calling tool fetch with arguments {"url":"https://example.com"}'),
-                                       a_hash_including(body: start_with('Tool response:')),
+                                       a_hash_including(body: '> Calling tool fetch with arguments {"url":"https://example.com"}'),
+                                       a_hash_including(body: start_with('> Tool response:')),
                                        a_hash_including(body: 'Fetched content.')
                                      ])
     end

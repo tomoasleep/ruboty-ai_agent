@@ -21,6 +21,10 @@ module Ruboty
         # @rbs body: String
         # @rbs return: void
         def complete_chat: (String body) -> void
+
+        def truncate: (untyped text, max: untyped) -> untyped
+
+        def indent_with_quotation: (untyped text, ?untyped quota) -> untyped
       end
     end
   end

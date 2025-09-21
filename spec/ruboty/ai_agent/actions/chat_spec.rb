@@ -196,8 +196,8 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       receive_message
 
       expect(said_messages).to match([
-                                       a_hash_including(body: 'Calling tool mcp_calc_server__calculator with arguments {"expression":"21 * 2"}'),
-                                       a_hash_including(body: 'Tool response: ["42"]'),
+                                       a_hash_including(body: '> Calling tool mcp_calc_server__calculator with arguments {"expression":"21 * 2"}'),
+                                       a_hash_including(body: '> Tool response: ["42"]'),
                                        a_hash_including(body: 'The answer is 42.')
                                      ])
     end

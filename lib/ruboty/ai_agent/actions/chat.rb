@@ -82,10 +82,10 @@ module Ruboty
 
               chat_thread.messages.compact(llm:) if chat_thread.messages.over_auto_compact_threshold?
             when :tool_call
-              message.reply("Calling tool #{event[:tool].name} with arguments #{event[:tool_arguments]&.to_json}") unless event[:tool].silent?
+              message.reply(indent_with_quotation("Calling tool #{event[:tool].name} with arguments #{truncate(event[:tool_arguments]&.to_json, max: 100)}")) unless event[:tool].silent?
             when :tool_response
               chat_thread.messages << event[:message]
-              message.reply("Tool response: #{event[:tool_response].slice(0..100)}") unless event[:tool].silent?
+              message.reply(indent_with_quotation("Tool response: #{truncate(event[:tool_response], max: 100)}")) unless event[:tool].silent?
             end
           end
         rescue StandardError => e
@@ -94,6 +94,18 @@ module Ruboty
           else
             message.reply("エラーが発生しました: #{e.message}")
           end
+        end
+
+        def truncate(text, max:)
+          if text.length > max
+            "#{text.slice(0..max)}..."
+          else
+            text
+          end
+        end
+
+        def indent_with_quotation(text, quota = '> ')
+          text.lines.map { |line| "#{quota}#{line}" }.join
         end
       end
     end

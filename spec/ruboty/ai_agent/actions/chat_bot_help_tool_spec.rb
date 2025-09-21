@@ -75,8 +75,8 @@ RSpec.describe Ruboty::AiAgent::Actions::Chat do
       receive_message
 
       expect(said_messages).to match([
-                                       a_hash_including(body: 'Calling tool bot_help with arguments {}'),
-                                       a_hash_including(body: start_with('Tool response: ruboty')),
+                                       a_hash_including(body: '> Calling tool bot_help with arguments {}'),
+                                       a_hash_including(body: start_with('> Tool response: ruboty')),
                                        a_hash_including(body: 'Yes.')
                                      ])
     end
