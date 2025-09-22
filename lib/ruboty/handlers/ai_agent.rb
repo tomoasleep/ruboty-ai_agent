@@ -9,6 +9,9 @@ module Ruboty
       env :OPENAI_API_KEY, 'Pass your OpenAI API Key'
       env :OPENAI_MODEL, 'OpenAI model to use', optional: true
 
+      env :AI_AGENT_MAX_TOKENS, 'Max tokens for AI requests (For OpenAI Models, the default value is automatically decided)', optional: true
+      env :AI_AGENT_AUTO_COMPACT_THRESHOLD, 'Threshold of token usage in percentage to auto compact AI memory (default: 90)', optional: true
+
       on(
         /(?<body>.+)/m,
         description: 'AI responds to your message if given message did not match any other handlers',

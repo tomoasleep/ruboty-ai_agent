@@ -5,5 +5,7 @@ module Ruboty
   module AiAgent
     class Error < StandardError
     end
+
+    extend Settings::Accessor
   end
 end

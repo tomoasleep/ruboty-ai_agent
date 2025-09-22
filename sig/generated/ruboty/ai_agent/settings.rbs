@@ -1,0 +1,21 @@
+# Generated from lib/ruboty/ai_agent/settings.rb with RBS::Inline
+
+module Ruboty
+  module AiAgent
+    # Provide library-wide settings.
+    class Settings
+      # Provide access to settings instance.
+      module Accessor
+        def settings: () -> Ruboty::AiAgent::Settings
+      end
+
+      # @rbs %a{memorized}
+      %a{memorized}
+      def self.instance: () -> Ruboty::AiAgent::Settings
+
+      def max_tokens: () -> Integer?
+
+      def auto_compact_threshold: () -> Float
+    end
+  end
+end

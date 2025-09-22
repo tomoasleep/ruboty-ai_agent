@@ -40,7 +40,7 @@ require 'fileutils'
 # Generate RBS instance variable definitions for memorized methods
 class MemorizedIvarRbsGenerator
   Source = Data.define(:file, :content, :prism_node)
-  MemorizedMethod = Data.define(:class_name, :method_name, :ivar_name, :return_type, :file)
+  MemorizedMethod = Data.define(:class_name, :method_name, :ivar_name, :return_type, :file, :is_class_ivar)
 
   def initialize(lib_path: 'lib', output_path: 'sig/generated-by-scripts', namespace_filter: nil)
     @lib_path = Pathname(lib_path)
@@ -58,7 +58,8 @@ class MemorizedIvarRbsGenerator
 
     puts "Found #{memorized_methods.size} memorized methods:"
     memorized_methods.each do |method|
-      puts "  - #{method.class_name}##{method.method_name} -> @#{method.ivar_name}: #{method.return_type}"
+      prefix = method.is_class_ivar ? '.' : '#'
+      puts "  - #{method.class_name}#{prefix}#{method.method_name} -> @#{method.ivar_name}: #{method.return_type}"
     end
 
     generate_rbs_files(memorized_methods)
@@ -108,8 +109,18 @@ class MemorizedIvarRbsGenerator
       # Class declaration with instance variables
       content << (('  ' * indent_level) + "class #{parts.last}")
 
-      methods.each do |method|
+      # Separate instance variables and class instance variables
+      instance_methods = methods.reject(&:is_class_ivar)
+      class_methods = methods.select(&:is_class_ivar)
+
+      # Add instance variables
+      instance_methods.each do |method|
         content << (('  ' * (indent_level + 1)) + "@#{method.ivar_name}: #{method.return_type}")
+      end
+
+      # Add class instance variables (using self.@variable_name notation)
+      class_methods.each do |method|
+        content << (('  ' * (indent_level + 1)) + "self.@#{method.ivar_name}: #{method.return_type}")
       end
 
       content << "#{'  ' * indent_level}end"
@@ -138,6 +149,7 @@ class MemorizedIvarRbsGenerator
       @memorized_methods = []
       @namespace = []
       @current_class = nil
+      @in_singleton_class = false
       super()
     end
 
@@ -157,11 +169,21 @@ class MemorizedIvarRbsGenerator
       end
     end
 
+    def visit_singleton_class_node(node)
+      old_singleton = @in_singleton_class
+      @in_singleton_class = true
+      super
+      @in_singleton_class = old_singleton
+    end
+
     def visit_def_node(node)
       return unless @current_class
 
       # Skip if namespace filter is set and doesn't match
       return if @namespace_filter && !@current_class.start_with?(@namespace_filter)
+
+      # Check if it's a class method (def self.method_name)
+      is_class_method = node.receiver&.is_a?(Prism::SelfNode)
 
       # Check for memorized annotation
       if memorized_annotated?(node)
@@ -176,7 +198,8 @@ class MemorizedIvarRbsGenerator
             method_name: method_name,
             ivar_name: ivar_info[:ivar_name],
             return_type: ivar_info[:return_type],
-            file: source.file
+            file: source.file,
+            is_class_ivar: @in_singleton_class || is_class_method
           )
         end
       end

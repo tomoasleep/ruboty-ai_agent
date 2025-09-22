@@ -19,7 +19,7 @@ module Ruboty
             if name.include?('gpt-5')
               400_000
             else
-              128_000
+              AiAgent.settings.max_tokens || 128_000
             end
           end
         end

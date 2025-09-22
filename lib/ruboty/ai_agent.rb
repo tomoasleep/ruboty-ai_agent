@@ -29,6 +29,7 @@ module Ruboty
     autoload :Recordable, 'ruboty/ai_agent/recordable'
     autoload :RecordSet, 'ruboty/ai_agent/record_set'
     autoload :Request, 'ruboty/ai_agent/request'
+    autoload :Settings, 'ruboty/ai_agent/settings'
     autoload :TokenUsage, 'ruboty/ai_agent/token_usage'
     autoload :Tool, 'ruboty/ai_agent/tool'
     autoload :ToolDefinitions, 'ruboty/ai_agent/tool_definitions'
@@ -40,6 +41,8 @@ module Ruboty
     autoload :UserMcpConfigurations, 'ruboty/ai_agent/user_mcp_configurations'
     autoload :UserMcpToolsCaches, 'ruboty/ai_agent/user_mcp_tools_caches'
     autoload :UserPromptCommandDefinitions, 'ruboty/ai_agent/user_prompt_command_definitions'
+
+    extend Settings::Accessor
 
     # Ensure all recordables are loaded
     [
