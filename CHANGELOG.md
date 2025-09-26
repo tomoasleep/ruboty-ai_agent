@@ -1,4 +1,5 @@
 ## Unreleased
+## 0.4.0
 
 - Add `bot_help` builtin tool to retrieve Ruboty's help information.
 - Add `fetch` builtin tool for fetching web content.
