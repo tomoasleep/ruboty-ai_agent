@@ -1,4 +1,10 @@
 ## Unreleased
+
+- Add `bot_help` builtin tool to retrieve Ruboty's help information.
+- Add `fetch` builtin tool for fetching web content.
+- Fix `/usage` command to show token usage of last message.
+- Format tool call logs for better readability.
+
 ## 0.3.0
 
 - Add think tool.
